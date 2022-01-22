@@ -11,22 +11,26 @@ header div {
   height: 100%;
 }
 
-.logo h1 {
-  font-size: 50px;
-  font-weight: 1000;
-}
-
 .logo {
   height: 100%;
   display: flex;
   align-items: center;
+  text-decoration: none;
+  color: black;
 }
 
 .logo:hover {
+  color: black;
   cursor: pointer;
 }
 
-.logo-icon {
+.logo__text {
+  font-size: 50px;
+  font-weight: 1000;
+  color: black;
+}
+
+.logo__icon {
   height: 80%;
 }
 
@@ -40,12 +44,10 @@ header div {
   width: 80%;
   height: 40px;
   padding-left: 10px;
-
   border: 3px solid #00b4cc;
   border-right: none;
   outline: none;
   border-radius: 5px 0 0 5px;
-
   font-size: 1.2rem;
   color: #202020;
   font-weight: 500;
