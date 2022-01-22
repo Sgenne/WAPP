@@ -53,26 +53,7 @@ header div {
   font-weight: 500;
 }
 
-.header-btn {
-  font-size: 1.2rem;
-  font-weight: 500;
-  border: 1px solid #00b4cc;
-  background: #00b4cc;
-  color: #ffffff;
-  text-align: center;
-  cursor: pointer;
-  font-size: 20px;
-  height: 40px;
-  border-radius: 5px;
-  padding: 5px;
-  transition: background-color 200ms ease-in-out;
-}
-
-.header-btn:hover {
-  background-color: #009fb4;
-}
-
-.search-btn {
+.search-button {
   width: 40px;
   border-radius: 0 5px 5px 0;
 }
