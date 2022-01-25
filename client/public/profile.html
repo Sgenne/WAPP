@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="resources/css/profile.css" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+
+    <div class="wholePage">
+        <button class="openInfo" data-bs-toggle="collapse" data-bs-target="#demo">
+            <div class="row">
+                <div class="col-sm-4"></div>
+                <div class="col-sm-4">
+                    Personal info
+                </div>
+                <div class="col-sm-3"></div>
+                <div class="col-sm-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                        class="bi bi-arrow-down" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z" />
+                    </svg>
+                </div>
+            </div>
+
+        </button>
+        <div id="demo" class="collapse">
+            <form>
+                <div class="form-group">
+                  <label for="exampleInputEmail1">Email address</label>
+                  <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="old mail display">
+                </div>
+                <div class="form-group">
+                  <label for="exampleInputPassword1">New password</label>
+                  <input type="password" class="form-control" id="exampleInputPassword1" placeholder="New password">
+                </div>
+                <div class="form-group required">
+                    <label for="exampleInputPassword1" class="control-label">Old Password</label>
+                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Old password" required>
+                  </div>
+                <button type="submit" class="btn btn-primary">Change settings</button>
+              </form>
+        </div>
+
+        <button class="openInfo" data-bs-toggle="collapse" data-bs-target="#demo2">
+            <div class="row">
+                <div class="col-sm-4"></div>
+                <div class="col-sm-4">
+                    Account info
+                </div>
+                <div class="col-sm-3"></div>
+                <div class="col-sm-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                        class="bi bi-arrow-down" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z" />
+                    </svg>
+                </div>
+            </div>
+
+        </button>
+        <div id="demo2" class="collapse">
+            <form>
+                <div class="form-group">
+                  <label>Username</label>
+                  <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="usernameHelp" placeholder="old username display">
+                </div>
+                <div class="form-group">
+                  <label>Number of posts</label>
+                  <input type="text" class="form-control noChange" id="exampleInputPassword1" placeholder="number of posts" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Number of comments</label>
+                    <input type="text" class="form-control noChange" id="exampleInputPassword1" placeholder="number of comments" disabled>
+                  </div>
+                  <div class="form-group required">
+                    <label for="exampleInputPassword1" class="control-label">Old Password</label>
+                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Old password" required>
+                  </div>
+                <button type="submit" class="btn btn-primary">Change settings</button>
+              </form>
+        </div>
+
+        <button class="openInfo" data-bs-toggle="collapse" data-bs-target="#demo3">
+            <div class="row">
+                <div class="col-sm-4"></div>
+                <div class="col-sm-4">
+                    Thread history
+                </div>
+                <div class="col-sm-3"></div>
+                <div class="col-sm-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                        class="bi bi-arrow-down" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z" />
+                    </svg>
+                </div>
+            </div>
+
+        </button>
+        <div id="demo3" class="collapse">
+            some div with info
+        </div>
+    </div>
+
+
+</body>
+
+</html>
