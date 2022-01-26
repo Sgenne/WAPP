@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="resources/css/button.css" />
     <link rel="stylesheet" href="resources/css/index.css" />
     <link rel="stylesheet" href="resources/css/header.css" />
+    <link rel="stylesheet" href="resources/css/login.css" />
 
     <!-- Bootstrap -->
     <link
@@ -22,6 +23,38 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     />
   </head>
+
+  <!-- Lightbox -->
+  <div class="lightbox__background">
+    <div class="lightbox__content">
+      <button class="lighbox__close-button button button--transparent">
+        <a href="index.html">
+          <i class="fa fa-times-circle"></i>
+        </a>
+      </button>
+      <div class="lightbox__input-container">
+        <input
+          class="lightbox__input"
+          name="username"
+          type="text"
+          placeholder="Username:"
+        />
+      </div>
+      <div class="lightbox__input-container">
+        <input
+          class="lightbox__input"
+          name="password"
+          type="password"
+          placeholder="Password:"
+        />
+      </div>
+      <button class="button button--blue">Sign In</button>
+      <p class="lightbox__register">
+        Don't have an account? <a href="#">Register here.</a>
+      </p>
+    </div>
+  </div>
+
   <body>
     <header class="container-fluid">
       <div class="row">
@@ -43,26 +76,24 @@
         </div>
         <!-- Log in -->
         <div class="sign-in-section col-lg-2 d-none d-lg-flex">
-          <button class="button button--blue">
-            <a href="login.html"> Sign-in </a>
-          </button>
+          <button class="button button--blue">Sign-in</button>
           <button class="button button--blue">Register</button>
         </div>
       </div>
     </header>
 
-    <ul class="category-list" >
+    <ul class="category-list">
       <li>
         <div class="category-box container-fluid px-4">
           <div class="row">
             <h3 class="col-11">
               <a href="category.html" class="link"> Category1 Title </a>
             </h3>
-            <button class="button button--grey col-1" data-bs-toggle="collapse" data-bs-target="#collapseCat">
+            <button class="button button--grey col-1">
               <i class="fa fa-arrow-down"></i>
             </button>
           </div>
-          <div class="row mt-2 collapse" id="collapseCat">
+          <div class="row mt-2">
             <p class="col-12 col-lg-3">
               Category1 Description. On the road again Just can't wait to get on
               the road again The life I love is making music with my friends And
@@ -112,11 +143,11 @@
             <h3 class="col-11">
               <a href="category.html" class="link"> Category2 Title </a>
             </h3>
-            <button class="button button--grey col-1" data-bs-toggle="collapse" data-bs-target="#collapseCat2">
+            <button class="button button--grey col-1">
               <i class="fa fa-arrow-down"></i>
             </button>
           </div>
-          <div class="row mt-2 collapse" id="collapseCat2">
+          <div class="row mt-2">
             <p class="col-12 col-lg-3">
               Category2 Description. Lorem, ipsum dolor sit amet consectetur
               adipisicing elit. Similique itaque id expedita consequatur
@@ -168,11 +199,11 @@
             <h3 class="col-11">
               <a href="category.html" class="link"> Category3 Title </a>
             </h3>
-            <button class="button button--grey col-1" data-bs-toggle="collapse" data-bs-target="#collapseCat3">
+            <button class="button button--grey col-1">
               <i class="fa fa-arrow-down"></i>
             </button>
           </div>
-          <div class="row mt-2 collapse" id="collapseCat3">
+          <div class="row mt-2">
             <p class="col-12 col-lg-3">
               Category3 Description. Lorem ipsum dolor sit amet consectetur
               adipisicing elit. Ab, non cumque. Fuga vitae incidunt corrupti
