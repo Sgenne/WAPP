@@ -1,6 +1,9 @@
     .wholePage {
       max-width: 1000px;
-      margin: auto;
+      margin: 6rem auto;
+  padding: 1%;
+      font-size: 1.1em;
+      background-color: #70b4c1;
     }
 
    .openInfo{
@@ -8,7 +11,11 @@
        height: 100px;
        border: none;
     margin-top: 50px;
-    font-size: 1.7em;
+    font-size: 1.5em;
+   }
+
+   .form-group{
+     margin-bottom: 20px;
    }
 
    .form-group.required .control-label:after {
