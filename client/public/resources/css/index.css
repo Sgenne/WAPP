@@ -7,6 +7,7 @@ a:visited:hover {
 }
 
 .category-list {
+  max-width: 1000px;
   background-color: #70b4c1;
   border-radius: 5px;
   list-style: none;
