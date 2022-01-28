@@ -68,6 +68,9 @@ a:visited:hover {
   width: 20%;
   display: inline-block;
   margin-top: 0%;
+  margin-right: 2%;
+  height: 10em;
+  float: left;
 }
 
 #editbox {
@@ -89,4 +92,14 @@ a:visited:hover {
   width: 90%;
   margin: 1% 5%;
   height: 20em;
+}
+
+#subThread {
+  margin: 1% 5%;
+}
+
+#submitbut {
+  /*border: 2px solid red;*/
+  display: flex;
+  justify-content: flex-end;
 }
