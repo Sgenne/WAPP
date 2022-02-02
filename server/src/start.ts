@@ -1,9 +1,6 @@
 import express, { Request, Response } from "express";
-
+import { userRouter } from "./router/user.router";
 export const app = express();
-
-app.get("/", (req: Request, res: Response) => {
-  res.status(200).json({ message: "Hello" });
-});
-
 app.use(express.json());
+
+app.use("/user", userRouter);
