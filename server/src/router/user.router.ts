@@ -35,10 +35,10 @@ userRouter.post("/sign-in", async (req: Request, res: Response) => {
     return;
   }
 
-  const success = await userServices.signIn(username, password);
+  const result = await userServices.signIn(username, password);
 
-  if (!success) {
-    return res.status(401).send({ message: "Could not sign in." });
+  if (result.statusCode !== 200) {
+    return res.status(result.statusCode).send({ message: result.message });
   }
 
   res.status(200).send({ message: "Signed in successfully." });
@@ -66,17 +66,16 @@ userRouter.put(
       image: image,
     };
 
-    const user = await userServices.editUserInformation(partialUser);
+    const result = await userServices.editUserInformation(partialUser);
 
-    if (!user) {
-      return res
-        .status(500)
-        .send({ message: "Could not update user information." });
+    if (result.statusCode !== 200) {
+      return res.status(result.statusCode).send({ message: result.message });
     }
 
-    res
-      .status(200)
-      .send({ message: "User information updated successfully.", user: user });
+    res.status(200).send({
+      message: "User information updated successfully.",
+      user: result.user,
+    });
   }
 );
 
@@ -98,8 +97,8 @@ userRouter.get("/:username", async (req: Request, res: Response) => {
 
   const result = await userServices.getUser(username);
 
-  if (result.statusCode === 404) {
-    return res.status(404).send({ message: result.message });
+  if (result.statusCode !== 200) {
+    return res.status(result.statusCode).send({ message: result.message });
   }
 
   res.status(200).send({ message: result.message, user: result.user });
@@ -137,11 +136,9 @@ userRouter.put(
       return res.status(result.statusCode).send({ message: result.message });
     }
 
-    res
-      .status(200)
-      .send({
-        message: "Preferences updated successfully.",
-        user: result.user,
-      });
+    res.status(200).send({
+      message: "Preferences updated successfully.",
+      user: result.user,
+    });
   }
 );

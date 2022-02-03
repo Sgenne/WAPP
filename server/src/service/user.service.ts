@@ -10,54 +10,64 @@ interface PartialUser {
   image?: any;
 }
 
-export const editUserInformation = async (partialUser: PartialUser) => {
-  const currentUser = users[partialUser.username];
-  if (!currentUser) {
-    console.log("No user found!");
-    return;
+export const editUserInformation = async (
+  partialUser: PartialUser
+): Promise<{ message: string; statusCode: number; user?: User }> => {
+  // Todo: check that password is correct before editing user.
+  const existingUser = users[partialUser.username];
+  if (!existingUser) {
+    return { statusCode: 404, message: "User not found." };
   }
   if (partialUser.birthDate) {
     if (validBirthDate(partialUser.birthDate)) {
-      currentUser["birthDate"] = partialUser.birthDate;
+      existingUser["birthDate"] = partialUser.birthDate;
     }
   }
   if (partialUser.bio) {
     if (validBio(partialUser.bio)) {
-      currentUser["bio"] = partialUser.bio;
+      existingUser["bio"] = partialUser.bio;
     }
   }
   if (partialUser.password) {
     if (validPassword(partialUser.password)) {
-      currentUser["passwordHash"] = await hashingPassword(partialUser.password);
+      existingUser["passwordHash"] = await hashPassword(partialUser.password);
     }
   }
   if (partialUser.image) {
     if (validImage(partialUser.image)) {
-      currentUser["image"] = partialUser.image;
+      existingUser["image"] = partialUser.image;
     }
   }
-  return currentUser;
+  return {
+    statusCode: 200,
+    message: "User updated successfully",
+    user: existingUser,
+  };
 };
 
 export const signIn = async (
   username: string,
   password: string
-): Promise<boolean> => {
-  const returnedUser = users[username];
-  if (returnedUser) {
-    const verifiedPassword = await bcrypt.compare(
-      password,
-      returnedUser.passwordHash
-    );
-    if (!verifiedPassword) {
-      console.log("False! Pepega");
-      return false;
-    }
-    console.log("Logged in! Poggers");
-    return true;
+): Promise<{ message: string; statusCode: number; user?: User }> => {
+  const existingUser = users[username];
+
+  if (!existingUser) {
+    return { statusCode: 404, message: "User not found." };
   }
-  console.log("User not found!");
-  return false;
+
+  const passwordIsValid = await bcrypt.compare(
+    password,
+    existingUser.passwordHash
+  );
+  if (!passwordIsValid) {
+    return { statusCode: 401, message: "The given password was invalid." };
+  }
+
+  return {
+    statusCode: 200,
+    message: "The user was signed in successfully.",
+    user: existingUser,
+  };
 };
 
 export const register = async (
@@ -65,40 +75,47 @@ export const register = async (
   username: string,
   password: string,
   birthDate: Date
-) => {
+): Promise<{ message: string; statusCode: number; user?: User }> => {
   if (
-    validEmail(email) &&
+    !validEmail(email) &&
     validusername(username) &&
     validPassword(password) &&
     validBirthDate(birthDate)
   ) {
-    if (users[username]) {
-      //User already exists
-      console.log("user already exists");
-      return;
-    }
-    const passwordHash = await hashingPassword(password);
-    const newUser = {
-      email,
-      username,
-      passwordHash,
-      birthDate,
-      likedThreads: [],
-      unlikedThreads: [],
-      joinDate: new Date(),
-      visibleProperties: {
-        email: true,
-        joinDate: true,
-        birthDate: true,
-        bio: true,
-        image: true,
-        likedThreads: true,
-        unlikedThreads: true,
-      },
-    };
-    users[username] = newUser;
-    return newUser;
+    return { statusCode: 400, message: "Invalid input" };
   }
+  if (users[username]) {
+    return {
+      statusCode: 403,
+      message: "A user with the given username already exists.",
+    };
+  }
+
+  const passwordHash = await hashPassword(password);
+  const newUser = {
+    email,
+    username,
+    passwordHash,
+    birthDate,
+    likedThreads: [],
+    unlikedThreads: [],
+    joinDate: new Date(),
+    visibleProperties: {
+      email: true,
+      joinDate: true,
+      birthDate: true,
+      bio: true,
+      image: true,
+      likedThreads: true,
+      unlikedThreads: true,
+    },
+  };
+  users[username] = newUser;
+  return {
+    statusCode: 201,
+    message: "The new user was created successfully.",
+    user: newUser,
+  };
 };
 
 export const deleteUser = async (
@@ -201,7 +218,7 @@ const validBirthDate = (date: Date): boolean => {
 const validBio = (bio: string): boolean => {
   return false;
 };
-const hashingPassword = async (password: string): Promise<string> => {
+const hashPassword = async (password: string): Promise<string> => {
   const salt = await bcrypt.genSalt();
   const hashed = await bcrypt.hash(password, salt);
   return hashed;
