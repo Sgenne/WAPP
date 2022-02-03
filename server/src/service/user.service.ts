@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 
 const users: { [key: string]: User } = {};
 interface PartialUser {
-  userName: string;
+  username: string;
   birthDate?: Date;
   bio?: string;
   password?: string;
@@ -11,7 +11,7 @@ interface PartialUser {
 }
 
 export const editUserInformation = async (partialUser: PartialUser) => {
-  const currentUser = users[partialUser.userName];
+  const currentUser = users[partialUser.username];
   if (!currentUser) {
     console.log("No user found!");
     return;
@@ -40,10 +40,10 @@ export const editUserInformation = async (partialUser: PartialUser) => {
 };
 
 export const signIn = async (
-  userName: string,
+  username: string,
   password: string
 ): Promise<boolean> => {
-  const returnedUser = users[userName];
+  const returnedUser = users[username];
   if (returnedUser) {
     const verifiedPassword = await bcrypt.compare(
       password,
@@ -62,17 +62,17 @@ export const signIn = async (
 
 export const register = async (
   email: string,
-  userName: string,
+  username: string,
   password: string,
   birthDate: Date
 ) => {
   if (
     validEmail(email) &&
-    validUserName(userName) &&
+    validusername(username) &&
     validPassword(password) &&
     validBirthDate(birthDate)
   ) {
-    if (users[userName]) {
+    if (users[username]) {
       //User already exists
       console.log("user already exists");
       return;
@@ -80,16 +80,104 @@ export const register = async (
     const passwordHash = await hashingPassword(password);
     const newUser = {
       email,
-      userName,
+      username,
       passwordHash,
       birthDate,
       likedThreads: [],
       unlikedThreads: [],
       joinDate: new Date(),
+      visibleProperties: {
+        email: true,
+        joinDate: true,
+        birthDate: true,
+        bio: true,
+        image: true,
+        likedThreads: true,
+        unlikedThreads: true,
+      },
     };
-    users[userName] = newUser;
+    users[username] = newUser;
     return newUser;
   }
+};
+
+export const deleteUser = async (
+  username: string,
+  password: string
+): Promise<{ statusCode: number; message: string }> => {
+  const existingUser = users[username];
+
+  if (!existingUser) {
+    return { statusCode: 404, message: "user not found." };
+  }
+
+  const passwordIsValid = await bcrypt.compare(
+    password,
+    existingUser.passwordHash
+  );
+
+  if (!passwordIsValid) {
+    return { statusCode: 401, message: "The given was invalid." };
+  }
+
+  delete users[username];
+
+  return { statusCode: 200, message: "User was deleted successfully." };
+};
+
+export const getUser = async (
+  username: string
+): Promise<{ statusCode: number; message: string; user?: User }> => {
+  const existingUser = users[username];
+
+  if (!existingUser) {
+    return { statusCode: 404, message: "user not found." };
+  }
+
+  const exposedUser = { ...existingUser, passwordHash: "" };
+
+  return {
+    statusCode: 200,
+    message: "User fetched successfully.",
+    user: exposedUser,
+  };
+};
+
+export const setVisibleProperties = async (
+  username: string,
+  password: string,
+  options: {
+    email: boolean;
+    joinDate: boolean;
+    birthDate: boolean;
+    bio: boolean;
+    image: boolean;
+    likedThreads: boolean;
+    unlikedThreads: boolean;
+  }
+): Promise<{ statusCode: number; message: string; user?: User }> => {
+  const existingUser = users[username];
+
+  if (!existingUser) {
+    return { statusCode: 404, message: "User not found." };
+  }
+
+  const passwordIsValid = await bcrypt.compare(
+    password,
+    existingUser.passwordHash
+  );
+
+  if (!passwordIsValid) {
+    return { statusCode: 401, message: "Invalid password." };
+  }
+
+  existingUser.visibleProperties = options;
+
+  return {
+    statusCode: 200,
+    message: "Visible properties updated successfully.",
+    user: existingUser,
+  };
 };
 
 const validEmail = (email: string): boolean => {
@@ -98,7 +186,7 @@ const validEmail = (email: string): boolean => {
 const validImage = (image: any): boolean => {
   return false;
 };
-const validUserName = (userName: string): boolean => {
+const validusername = (username: string): boolean => {
   return false;
 };
 

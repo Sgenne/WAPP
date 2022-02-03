@@ -1,11 +1,22 @@
 export interface User {
-    userName: string;
-    email: string;
-    joinDate: Date;
-    birthDate: Date;
-    bio?: string;
-    passwordHash: string;
-    image?: any;
-    likedThreads: any[]; //Threads type later
-    unlikedThreads: any[];
+  username: string;
+  email: string;
+  joinDate: Date;
+  birthDate: Date;
+  bio?: string;
+  passwordHash: string;
+  image?: any;
+  likedThreads: any[]; //Threads type later
+  unlikedThreads: any[];
+
+  // Determines which properties are visible on the profile page.
+  visibleProperties: {
+    email: boolean;
+    joinDate: boolean;
+    birthDate: boolean;
+    bio: boolean;
+    image: boolean;
+    likedThreads: boolean;
+    unlikedThreads: boolean;
+  };
 }
