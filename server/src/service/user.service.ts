@@ -1,8 +1,37 @@
 import { User } from "../model/user.interface";
 import bcrypt from "bcryptjs";
 
-// Temporary in-memory store.
+/**
+ * Temporary in-memory store.
+ */
 const users: { [key: string]: User } = {};
+
+/**
+ * The result of a user service.
+ */
+interface UserServiceResult {
+  /*
+    (Eftersom alla services returnar samma sak så tyckte jag det var snyggt att
+    göra ett interface som beskriver alla properties i detalj.
+    Säg till om ni inte håller med 🦤)
+  */
+
+  /**
+   * An HTTP status code describing the result of the attempted operation.
+   */
+  statusCode: number;
+
+  /**
+   * A message describing the result of the attempted operation.
+   */
+  message: string;
+
+  /**
+   * The user that the attempted service acted upon, in the case that the operation was
+   * successfull.
+   */
+  user?: User;
+}
 
 interface PartialUser {
   username: string;
@@ -18,12 +47,11 @@ interface PartialUser {
  * @param partialUser - An object whose birthDate, bio, password, and image
  * properties will, if defined, be used to updated the user.
  *
- * @returns An object containing information about if the service succeeded
- * and the updated user if one was updated.
+ * @returns A UserServiceResult object.
  */
 export const editUserInformation = async (
   partialUser: PartialUser
-): Promise<{ message: string; statusCode: number; user?: User }> => {
+): Promise<UserServiceResult> => {
   /* 
     Todo: check that password is correct before editing user.
     Needs to take the password as a separate argument since we
@@ -69,15 +97,13 @@ export const editUserInformation = async (
  *
  * @param password - The password to use when signing the user in.
  *
- * @returns An object indicating the success of the attempted
- * sign-in. If successfull, then the object will contain the user object
- * of the signed in user.
+ * @returns A UserServiceResult object.
  *
  */
 export const signIn = async (
   username: string,
   password: string
-): Promise<{ message: string; statusCode: number; user?: User }> => {
+): Promise<UserServiceResult> => {
   const existingUser = users[username];
 
   if (!existingUser) {
@@ -110,15 +136,14 @@ export const signIn = async (
  *
  * @param birthDate - The date of birth of the new user.
  *
- * @returns An object indicating success of the service.
- * If the new user was registered, then the object will
+ * @returns A UserServiceResult object.
  */
 export const register = async (
   email: string,
   username: string,
   password: string,
   birthDate: Date
-): Promise<{ message: string; statusCode: number; user?: User }> => {
+): Promise<UserServiceResult> => {
   if (
     !validEmail(email) &&
     validusername(username) &&
@@ -168,12 +193,12 @@ export const register = async (
  *
  * @param password - The password of the user to delete.
  *
- * @returns An object containing the result of the attempted service.
+ * @returns A UserServiceResult object.
  */
 export const deleteUser = async (
   username: string,
   password: string
-): Promise<{ statusCode: number; message: string }> => {
+): Promise<UserServiceResult> => {
   const existingUser = users[username];
 
   if (!existingUser) {
@@ -197,9 +222,7 @@ export const deleteUser = async (
 /**
  * Returns the user object of the user with the given username, if one exists.
  */
-export const getUser = async (
-  username: string
-): Promise<{ statusCode: number; message: string; user?: User }> => {
+export const getUser = async (username: string): Promise<UserServiceResult> => {
   const existingUser = users[username];
 
   if (!existingUser) {
@@ -224,7 +247,7 @@ export const getUser = async (
  *
  * @param options  - An object describing which of the users properties should be visible.
  *
- * @returns An object containing the result of the attempted service.
+ * @returns A UserServiceResult object.
  */
 export const setVisibleProperties = async (
   username: string,
@@ -238,7 +261,7 @@ export const setVisibleProperties = async (
     likedThreads: boolean;
     unlikedThreads: boolean;
   }
-): Promise<{ statusCode: number; message: string; user?: User }> => {
+): Promise<UserServiceResult> => {
   const existingUser = users[username];
 
   if (!existingUser) {
