@@ -1,3 +1,5 @@
+import { Thread } from "./thread.interface";
+
 export interface User {
   username: string;
   email: string;
