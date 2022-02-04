@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 const users: { [key: string]: User } = {};
 interface PartialUser {
   username: string;
-  birthDate?: Date;
+  birthDate?: any;
   bio?: string;
   password?: string;
   image?: any;
@@ -14,7 +14,14 @@ export const editUserInformation = async (
   partialUser: PartialUser
 ): Promise<{ message: string; statusCode: number; user?: User }> => {
   // Todo: check that password is correct before editing user.
+
+  console.log("partialUser: ", partialUser);
+
   const existingUser = users[partialUser.username];
+  
+  console.log("existingUser: ")
+
+
   if (!existingUser) {
     return { statusCode: 404, message: "User not found." };
   }
@@ -198,25 +205,25 @@ export const setVisibleProperties = async (
 };
 
 const validEmail = (email: string): boolean => {
-  return false;
+  return true;
 };
 const validImage = (image: any): boolean => {
-  return false;
+  return true;
 };
 const validusername = (username: string): boolean => {
-  return false;
+  return true;
 };
 
 const validPassword = (password: string): boolean => {
-  return false;
+  return true;
 };
 
 const validBirthDate = (date: Date): boolean => {
-  return false;
+  return true;
 };
 
 const validBio = (bio: string): boolean => {
-  return false;
+  return true;
 };
 const hashPassword = async (password: string): Promise<string> => {
   const salt = await bcrypt.genSalt();

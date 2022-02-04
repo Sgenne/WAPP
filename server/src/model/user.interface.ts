@@ -2,7 +2,7 @@ export interface User {
   username: string;
   email: string;
   joinDate: Date;
-  birthDate: Date;
+  birthDate: any;
   bio?: string;
   passwordHash: string;
   image?: any;

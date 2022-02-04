@@ -7,23 +7,29 @@ userRouter.post("/register", async (req: Request, res: Response) => {
   const email = req.body.email;
   const username = req.body.username;
   const password = req.body.password;
-  const birthDate = req.body.birthDate;
-  if (!(email && username && password && birthDate)) {
+  // If no date is given, set birthDateParam to the current date. Just for testing
+  const birthDateParam = req.body.birthDate || new Date().toISOString();
+  if (!(email && username && password && birthDateParam)) {
     res.status(400).send({ message: "Invalid input" });
     return;
   }
 
-  const newUser = await userServices.register(
+  const birthDate = new Date(birthDateParam);
+
+  const result = await userServices.register(
     email,
     username,
     password,
     birthDate
   );
-  if (!newUser) {
-    res.status(500).send({ message: "Server error" });
+  if (result.statusCode !== 201) {
+    res.status(result.statusCode).send({ message: result.message });
     return;
   }
-  res.status(201).send({ message: "Created user", user: newUser });
+  res.status(201).send({
+    message: "The new user was created successfully",
+    user: result.user,
+  });
 });
 
 userRouter.post("/sign-in", async (req: Request, res: Response) => {
@@ -41,7 +47,9 @@ userRouter.post("/sign-in", async (req: Request, res: Response) => {
     return res.status(result.statusCode).send({ message: result.message });
   }
 
-  res.status(200).send({ message: "Signed in successfully." });
+  res
+    .status(200)
+    .send({ message: "Signed in successfully.", user: result.user });
 });
 
 userRouter.put(
@@ -112,13 +120,13 @@ userRouter.put(
     const password = req.body.password;
     if (
       !(
-        options.email &&
-        options.joinDate &&
-        options.birthDate &&
-        options.bio &&
-        options.image &&
-        options.likedThreads &&
-        options.dislikedThreads &&
+        typeof options.email !== "undefined" &&
+        typeof options.joinDate !== "undefined"&&
+        typeof options.birthDate !== "undefined"&&
+        typeof options.bio !== "undefined"&&
+        typeof options.image !== "undefined"&&
+        typeof options.likedThreads !== "undefined"&&
+        typeof options.dislikedThreads !== "undefined"&&
         username &&
         password
       )
