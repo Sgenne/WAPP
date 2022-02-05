@@ -1,16 +1,20 @@
-import { register, signIn } from "../user.service";
+import { updateUser, register, signIn, users } from "../user.service";
 
 const dummyUsername = "¯_(ツ)_/¯";
 const dummyPassword = "password";
 const dummyEmail = "email@email.com";
 const dummyDateOfBirth = new Date(1972, 11, 10);
 
-test("Sign in fails if no user with the given username exists.", async () => {
-  const result = await signIn(dummyUsername, dummyPassword);
+// Clear users before each test.
+beforeEach(async () =>
+  Object.keys(users).forEach((username) => delete users[username])
+);
 
-  expect(result.user).toBeUndefined;
-  expect(result.statusCode).toBe(404);
-});
+/*
+================================
+signIn
+================================
+*/
 
 test("Sign in succeeds if the correct username and password is provided.", async () => {
   await register(dummyEmail, dummyUsername, dummyPassword, dummyDateOfBirth);
@@ -24,6 +28,13 @@ test("Sign in succeeds if the correct username and password is provided.", async
   expect(result.statusCode).toBe(200);
 });
 
+test("Sign in fails if no user with the given username exists.", async () => {
+  const result = await signIn(dummyUsername, dummyPassword);
+
+  expect(result.user).toBeUndefined;
+  expect(result.statusCode).toBe(404);
+});
+
 test("Sign in fails if the username exists but the password is incorrect.", async () => {
   await register(dummyEmail, dummyUsername, dummyPassword, dummyDateOfBirth);
 
@@ -33,3 +44,76 @@ test("Sign in fails if the username exists but the password is incorrect.", asyn
   expect(result.statusCode).toBe(401);
 });
 
+/*
+================================
+updateUser
+================================
+*/
+
+test("Editing an existing user with the correct password succeeds.", async () => {
+  await register(dummyEmail, dummyUsername, dummyPassword, dummyDateOfBirth);
+
+  const update = {
+    birthDate: new Date(1996, 8, 26),
+    password: "newPassword",
+    bio: "biobio",
+  };
+
+  const updateResult = await updateUser(dummyUsername, dummyPassword, update);
+  const signInResult = await signIn(dummyUsername, update.password);
+  if (!updateResult.user) throw new Error("User was undefined.");
+
+  expect(updateResult.statusCode).toBe(200);
+  expect(updateResult.user.username).toBe(dummyUsername);
+  expect(updateResult.user.birthDate).toBe(update.birthDate);
+  expect(updateResult.user.bio).toBe(update.bio);
+  expect(signInResult.statusCode).toBe(200);
+});
+
+test("Attempting to edit a user that doesn't exist fails.", async () => {
+  const update = {
+    birthDate: dummyDateOfBirth,
+    password: dummyPassword,
+    bio: "bio",
+  };
+
+  const result = await updateUser(dummyUsername, dummyPassword, update);
+
+  expect(result.user).toBeUndefined();
+  expect(result.statusCode).toBe(404);
+});
+
+test("Attempting to edit an existing user with an incorrect password fails.", async () => {
+  await register(dummyEmail, dummyUsername, dummyPassword, dummyDateOfBirth);
+
+  const update = {
+    birthDate: new Date(1996, 8, 26),
+    bio: "biobio",
+    password: "new password",
+  };
+
+  const result = await updateUser(dummyUsername, "wrongPassword", update);
+
+  expect(result.statusCode).toBe(401);
+  expect(result.user).toBeUndefined();
+});
+
+/*
+================================
+register
+================================
+*/
+
+test("Registering a user with an occupied username fails", async () => {
+  await register(dummyEmail, dummyUsername, dummyPassword, dummyDateOfBirth);
+
+  const result = await register(
+    "newEmail@email.com",
+    dummyUsername,
+    "newPassword",
+    new Date(1990, 4, 2)
+  );
+
+  expect(result.statusCode).toBe(403);
+  expect(result.user).toBeUndefined();
+});

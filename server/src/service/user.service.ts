@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 /**
  * Temporary in-memory store.
  */
-const users: { [key: string]: User } = {};
+export const users: { [key: string]: User } = {};
 
 /**
  * The result of a user service.
@@ -33,54 +33,61 @@ interface UserServiceResult {
   user?: User;
 }
 
-interface PartialUser {
-  username: string;
-  birthDate?: any;
-  bio?: string;
-  password?: string;
-  image?: any;
-}
-
 /**
  * Updates the properties of a registered user.
  *
- * @param partialUser - An object whose birthDate, bio, password, and image
- * properties will, if defined, be used to updated the user.
+ * @param username - The username of the user to update.
+ *
+ * @param password - The password of the user to update.
+ *
+ * @param update - An object whose defined properties
+ * will be used to update the user.
  *
  * @returns A UserServiceResult object.
  */
-export const editUserInformation = async (
-  partialUser: PartialUser
+export const updateUser = async (
+  username: string,
+  password: string,
+  update: {
+    birthDate?: any;
+    bio?: string;
+    password?: string;
+    image?: any;
+  }
 ): Promise<UserServiceResult> => {
-  /* 
-    Todo: check that password is correct before editing user.
-    Needs to take the password as a separate argument since we
-    want to be able to provide the password without updating it.
-  */
-
-  const existingUser = users[partialUser.username];
+  const existingUser = users[username];
 
   if (!existingUser) {
     return { statusCode: 404, message: "User not found." };
   }
-  if (partialUser.birthDate) {
-    if (validBirthDate(partialUser.birthDate)) {
-      existingUser["birthDate"] = partialUser.birthDate;
+
+  const passwordIsValid = await bcrypt.compare(
+    password,
+    existingUser.passwordHash
+  );
+
+  if (!passwordIsValid) {
+    return { statusCode: 401, message: "The given password was invalid." };
+  }
+
+  if (update.birthDate) {
+    if (validBirthDate(update.birthDate)) {
+      existingUser["birthDate"] = update.birthDate;
     }
   }
-  if (partialUser.bio) {
-    if (validBio(partialUser.bio)) {
-      existingUser["bio"] = partialUser.bio;
+  if (update.bio) {
+    if (validBio(update.bio)) {
+      existingUser["bio"] = update.bio;
     }
   }
-  if (partialUser.password) {
-    if (validPassword(partialUser.password)) {
-      existingUser["passwordHash"] = await hashPassword(partialUser.password);
+  if (update.password) {
+    if (validPassword(update.password)) {
+      existingUser["passwordHash"] = await hashPassword(update.password);
     }
   }
-  if (partialUser.image) {
-    if (validImage(partialUser.image)) {
-      existingUser["image"] = partialUser.image;
+  if (update.image) {
+    if (validImage(update.image)) {
+      existingUser["image"] = update.image;
     }
   }
   return {

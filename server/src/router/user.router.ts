@@ -52,40 +52,32 @@ userRouter.post("/sign-in", async (req: Request, res: Response) => {
     .send({ message: "Signed in successfully.", user: result.user });
 });
 
-userRouter.put(
-  "/edit-user-information",
-  async (req: Request, res: Response) => {
-    const username = req.body.username;
-    const password = req.body.password;
+userRouter.put("/update-user", async (req: Request, res: Response) => {
+  const username = req.body.username;
+  const password = req.body.password;
 
-    if (!(username && password)) {
-      return res.status(400).send({ message: "Invalid input." });
-    }
-
-    const birthDate = req.body.birthDate;
-    const bio = req.body.bio;
-    const image = req.body.image;
-
-    const partialUser = {
-      username: username,
-      password: password,
-      birthDate: birthDate,
-      bio: bio,
-      image: image,
-    };
-
-    const result = await userServices.editUserInformation(partialUser);
-
-    if (result.statusCode !== 200) {
-      return res.status(result.statusCode).send({ message: result.message });
-    }
-
-    res.status(200).send({
-      message: "User information updated successfully.",
-      user: result.user,
-    });
+  if (!(username && password)) {
+    return res.status(400).send({ message: "Invalid input." });
   }
-);
+
+  const update = {
+    birthDate: req.body.birthDate,
+    bio: req.body.bio,
+    image: req.body.image,
+    password: req.body.newPassword,
+  };
+
+  const result = await userServices.updateUser(username, password, update);
+
+  if (result.statusCode !== 200) {
+    return res.status(result.statusCode).send({ message: result.message });
+  }
+
+  res.status(200).send({
+    message: "User information updated successfully.",
+    user: result.user,
+  });
+});
 
 userRouter.delete("/delete-user", async (req: Request, res: Response) => {
   const username = req.body.username;
@@ -121,12 +113,12 @@ userRouter.put(
     if (
       !(
         typeof options.email !== "undefined" &&
-        typeof options.joinDate !== "undefined"&&
-        typeof options.birthDate !== "undefined"&&
-        typeof options.bio !== "undefined"&&
-        typeof options.image !== "undefined"&&
-        typeof options.likedThreads !== "undefined"&&
-        typeof options.dislikedThreads !== "undefined"&&
+        typeof options.joinDate !== "undefined" &&
+        typeof options.birthDate !== "undefined" &&
+        typeof options.bio !== "undefined" &&
+        typeof options.image !== "undefined" &&
+        typeof options.likedThreads !== "undefined" &&
+        typeof options.dislikedThreads !== "undefined" &&
         username &&
         password
       )
