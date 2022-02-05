@@ -1,4 +1,10 @@
-import { updateUser, register, signIn, users } from "../user.service";
+import {
+  updateUser,
+  register,
+  signIn,
+  users,
+  deleteUser,
+} from "../user.service";
 
 const dummyUsername = "¯_(ツ)_/¯";
 const dummyPassword = "password";
@@ -74,7 +80,7 @@ test("Attempting to edit a user that doesn't exist fails.", async () => {
   const update = {
     birthDate: dummyDateOfBirth,
     password: dummyPassword,
-    bio: "bio",
+    bio: "(ง^ᗜ^)ง",
   };
 
   const result = await updateUser(dummyUsername, dummyPassword, update);
@@ -88,7 +94,7 @@ test("Attempting to edit an existing user with an incorrect password fails.", as
 
   const update = {
     birthDate: new Date(1996, 8, 26),
-    bio: "biobio",
+    bio: "ಠ_ಠ",
     password: "new password",
   };
 
@@ -110,10 +116,38 @@ test("Registering a user with an occupied username fails", async () => {
   const result = await register(
     "newEmail@email.com",
     dummyUsername,
-    "newPassword",
+    "(⌐■_■)",
     new Date(1990, 4, 2)
   );
 
   expect(result.statusCode).toBe(403);
+  expect(result.user).toBeUndefined();
+});
+
+/*
+================================
+deleteUser
+================================
+*/
+
+test("After deleting a user, that user is no longer stored.", async () => {
+  await register(dummyEmail, dummyUsername, dummyPassword, dummyDateOfBirth);
+
+  const existingUser = users[dummyUsername];
+
+  await deleteUser(dummyUsername, dummyPassword);
+
+  const deletedUser = users[dummyUsername];
+
+  expect(existingUser).toBeDefined();
+  expect(deletedUser).toBeUndefined();
+});
+
+test("Deleting a user while providing an incorrect password fails.", async () => {
+  await register(dummyEmail, dummyUsername, dummyPassword, dummyDateOfBirth);
+
+  const result = await deleteUser(dummyUsername, "(° ͜ʖ°)");
+
+  expect(result.statusCode).toBe(401);
   expect(result.user).toBeUndefined();
 });
