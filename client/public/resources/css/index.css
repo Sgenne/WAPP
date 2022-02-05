@@ -1,3 +1,8 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+
 a:link,
 a:link:hover,
 a:visited,
@@ -5,6 +10,16 @@ a:visited:hover {
   text-decoration: none;
   color: inherit;
 }
+
+.siteColor{
+  max-width: 1000px;
+  background-color: #70b4c1;
+  border-radius: 5px;
+  width: 65%;
+  margin: 6rem auto;
+  padding: 1%;
+}
+
 
 .category-list {
   max-width: 1000px;
@@ -42,4 +57,8 @@ a:visited:hover {
 
 .category-thread__info span {
   margin-right: 10px;
+}
+
+.threadComment{
+  margin-left: 15px;
 }
