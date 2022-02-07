@@ -151,14 +151,6 @@ export const register = async (
   password: string,
   birthDate: Date
 ): Promise<UserServiceResult> => {
-  if (
-    !validEmail(email) &&
-    validusername(username) &&
-    validPassword(password) &&
-    validBirthDate(birthDate)
-  ) {
-    return { statusCode: 400, message: "Invalid input" };
-  }
   if (users[username]) {
     return {
       statusCode: 403,
@@ -291,48 +283,6 @@ export const setVisibleProperties = async (
     message: "Visible properties updated successfully.",
     user: existingUser,
   };
-};
-
-/**
- * Returns a boolean indicating if the given email address is valid.
- */
-const validEmail = (email: string): boolean => {
-  return true;
-};
-
-/**
- * Returns a boolean indicating if the given image is valid.
- */
-const validImage = (image: any): boolean => {
-  return true;
-};
-
-/**
- * Returns a boolean indicating if the given username is valid.
- */
-const validusername = (username: string): boolean => {
-  return true;
-};
-
-/**
- * Returns a boolean indicating if the given password is valid.
- */
-const validPassword = (password: string): boolean => {
-  return true;
-};
-
-/**
- * Returns a boolean indicating if the given date of birth is valid.
- */
-const validBirthDate = (date: Date): boolean => {
-  return true;
-};
-
-/**
- * Returns a boolean indicating if the given bio is valid.
- */
-const validBio = (bio: string): boolean => {
-  return true;
 };
 
 /**

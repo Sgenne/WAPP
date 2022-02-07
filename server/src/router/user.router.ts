@@ -1,36 +1,43 @@
 import * as userServices from "../service/user.service";
 import { Request, Response, Router } from "express";
+import { body, validationResult } from "express-validator";
 
 export const userRouter = Router();
 
-userRouter.post("/register", async (req: Request, res: Response) => {
-  const email = req.body.email;
-  const username = req.body.username;
-  const password = req.body.password;
-  // If no date is given, set birthDateParam to the current date. Just for testing
-  const birthDateParam = req.body.birthDate || new Date().toISOString();
-  if (!(email && username && password && birthDateParam)) {
-    res.status(400).send({ message: "Invalid input" });
-    return;
-  }
+userRouter.post(
+  "/register",
+  body("email").isEmail(),
+  body("username").isLength({ min: 4, max: 16 }),
+  body("password").isLength({ min: 5, max: 16 }),
+  async (req: Request, res: Response) => {
+    const email = req.body.email;
+    const username = req.body.username;
+    const password = req.body.password;
+    // If no date is given, set birthDateParam to the current date. Just for testing
+    const birthDateParam = req.body.birthDate || new Date().toISOString();
+    if (validationResult(req).isEmpty()) {
+      res.status(400).send({ message: "Invalid input" });
+      return;
+    }
 
-  const birthDate = new Date(birthDateParam);
+    const birthDate = new Date(birthDateParam);
 
-  const result = await userServices.register(
-    email,
-    username,
-    password,
-    birthDate
-  );
-  if (result.statusCode !== 201) {
-    res.status(result.statusCode).send({ message: result.message });
-    return;
+    const result = await userServices.register(
+      email,
+      username,
+      password,
+      birthDate
+    );
+    if (result.statusCode !== 201) {
+      res.status(result.statusCode).send({ message: result.message });
+      return;
+    }
+    res.status(201).send({
+      message: "The new user was created successfully",
+      user: result.user,
+    });
   }
-  res.status(201).send({
-    message: "The new user was created successfully",
-    user: result.user,
-  });
-});
+);
 
 userRouter.post("/sign-in", async (req: Request, res: Response) => {
   const username = req.body.username;
