@@ -165,7 +165,9 @@ export const register = async (
     passwordHash,
     birthDate,
     likedThreads: [],
-    unlikedThreads: [],
+    dislikedThreads: [],
+    likedComments: [],
+    dislikedComments: [],
     joinDate: new Date(),
     visibleProperties: {
       email: true,

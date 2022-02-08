@@ -45,6 +45,8 @@ export interface User {
    * The threads that the user has disliked.
    */
   unlikedThreads: any[];
+  likedComments: Comment[];
+  dislikedComments: Comment[];
 
   /**
    * Indicates which of the users properties should be visible on their profile page.

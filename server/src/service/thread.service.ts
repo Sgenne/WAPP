@@ -8,7 +8,7 @@ const categories: string[] = [];
 let id: number = 0;
 export let commentID: number = 0;
 
-export const likeThread = async (threadId: string, username: string) => {
+export const likeThread = async (threadId: number, username: string) => {
   let thread = threads[threadId];
   let user = users[username];
   if (!user.likedThreads.includes(thread)) {
@@ -26,7 +26,7 @@ export const likeThread = async (threadId: string, username: string) => {
   };
 };
 
-export const disLikeThread = async (threadId: string, username: string) => {
+export const disLikeThread = async (threadId: number, username: string) => {
   let thread = threads[threadId];
   let user = users[username];
   if (!user.dislikedThreads.includes(thread)) {
@@ -45,7 +45,7 @@ export const disLikeThread = async (threadId: string, username: string) => {
 };
 
 export const editThread = async (
-  threadId: string,
+  threadId: number,
   breadText: string,
   title: string
 ) => {
@@ -70,7 +70,7 @@ export const editThread = async (
 
 export const commentThread = async (
   username: string,
-  threadId: string,
+  threadId: number,
   breadText: string
 ) => {
   let thread: Thread = threads[threadId];

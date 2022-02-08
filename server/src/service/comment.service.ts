@@ -9,7 +9,7 @@ let commentID: number = 0;
 export const likeComment = async (commentId: number, username: string) => {
   let comment: Comment = comments[commentId];
   let user: User = users[username];
-  if (comment.authour.userName != "Deleted") {
+  if (comment.authour.username != "Deleted") {
     if (!user.likedComments.includes(comment)) {
       user.likedComments.push(comment);
       comment.likes++;
@@ -29,7 +29,7 @@ export const likeComment = async (commentId: number, username: string) => {
 export const disLikeComment = async (commentId: number, username: string) => {
   let comment: Comment = comments[commentId];
   let user: User = users[username];
-  if (comment.authour.userName != "Deleted") {
+  if (comment.authour.username != "Deleted") {
     if (!user.dislikedComments.includes(comment)) {
       user.dislikedComments.push(comment);
       comment.dislikes++;
@@ -48,7 +48,7 @@ export const disLikeComment = async (commentId: number, username: string) => {
 
 export const editComment = async (commentId: number, breadText: string) => {
   let comment: Comment = comments[commentId];
-  if (comment.authour.userName != "Deleted") {
+  if (comment.authour.username != "Deleted") {
     comment.breadText = breadText + "\nedited";
   }
   return {
@@ -60,7 +60,7 @@ export const editComment = async (commentId: number, breadText: string) => {
 
 export const deleteComment = async (commentId: number) => {
   let comment: Comment = comments[commentId];
-  if (comment.authour.userName != "Deleted") {
+  if (comment.authour.username != "Deleted") {
     comment.authour = users["Deleted"];
     comment.breadText = "";
     comment.dislikes = 0;
