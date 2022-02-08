@@ -15,7 +15,7 @@ userRouter.post(
     const password = req.body.password;
     // If no date is given, set birthDateParam to the current date. Just for testing
     const birthDateParam = req.body.birthDate || new Date().toISOString();
-    if (validationResult(req).isEmpty()) {
+    if (!validationResult(req).isEmpty()) {
       res.status(400).send({ message: "Invalid input" });
       return;
     }

@@ -10,11 +10,6 @@ export const users: { [key: string]: User } = {};
  * The result of a user service.
  */
 interface UserServiceResult {
-  /*
-    (Eftersom alla services returnar samma sak så tyckte jag det var snyggt att
-    göra ett interface som beskriver alla properties i detalj.
-    Säg till om ni inte håller med 🦤)
-  */
 
   /**
    * An HTTP status code describing the result of the attempted operation.
@@ -71,24 +66,16 @@ export const updateUser = async (
   }
 
   if (update.birthDate) {
-    if (validBirthDate(update.birthDate)) {
-      existingUser["birthDate"] = update.birthDate;
-    }
+    existingUser["birthDate"] = update.birthDate;
   }
   if (update.bio) {
-    if (validBio(update.bio)) {
-      existingUser["bio"] = update.bio;
-    }
+    existingUser["bio"] = update.bio;
   }
   if (update.password) {
-    if (validPassword(update.password)) {
-      existingUser["passwordHash"] = await hashPassword(update.password);
-    }
+    existingUser["passwordHash"] = await hashPassword(update.password);
   }
   if (update.image) {
-    if (validImage(update.image)) {
-      existingUser["image"] = update.image;
-    }
+    existingUser["image"] = update.image;
   }
   return {
     statusCode: 200,
