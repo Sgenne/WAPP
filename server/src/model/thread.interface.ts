@@ -5,7 +5,7 @@ export interface Thread {
   likes: number;
   dislikes: number;
   title: string;
-  breadText: string;
+  content: string;
   author: User;
   dare: Date;
   category: string;

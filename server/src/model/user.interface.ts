@@ -39,13 +39,21 @@ export interface User {
   /**
    * The threads that the user has liked.
    */
-  likedThreads: any[]; //Threads type later
+  likedThreads: Thread[];
 
   /**
    * The threads that the user has disliked.
    */
-  dislikedThreads: any[];
+  dislikedThreads: Thread[];
+
+  /**
+   * The comments that the user has liked.
+   */
   likedComments: Comment[];
+
+  /**
+   * The comments that the user had disliked.
+   */
   dislikedComments: Comment[];
 
   /**

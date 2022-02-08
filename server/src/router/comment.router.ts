@@ -45,13 +45,13 @@ commentRouter.put("/disLikeComment", async (req: Request, res: Response) => {
 
 commentRouter.put("/editComment", async (req: Request, res: Response) => {
   const commentID = req.body.commentID;
-  const breadText = req.body.breadText;
+  const content = req.body.content;
 
-  if (!(breadText && commentID)) {
+  if (!(content && commentID)) {
     return res.status(400).send({ message: "Invalid input." });
   }
 
-  const result = await commentService.editComment(commentID, breadText);
+  const result = await commentService.editComment(commentID, content);
 
   if (result.statusCode !== 200) {
     return res.status(result.statusCode).send({ message: result.message });
@@ -84,14 +84,14 @@ commentRouter.put("/deleteComment", async (req: Request, res: Response) => {
 
 commentRouter.put("/editComment", async (req: Request, res: Response) => {
   const commentID = req.body.commentID;
-  const breadText = req.body.breadText;
+  const content = req.body.content;
   const username = req.body.username;
 
-  if (!(breadText && commentID && username)) {
+  if (!(content && commentID && username)) {
     return res.status(400).send({ message: "Invalid input." });
   }
 
-  const result = await commentService.postReply(commentID, breadText, username);
+  const result = await commentService.postReply(commentID, content, username);
 
   if (result.statusCode !== 200) {
     return res.status(result.statusCode).send({ message: result.message });

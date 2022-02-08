@@ -46,7 +46,7 @@ export const disLikeThread = async (threadId: number, username: string) => {
 
 export const editThread = async (
   threadId: number,
-  breadText: string,
+  content: string,
   title: string
 ) => {
   let thread = threads[threadId];
@@ -58,8 +58,8 @@ export const editThread = async (
     today.getMonth() +
     "-" +
     today.getDate();
-  breadText += date;
-  thread.breadText = breadText;
+  content += date;
+  thread.content = content;
   thread.title = title;
   return {
     statusCode: 200,
@@ -71,7 +71,7 @@ export const editThread = async (
 export const commentThread = async (
   username: string,
   threadId: number,
-  breadText: string
+  content: string
 ) => {
   let thread: Thread = threads[threadId];
   let authour: User = users[username];
@@ -81,7 +81,7 @@ export const commentThread = async (
   let dislikes: number = 0;
   let commentId: number = commentID++;
   const newComment: Comment = {
-    breadText,
+    content,
     authour,
     date,
     replies,
@@ -121,7 +121,7 @@ export const postThread = async (
   username: string,
   category: string,
   title: string,
-  breadText: string
+  content: string
 ) => {
   if (categories.includes(category)) {
     let author: User = users[username];
@@ -134,7 +134,7 @@ export const postThread = async (
       likes,
       dislikes,
       title,
-      breadText,
+      content,
       author,
       date,
       category,

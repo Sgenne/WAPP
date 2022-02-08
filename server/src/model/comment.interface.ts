@@ -2,7 +2,7 @@ import { User } from "./user.interface";
 
 export interface Comment {
   title: string;
-  breadText: string;
+  content: string;
   authour: User;
   date: Date;
   replies: Comment[];

@@ -46,10 +46,10 @@ export const disLikeComment = async (commentId: number, username: string) => {
   };
 };
 
-export const editComment = async (commentId: number, breadText: string) => {
+export const editComment = async (commentId: number, content: string) => {
   let comment: Comment = comments[commentId];
   if (comment.authour.username != "Deleted") {
-    comment.breadText = breadText + "\nedited";
+    comment.content = content + "\nedited";
   }
   return {
     statusCode: 200,
@@ -62,7 +62,7 @@ export const deleteComment = async (commentId: number) => {
   let comment: Comment = comments[commentId];
   if (comment.authour.username != "Deleted") {
     comment.authour = users["Deleted"];
-    comment.breadText = "";
+    comment.content = "";
     comment.dislikes = 0;
     comment.likes = 0;
   }
@@ -75,7 +75,7 @@ export const deleteComment = async (commentId: number) => {
 
 export const postReply = async (
   commentIdRoot: number,
-  breadText: string,
+  content: string,
   username: string
 ) => {
   let root: Comment = comments[commentIdRoot];
@@ -86,7 +86,7 @@ export const postReply = async (
   let dislikes: number = 0;
   let commentId: number = commentID++;
   const newComment: Comment = {
-    breadText,
+    content,
     authour,
     date,
     replies,

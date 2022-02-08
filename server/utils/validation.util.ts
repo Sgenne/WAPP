@@ -24,6 +24,8 @@ export const handleValidationResult = (
 
 /**
  * Verifies that the request body has a valid username.
+ * A username is valid if it has between 4 and 16 alphanumeric
+ * characters. Usernames cannot have whitespace.
  */
 export const hasValidUsername = body("username")
   .exists()
@@ -34,6 +36,8 @@ export const hasValidUsername = body("username")
 
 /**
  * Verifies that the request body has a valid password.
+ * A username is valid if it has between 5 and 16, non whitespace,
+ * characters.
  */
 export const hasValidPassword = body("password")
   .exists()
@@ -99,3 +103,37 @@ export const hasVisiblePropertiesOptions = body("options")
     }
     return true;
   });
+
+/**
+ * Verifies that the request body has a valid thread-id.
+ * Thread-ids have to be numeric.
+ */
+export const hasValidThreadId = body("threadId")
+  .notEmpty()
+  .withMessage("No thread-id was provided.")
+  .isNumeric()
+  .withMessage("The thread-id was invalid.");
+
+/**
+ * Verifies that the request body has a non-empty content field.
+ */
+export const hasContent = body("content")
+  .notEmpty()
+  .withMessage("No content was provided");
+
+/**
+ * Verifies that the request body has a valid thread title.
+ * A thread title is valid if it is between 4 and 16 characters.
+ */
+export const hasValidThreadTitle = body("title")
+  .notEmpty()
+  .withMessage("No thread title was provided.")
+  .isLength({ min: 4, max: 16 })
+  .withMessage("The title has to be between 4 and 16 characters long.");
+
+/**
+ * Verifies that the request body has a non-empty category field.
+ */
+export const hasCategory = body("category")
+  .notEmpty()
+  .withMessage("No category was provided.");
