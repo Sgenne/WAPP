@@ -1,24 +1,30 @@
 import * as userServices from "../service/user.service";
 import { Request, Response, Router } from "express";
-import { body, validationResult } from "express-validator";
+import {
+  handleValidationResult,
+  hasPassword,
+  hasUsername,
+  hasValidBirthDate,
+  hasValidEmail,
+  hasValidPassword,
+  hasValidUsername,
+  hasVisiblePropertiesOptions,
+} from "../../utils/validation.util";
 
 export const userRouter = Router();
 
 userRouter.post(
   "/register",
-  body("email").isEmail(),
-  body("username").isLength({ min: 4, max: 16 }),
-  body("password").isLength({ min: 5, max: 16 }),
+  hasValidEmail,
+  hasValidUsername,
+  hasValidPassword,
+  hasValidBirthDate,
+  handleValidationResult,
   async (req: Request, res: Response) => {
     const email = req.body.email;
     const username = req.body.username;
     const password = req.body.password;
-    // If no date is given, set birthDateParam to the current date. Just for testing
-    const birthDateParam = req.body.birthDate || new Date().toISOString();
-    if (!validationResult(req).isEmpty()) {
-      res.status(400).send({ message: "Invalid input" });
-      return;
-    }
+    const birthDateParam = req.body.birthDate;
 
     const birthDate = new Date(birthDateParam);
 
@@ -39,65 +45,70 @@ userRouter.post(
   }
 );
 
-userRouter.post("/sign-in", async (req: Request, res: Response) => {
-  const username = req.body.username;
-  const password = req.body.password;
+userRouter.post(
+  "/sign-in",
+  hasUsername,
+  hasPassword,
+  handleValidationResult,
+  async (req: Request, res: Response) => {
+    const username = req.body.username;
+    const password = req.body.password;
 
-  if (!(username && password)) {
-    res.status(400).send({ message: "Invalid input" });
-    return;
+    const result = await userServices.signIn(username, password);
+
+    if (result.statusCode !== 200) {
+      return res.status(result.statusCode).send({ message: result.message });
+    }
+
+    res
+      .status(200)
+      .send({ message: "Signed in successfully.", user: result.user });
   }
+);
 
-  const result = await userServices.signIn(username, password);
+userRouter.put(
+  "/update-user",
+  hasUsername,
+  hasPassword,
+  handleValidationResult,
+  async (req: Request, res: Response) => {
+    const username = req.body.username;
+    const password = req.body.password;
 
-  if (result.statusCode !== 200) {
+    const update = {
+      birthDate: req.body.birthDate,
+      bio: req.body.bio,
+      image: req.body.image,
+      password: req.body.newPassword,
+    };
+
+    const result = await userServices.updateUser(username, password, update);
+
+    if (result.statusCode !== 200) {
+      return res.status(result.statusCode).send({ message: result.message });
+    }
+
+    res.status(200).send({
+      message: "User information updated successfully.",
+      user: result.user,
+    });
+  }
+);
+
+userRouter.delete(
+  "/delete-user",
+  hasUsername,
+  hasPassword,
+  handleValidationResult,
+  async (req: Request, res: Response) => {
+    const username = req.body.username;
+    const password = req.body.password;
+
+    const result = await userServices.deleteUser(username, password);
+
     return res.status(result.statusCode).send({ message: result.message });
   }
-
-  res
-    .status(200)
-    .send({ message: "Signed in successfully.", user: result.user });
-});
-
-userRouter.put("/update-user", async (req: Request, res: Response) => {
-  const username = req.body.username;
-  const password = req.body.password;
-
-  if (!(username && password)) {
-    return res.status(400).send({ message: "Invalid input." });
-  }
-
-  const update = {
-    birthDate: req.body.birthDate,
-    bio: req.body.bio,
-    image: req.body.image,
-    password: req.body.newPassword,
-  };
-
-  const result = await userServices.updateUser(username, password, update);
-
-  if (result.statusCode !== 200) {
-    return res.status(result.statusCode).send({ message: result.message });
-  }
-
-  res.status(200).send({
-    message: "User information updated successfully.",
-    user: result.user,
-  });
-});
-
-userRouter.delete("/delete-user", async (req: Request, res: Response) => {
-  const username = req.body.username;
-  const password = req.body.password;
-
-  if (!(username && password)) {
-    return res.status(400).send({ message: "Invalid input." });
-  }
-
-  const result = await userServices.deleteUser(username, password);
-
-  return res.status(result.statusCode).send({ message: result.message });
-});
+);
 
 userRouter.get("/:username", async (req: Request, res: Response) => {
   const username = req.params.username;
@@ -113,25 +124,14 @@ userRouter.get("/:username", async (req: Request, res: Response) => {
 
 userRouter.put(
   "/edit-user-preferences",
+  hasUsername,
+  hasPassword,
+  hasVisiblePropertiesOptions,
+  handleValidationResult,
   async (req: Request, res: Response) => {
     const options = req.body.options;
     const username = req.body.username;
     const password = req.body.password;
-    if (
-      !(
-        typeof options.email !== "undefined" &&
-        typeof options.joinDate !== "undefined" &&
-        typeof options.birthDate !== "undefined" &&
-        typeof options.bio !== "undefined" &&
-        typeof options.image !== "undefined" &&
-        typeof options.likedThreads !== "undefined" &&
-        typeof options.dislikedThreads !== "undefined" &&
-        username &&
-        password
-      )
-    ) {
-      return res.status(400).send({ message: "Invalid input." });
-    }
 
     const result = await userServices.setVisibleProperties(
       username,

@@ -44,7 +44,7 @@ export interface User {
   /**
    * The threads that the user has disliked.
    */
-  unlikedThreads: any[];
+  dislikedThreads: any[];
   likedComments: Comment[];
   dislikedComments: Comment[];
 
