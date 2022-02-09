@@ -137,3 +137,13 @@ export const hasValidThreadTitle = body("title")
 export const hasCategory = body("category")
   .notEmpty()
   .withMessage("No category was provided.");
+
+/**
+ * Verifies that the request body has a valid comment-id.
+ * A valid comment-id has to be numeric.
+ */
+export const hasValidCommentId = body("commentId")
+  .notEmpty()
+  .withMessage("No comment-id was provided.")
+  .isNumeric()
+  .withMessage("The comment-id was invalid.");
