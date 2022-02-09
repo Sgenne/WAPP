@@ -180,6 +180,6 @@ export const postThread = async (
   return {
     statusCode: 400,
     message: "Invalid inputs",
-    thread: null,
+    thread: undefined,
   };
 };

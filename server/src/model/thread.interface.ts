@@ -7,7 +7,8 @@ export interface Thread {
   title: string;
   content: string;
   author: User;
-  dare: Date;
+  date: Date;
   category: string;
   replies: Comment[]; //Comment type later
+  threadId: number;
 }
