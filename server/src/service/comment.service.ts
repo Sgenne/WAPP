@@ -1,12 +1,34 @@
 import { Comment } from "../model/comment.interface";
-import { Thread } from "../model/thread.interface";
 import { User } from "../model/user.interface";
 
 const users: { [key: string]: User } = {};
 const comments: { [key: string]: Comment } = {};
 let commentID: number = 0;
 
-export const likeComment = async (commentId: number, username: string) => {
+/**
+ * The result of a comment service.
+ */
+interface CommentServiceResult {
+  /**
+   * An HTTP status code describing the result of the attempted operation.
+   */
+  statusCode: number;
+
+  /**
+   * A message describing the result of the attempted operation.
+   */
+  message: string;
+
+  /**
+   * The comment that was acted upon.
+   */
+  comment?: Comment;
+}
+
+export const likeComment = async (
+  commentId: number,
+  username: string
+): Promise<CommentServiceResult> => {
   let comment: Comment = comments[commentId];
   let user: User = users[username];
   if (comment.authour.username != "Deleted") {
@@ -26,7 +48,10 @@ export const likeComment = async (commentId: number, username: string) => {
   };
 };
 
-export const disLikeComment = async (commentId: number, username: string) => {
+export const disLikeComment = async (
+  commentId: number,
+  username: string
+): Promise<CommentServiceResult> => {
   let comment: Comment = comments[commentId];
   let user: User = users[username];
   if (comment.authour.username != "Deleted") {
@@ -46,7 +71,10 @@ export const disLikeComment = async (commentId: number, username: string) => {
   };
 };
 
-export const editComment = async (commentId: number, content: string) => {
+export const editComment = async (
+  commentId: number,
+  content: string
+): Promise<CommentServiceResult> => {
   let comment: Comment = comments[commentId];
   if (comment.authour.username != "Deleted") {
     comment.content = content + "\nedited";
@@ -58,7 +86,9 @@ export const editComment = async (commentId: number, content: string) => {
   };
 };
 
-export const deleteComment = async (commentId: number) => {
+export const deleteComment = async (
+  commentId: number
+): Promise<CommentServiceResult> => {
   let comment: Comment = comments[commentId];
   if (comment.authour.username != "Deleted") {
     comment.authour = users["Deleted"];
@@ -77,7 +107,7 @@ export const postReply = async (
   commentIdRoot: number,
   content: string,
   username: string
-) => {
+): Promise<CommentServiceResult> => {
   let root: Comment = comments[commentIdRoot];
   let authour: User = users[username];
   let date: Date = new Date();

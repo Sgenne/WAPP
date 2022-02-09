@@ -8,7 +8,30 @@ const categories: string[] = [];
 let id: number = 0;
 export let commentID: number = 0;
 
-export const likeThread = async (threadId: number, username: string) => {
+/**
+ * The result of a thread service.
+ */
+interface ThreadServiceResult {
+  /**
+   * An HTTP status code describing the result of the attempted operation.
+   */
+  statusCode: number;
+
+  /**
+   * A message describing the result of the attempted operation.
+   */
+  message: string;
+
+  /**
+   * The thread that was acted upon.
+   */
+  thread?: Thread;
+}
+
+export const likeThread = async (
+  threadId: number,
+  username: string
+): Promise<ThreadServiceResult> => {
   let thread = threads[threadId];
   let user = users[username];
   if (!user.likedThreads.includes(thread)) {
@@ -26,7 +49,10 @@ export const likeThread = async (threadId: number, username: string) => {
   };
 };
 
-export const disLikeThread = async (threadId: number, username: string) => {
+export const disLikeThread = async (
+  threadId: number,
+  username: string
+): Promise<ThreadServiceResult> => {
   let thread = threads[threadId];
   let user = users[username];
   if (!user.dislikedThreads.includes(thread)) {
@@ -48,7 +74,7 @@ export const editThread = async (
   threadId: number,
   content: string,
   title: string
-) => {
+): Promise<ThreadServiceResult> => {
   let thread = threads[threadId];
   var today: Date = new Date();
   var date: string =
@@ -72,7 +98,7 @@ export const commentThread = async (
   username: string,
   threadId: number,
   content: string
-) => {
+): Promise<ThreadServiceResult> => {
   let thread: Thread = threads[threadId];
   let authour: User = users[username];
   let date: Date = new Date();
@@ -97,7 +123,9 @@ export const commentThread = async (
   };
 };
 
-export const deleteThread = async (threadId: string) => {
+export const deleteThread = async (
+  threadId: string
+): Promise<ThreadServiceResult> => {
   let thread: Thread = threads[threadId];
   thread.replies.forEach(function (element, index) {
     removeReplies(element);
@@ -122,7 +150,7 @@ export const postThread = async (
   category: string,
   title: string,
   content: string
-) => {
+): Promise<ThreadServiceResult> => {
   if (categories.includes(category)) {
     let author: User = users[username];
     let threadId: number = id++;

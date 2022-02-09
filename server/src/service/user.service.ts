@@ -10,7 +10,6 @@ export const users: { [key: string]: User } = {};
  * The result of a user service.
  */
 interface UserServiceResult {
-
   /**
    * An HTTP status code describing the result of the attempted operation.
    */
