@@ -9,7 +9,7 @@ import {
   hasValidPassword,
   hasValidUsername,
   hasVisiblePropertiesOptions,
-} from "../../utils/validation.util";
+} from "../utils/validation.util";
 
 export const userRouter = Router();
 

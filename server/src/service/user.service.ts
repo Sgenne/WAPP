@@ -91,7 +91,6 @@ export const updateUser = async (
  * @param password - The password to use when signing the user in.
  *
  * @returns A UserServiceResult object.
- *
  */
 export const signIn = async (
   username: string,

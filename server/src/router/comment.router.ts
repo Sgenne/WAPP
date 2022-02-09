@@ -5,7 +5,7 @@ import {
   hasContent,
   hasUsername,
   hasValidCommentId,
-} from "../../utils/validation.util";
+} from "../utils/validation.util";
 
 export const commentRouter = Router();
 

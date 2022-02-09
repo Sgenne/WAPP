@@ -7,7 +7,7 @@ import {
   hasUsername,
   hasValidThreadId,
   hasValidThreadTitle,
-} from "../../utils/validation.util";
+} from "../utils/validation.util";
 
 export const threadRouter = Router();
 
