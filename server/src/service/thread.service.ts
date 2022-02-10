@@ -149,13 +149,13 @@ export const editThread = async (
   let thread = threads[threadId];
   var today: Date = new Date();
   var date: string =
-    "\nlast edited" +
+    "\nlast edited " +
     today.getFullYear() +
     "-" +
     today.getMonth() +
     "-" +
     today.getDate();
-  //content += date;
+  content += date;
   thread.content = content;
   thread.title = title;
   return {
