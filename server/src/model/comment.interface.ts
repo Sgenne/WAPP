@@ -1,7 +1,6 @@
 import { User } from "./user.interface";
 
 export interface Comment {
-  title: string;
   content: string;
   authour: User;
   date: Date;

@@ -1,10 +1,10 @@
 import { Comment } from "../model/comment.interface";
 import { Thread } from "../model/thread.interface";
 import { User } from "../model/user.interface";
+import { users } from "./user.service";
 
-const users: { [key: string]: User } = {};
-const threads: { [key: string]: Thread } = {};
-const categories: string[] = [];
+export const threads: { [key: string]: Thread } = {};
+export const categories: string[] = [];
 let id: number = 0;
 export let commentID: number = 0;
 
@@ -34,6 +34,11 @@ export const likeThread = async (
 ): Promise<ThreadServiceResult> => {
   let thread = threads[threadId];
   let user = users[username];
+  if(user.dislikedThreads.includes(thread)){
+    let temp: number = user.dislikedThreads.lastIndexOf(thread);
+    user.likedThreads = user.dislikedThreads.splice(temp, 1);
+    thread.dislikes--;
+  }
   if (!user.likedThreads.includes(thread)) {
     user.likedThreads.push(thread);
     thread.likes++;
@@ -55,6 +60,11 @@ export const disLikeThread = async (
 ): Promise<ThreadServiceResult> => {
   let thread = threads[threadId];
   let user = users[username];
+  if(user.likedThreads.includes(thread)){
+    let temp: number = user.likedThreads.lastIndexOf(thread);
+    user.likedThreads = user.likedThreads.splice(temp, 1);
+    thread.likes--;
+  }
   if (!user.dislikedThreads.includes(thread)) {
     user.dislikedThreads.push(thread);
     thread.dislikes++;
@@ -75,6 +85,13 @@ export const editThread = async (
   content: string,
   title: string
 ): Promise<ThreadServiceResult> => {
+  if (threads[threadId] === undefined) {
+    return {
+      statusCode: 400,
+      message: "Thread does not exist",
+      thread: undefined,
+    };
+  }
   let thread = threads[threadId];
   var today: Date = new Date();
   var date: string =
@@ -124,7 +141,7 @@ export const commentThread = async (
 };
 
 export const deleteThread = async (
-  threadId: string
+  threadId: number
 ): Promise<ThreadServiceResult> => {
   let thread: Thread = threads[threadId];
   thread.replies.forEach(function (element, index) {
