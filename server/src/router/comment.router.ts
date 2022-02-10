@@ -96,7 +96,7 @@ commentRouter.put(
 );
 
 commentRouter.put(
-  "/editComment",
+  "/replyComment",
   hasValidCommentId,
   hasContent,
   hasUsername,

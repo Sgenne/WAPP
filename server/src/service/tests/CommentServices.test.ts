@@ -45,17 +45,25 @@ beforeEach(async () => {
     dummyPassword,
     dummyDateOfBirth
   );
+
   categories.push(dummyCategory);
-  await postThread(dummyUsername, dummyCategory, dummyTitle, dummyContent);
+  const threadres = await postThread(
+    dummyUsername,
+    dummyCategory,
+    dummyTitle,
+    dummyContent
+  );
+  if (threadres) user = users[dummyUsername];
+  if (!threadres.thread) throw new Error("Thread failed");
+  thread = threadres.thread;
   //posting a thread comment / root comment
-  await commentThread(
-    users[0].username,
-    threads[0].threadId,
+  const commentres = await commentThread(
+    user.username,
+    thread.threadId,
     dummyCommentContent
   );
-  user = users[0];
-  thread = threads[0];
-  rootComment = comments[0];
+  if (!commentres.thread) throw new Error("Thread comment failed");
+  rootComment = commentres.thread.replies[0];
 });
 
 /*
@@ -153,8 +161,8 @@ test("replying to a comment as a valid user", async () => {
   const newComment = "I fully agree";
   const result = await postReply(
     rootComment.commentId,
-    user.username,
-    newComment
+    newComment,
+    user.username
   );
   if (!result.comment) throw new Error("Comment is undefined.");
 

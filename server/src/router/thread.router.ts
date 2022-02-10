@@ -79,8 +79,8 @@ threadRouter.put(
   }
 );
 
-threadRouter.put(
-  "/editThread",
+threadRouter.post(
+  "/commentThread",
   hasValidThreadId,
   hasContent,
   hasValidThreadTitle,
@@ -88,16 +88,20 @@ threadRouter.put(
   async (req: Request, res: Response) => {
     const threadID = req.body.threadId;
     const content = req.body.content;
-    const title = req.body.title;
+    const username = req.body.username;
 
-    const result = await threadServices.editThread(threadID, content, title);
+    const result = await threadServices.commentThread(
+      username,
+      threadID,
+      content
+    );
 
     if (result.statusCode !== 200) {
       return res.status(result.statusCode).send({ message: result.message });
     }
 
     res.status(200).send({
-      message: "Thread edited successfully.",
+      message: "Comment posted successfully.",
       thread: result.thread,
     });
   }
@@ -148,7 +152,7 @@ threadRouter.delete(
     }
 
     res.status(200).send({
-      message: "Thread posted successfully.",
+      message: "Thread deleted successfully.",
     });
   }
 );

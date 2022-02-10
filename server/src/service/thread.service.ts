@@ -2,6 +2,7 @@ import { Comment } from "../model/comment.interface";
 import { Thread } from "../model/thread.interface";
 import { User } from "../model/user.interface";
 import { users } from "./user.service";
+import { comments } from "./comment.service";
 
 /**
  * Temporary in-memory store of all threads.
@@ -64,16 +65,18 @@ export const likeThread = async (
   let thread = threads[threadId];
   let user = users[username];
   if (user.dislikedThreads.includes(thread)) {
-    let temp: number = user.dislikedThreads.lastIndexOf(thread);
-    user.dislikedThreads.splice(temp, 1);
+    user.dislikedThreads.forEach((item, index) => {
+      if (item === thread) user.dislikedThreads.splice(index, 1);
+    });
     thread.dislikes--;
   }
   if (!user.likedThreads.includes(thread)) {
     user.likedThreads.push(thread);
     thread.likes++;
   } else {
-    let temp: number = user.likedThreads.lastIndexOf(thread);
-    user.likedThreads = user.likedThreads.splice(temp, 1);
+    user.likedThreads.forEach((item, index) => {
+      if (item === thread) user.likedThreads.splice(index, 1);
+    });
     thread.likes--;
   }
   return {
@@ -99,16 +102,18 @@ export const disLikeThread = async (
   let thread = threads[threadId];
   let user = users[username];
   if (user.likedThreads.includes(thread)) {
-    let temp: number = user.likedThreads.lastIndexOf(thread);
-    user.likedThreads.splice(temp, 1);
+    user.likedThreads.forEach((item, index) => {
+      if (item === thread) user.likedThreads.splice(index, 1);
+    });
     thread.likes--;
   }
   if (!user.dislikedThreads.includes(thread)) {
     user.dislikedThreads.push(thread);
     thread.dislikes++;
   } else {
-    let temp: number = user.dislikedThreads.lastIndexOf(thread);
-    user.dislikedThreads = user.dislikedThreads.splice(temp, 1);
+    user.dislikedThreads.forEach((item, index) => {
+      if (item === thread) user.dislikedThreads.splice(index, 1);
+    });
     thread.dislikes--;
   }
   return {
@@ -193,6 +198,7 @@ export const commentThread = async (
     commentId,
   };
   thread.replies.push(newComment);
+  comments[newComment.commentId] = newComment;
   return {
     statusCode: 200,
     message: "Thread posted successfully",
@@ -248,8 +254,8 @@ export const postThread = async (
   title: string,
   content: string
 ): Promise<ThreadServiceResult> => {
-  let author: User = users[username];
-  if (categories.includes(category) && author) {
+  if (categories.includes(category) && users[username]) {
+    let author: User = users[username];
     let threadId: number = id++;
     let date: Date = new Date();
     let replies: Comment[] = [];

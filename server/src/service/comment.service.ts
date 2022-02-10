@@ -36,8 +36,9 @@ export const likeComment = async (
       user.likedComments.push(comment);
       comment.likes++;
     } else {
-      let temp: number = user.likedComments.lastIndexOf(comment);
-      user.likedComments = user.likedComments.splice(temp, 1);
+      user.likedComments.forEach((item, index) => {
+        if (item === comment) user.likedComments.splice(index, 1);
+      });
       comment.likes--;
     }
     return {
@@ -65,8 +66,9 @@ export const disLikeComment = async (
       user.dislikedComments.push(comment);
       comment.dislikes++;
     } else {
-      let temp: number = user.dislikedComments.lastIndexOf(comment);
-      user.dislikedComments = user.dislikedComments.splice(temp, 1);
+      user.dislikedComments.forEach((item, index) => {
+        if (item === comment) user.dislikedComments.splice(index, 1);
+      });
       comment.dislikes--;
     }
   }

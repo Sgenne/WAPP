@@ -1,5 +1,6 @@
 import { User } from "../model/user.interface";
 import bcrypt from "bcryptjs";
+import { Console } from "console";
 
 /**
  * Temporary in-memory store.
