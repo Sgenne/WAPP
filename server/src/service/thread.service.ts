@@ -18,7 +18,11 @@ let id: number = 0;
 /**
  * Global variable to know what id to assign next comment
  */
-export let commentID: number = 0;
+let commentID: number = 0;
+
+export function newComment(): number {
+  return commentID++;
+}
 
 /**
  * The result of a thread service.
@@ -42,11 +46,11 @@ interface ThreadServiceResult {
 
 /**
  * User likes a thread
- * 
+ *
  * @param threadId - id of the thread the user likes.
- * 
+ *
  * @param username - the user who likes the thread.
- * 
+ *
  * @returns - A ThreadServiceResult object.
  */
 export const likeThread = async (
@@ -55,7 +59,7 @@ export const likeThread = async (
 ): Promise<ThreadServiceResult> => {
   let thread = threads[threadId];
   let user = users[username];
-  if(user.dislikedThreads.includes(thread)){
+  if (user.dislikedThreads.includes(thread)) {
     let temp: number = user.dislikedThreads.lastIndexOf(thread);
     user.likedThreads = user.dislikedThreads.splice(temp, 1);
     thread.dislikes--;
@@ -77,11 +81,11 @@ export const likeThread = async (
 
 /**
  * User dislikes a thread
- * 
+ *
  * @param threadId - id of the thread the user dislikes.
- * 
+ *
  * @param username - the user who dislikes the thread.
- * 
+ *
  * @returns - A ThreadServiceResult object.
  */
 export const disLikeThread = async (
@@ -90,7 +94,7 @@ export const disLikeThread = async (
 ): Promise<ThreadServiceResult> => {
   let thread = threads[threadId];
   let user = users[username];
-  if(user.likedThreads.includes(thread)){
+  if (user.likedThreads.includes(thread)) {
     let temp: number = user.likedThreads.lastIndexOf(thread);
     user.likedThreads = user.likedThreads.splice(temp, 1);
     thread.likes--;
@@ -112,13 +116,13 @@ export const disLikeThread = async (
 
 /**
  * Edits the content of a thread
- * 
+ *
  * @param threadId - The thread to edit
- * 
+ *
  * @param content - The new content of the thread
- * 
+ *
  * @param title - can change the title of the thread
- * 
+ *
  * @returns A ThreadServiceResult object.
  */
 export const editThread = async (
@@ -154,13 +158,13 @@ export const editThread = async (
 
 /**
  * Creates a new comment to a thread
- * 
+ *
  * @param username - username of the user who wants to comment
- * 
+ *
  * @param threadId - the thread to comment on
- * 
+ *
  * @param content - the bread-text of the comment
- * 
+ *
  * @returns A ThreadServiceResult object.
  */
 export const commentThread = async (
@@ -194,9 +198,9 @@ export const commentThread = async (
 
 /**
  * Deletes a thread
- * 
+ *
  * @param threadId - The thread to delete
- * 
+ *
  * @returns A ThreadServiceResult object.
  */
 export const deleteThread = async (
@@ -223,15 +227,15 @@ function removeReplies(reply: Comment) {
 
 /**
  * Creates a new thread
- * 
+ *
  * @param username - username of the user who wants to create the thread
- * 
+ *
  * @param category - The category the thread should be in
- * 
+ *
  * @param title - the title of the thread
- * 
+ *
  * @param content - the bread-text of the comment
- * 
+ *
  * @returns A ThreadServiceResult object.
  */
 export const postThread = async (

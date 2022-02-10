@@ -1,9 +1,9 @@
 import { Comment } from "../model/comment.interface";
 import { User } from "../model/user.interface";
+import { users } from "./user.service";
+import { newComment } from "./thread.service";
 
-const users: { [key: string]: User } = {};
-const comments: { [key: string]: Comment } = {};
-let commentID: number = 0;
+export const comments: { [key: string]: Comment } = {};
 
 /**
  * The result of a comment service.
@@ -40,12 +40,18 @@ export const likeComment = async (
       user.likedComments = user.likedComments.splice(temp, 1);
       comment.likes--;
     }
+    return {
+      statusCode: 200,
+      message: "Comment like status changed successfully",
+      comment: comment,
+    };
+  } else {
+    return {
+      statusCode: 400,
+      message: "Comment or User doesnt exist",
+      comment: undefined,
+    };
   }
-  return {
-    statusCode: 200,
-    message: "Comment like status changed successfully",
-    comment: comment,
-  };
 };
 
 export const disLikeComment = async (
@@ -114,7 +120,7 @@ export const postReply = async (
   let replies: Comment[] = [];
   let likes: number = 0;
   let dislikes: number = 0;
-  let commentId: number = commentID++;
+  let commentId: number = getCommentID();
   const newComment: Comment = {
     content,
     authour,
@@ -131,3 +137,7 @@ export const postReply = async (
     comment: newComment,
   };
 };
+
+function getCommentID() {
+  return newComment();
+}
