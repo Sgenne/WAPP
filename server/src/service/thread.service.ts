@@ -61,7 +61,7 @@ export const likeThread = async (
   let user = users[username];
   if (user.dislikedThreads.includes(thread)) {
     let temp: number = user.dislikedThreads.lastIndexOf(thread);
-    user.likedThreads = user.dislikedThreads.splice(temp, 1);
+    user.dislikedThreads.splice(temp, 1);
     thread.dislikes--;
   }
   if (!user.likedThreads.includes(thread)) {
@@ -96,7 +96,7 @@ export const disLikeThread = async (
   let user = users[username];
   if (user.likedThreads.includes(thread)) {
     let temp: number = user.likedThreads.lastIndexOf(thread);
-    user.likedThreads = user.likedThreads.splice(temp, 1);
+    user.likedThreads.splice(temp, 1);
     thread.likes--;
   }
   if (!user.dislikedThreads.includes(thread)) {
@@ -146,7 +146,7 @@ export const editThread = async (
     today.getMonth() +
     "-" +
     today.getDate();
-  content += date;
+  //content += date;
   thread.content = content;
   thread.title = title;
   return {
@@ -244,8 +244,8 @@ export const postThread = async (
   title: string,
   content: string
 ): Promise<ThreadServiceResult> => {
-  if (categories.includes(category)) {
-    let author: User = users[username];
+  let author: User = users[username];
+  if (categories.includes(category) && author !== undefined) {
     let threadId: number = id++;
     let date: Date = new Date();
     let replies: Comment[] = [];

@@ -63,7 +63,6 @@ test("Create thread fails if no user with the given username exists.", async () 
     dummyContent
   );
 
-  if (!result.thread) throw new Error("Thread is undefined.");
 
   expect(result.thread).toBeUndefined;
   expect(result.statusCode).toBe(400);
@@ -78,8 +77,6 @@ test("Create thread fails if given category does not exists.", async () => {
     dummyTitle,
     dummyContent
   );
-
-  if (!result.thread) throw new Error("Thread is undefined.");
 
   expect(result.thread).toBeUndefined;
   expect(result.statusCode).toBe(400);
@@ -121,8 +118,8 @@ test("Attempting to edit a thread that doesn't exist fails.", async () => {
   categories.push(dummyCategory);
 
   const result = await editThread(100, "凸༼ຈل͜ຈ༽凸", "Lenny faces uwu");
-  if (!result.thread) throw new Error("Thread is undefined.");
 
+  expect(result.thread).toBeUndefined;
   expect(result.statusCode).toBe(400);
 });
 
@@ -246,11 +243,13 @@ test("Disliking an already liked thread succeeds if the thread exists and the us
     dummyTitle,
     dummyContent
   );
-  if (thread.thread?.threadId === undefined)
-    throw new Error("Thread is undefined.");
+  if (thread.thread?.threadId === undefined) throw new Error("Thread is undefined.");
+
   if (user.user?.username === undefined) throw new Error("User is undefined.");
+
   const result = await likeThread(thread.thread.threadId, user.user?.username);
   if (!result.thread) throw new Error("Thread is undefined.");
+  
   expect(user.user.dislikedThreads.includes(result.thread)).toBe(false);
   expect(user.user.likedThreads.includes(result.thread)).toBe(true);
 
