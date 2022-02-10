@@ -128,7 +128,7 @@ export const hasContent = body("content")
 export const hasValidThreadTitle = body("title")
   .notEmpty()
   .withMessage("No thread title was provided.")
-  .isLength({ min: 4, max: 16 })
+  .isLength({ min: 4, max: 64 })
   .withMessage("The title has to be between 4 and 16 characters long.");
 
 /**

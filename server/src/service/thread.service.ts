@@ -10,7 +10,11 @@ export const threads: { [key: string]: Thread } = {};
 /**
  * Temporary in-memory store of all categories.
  */
-export const categories: string[] = [];
+export const categories: string[] = [
+  "dogs",
+  "cats",
+  "Guianan Cock-of-the-rock",
+];
 /**
  * Global variable to know what id to assign next thread
  */
@@ -245,7 +249,7 @@ export const postThread = async (
   content: string
 ): Promise<ThreadServiceResult> => {
   let author: User = users[username];
-  if (categories.includes(category) && author !== undefined) {
+  if (categories.includes(category) && author) {
     let threadId: number = id++;
     let date: Date = new Date();
     let replies: Comment[] = [];
