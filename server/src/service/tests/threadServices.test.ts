@@ -30,6 +30,11 @@ beforeEach(async () =>
   categories.forEach((category, index) => delete categories[index])
 );
 
+/*
+  ================================
+  postThread
+  ================================
+  */
 test("Create thread succeds if username, category, title and content is provided.", async () => {
   await register(dummyEmail, dummyUsername, dummyPassword, dummyDateOfBirth);
   categories.push(dummyCategory);
@@ -64,7 +69,7 @@ test("Create thread fails if no user with the given username exists.", async () 
   expect(result.statusCode).toBe(400);
 });
 
-test("Create thread fails if no user with the given category exists.", async () => {
+test("Create thread fails if given category does not exists.", async () => {
   await register(dummyEmail, dummyUsername, dummyPassword, dummyDateOfBirth);
 
   const result = await postThread(
@@ -85,7 +90,6 @@ test("Create thread fails if no user with the given category exists.", async () 
   editThread
   ================================
   */
-
 test("Editing an existing thread with the correct variables succeeds.", async () => {
   await register(dummyEmail, dummyUsername, dummyPassword, dummyDateOfBirth);
   categories.push(dummyCategory);
@@ -297,7 +301,7 @@ test("Registering a user with an occupied username fails", async () => {
 
 /*
   ================================
-  deleteUser
+  deleteThread
   ================================
   */
 

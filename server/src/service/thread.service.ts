@@ -3,9 +3,21 @@ import { Thread } from "../model/thread.interface";
 import { User } from "../model/user.interface";
 import { users } from "./user.service";
 
+/**
+ * Temporary in-memory store of all threads.
+ */
 export const threads: { [key: string]: Thread } = {};
+/**
+ * Temporary in-memory store of all categories.
+ */
 export const categories: string[] = [];
+/**
+ * Global variable to know what id to assign next thread
+ */
 let id: number = 0;
+/**
+ * Global variable to know what id to assign next comment
+ */
 export let commentID: number = 0;
 
 /**
@@ -28,6 +40,15 @@ interface ThreadServiceResult {
   thread?: Thread;
 }
 
+/**
+ * User likes a thread
+ * 
+ * @param threadId - id of the thread the user likes.
+ * 
+ * @param username - the user who likes the thread.
+ * 
+ * @returns - A ThreadServiceResult object.
+ */
 export const likeThread = async (
   threadId: number,
   username: string
@@ -54,6 +75,15 @@ export const likeThread = async (
   };
 };
 
+/**
+ * User dislikes a thread
+ * 
+ * @param threadId - id of the thread the user dislikes.
+ * 
+ * @param username - the user who dislikes the thread.
+ * 
+ * @returns - A ThreadServiceResult object.
+ */
 export const disLikeThread = async (
   threadId: number,
   username: string
@@ -80,6 +110,17 @@ export const disLikeThread = async (
   };
 };
 
+/**
+ * Edits the content of a thread
+ * 
+ * @param threadId - The thread to edit
+ * 
+ * @param content - The new content of the thread
+ * 
+ * @param title - can change the title of the thread
+ * 
+ * @returns A ThreadServiceResult object.
+ */
 export const editThread = async (
   threadId: number,
   content: string,
@@ -111,6 +152,17 @@ export const editThread = async (
   };
 };
 
+/**
+ * Creates a new comment to a thread
+ * 
+ * @param username - username of the user who wants to comment
+ * 
+ * @param threadId - the thread to comment on
+ * 
+ * @param content - the bread-text of the comment
+ * 
+ * @returns A ThreadServiceResult object.
+ */
 export const commentThread = async (
   username: string,
   threadId: number,
@@ -140,6 +192,13 @@ export const commentThread = async (
   };
 };
 
+/**
+ * Deletes a thread
+ * 
+ * @param threadId - The thread to delete
+ * 
+ * @returns A ThreadServiceResult object.
+ */
 export const deleteThread = async (
   threadId: number
 ): Promise<ThreadServiceResult> => {
@@ -162,6 +221,19 @@ function removeReplies(reply: Comment) {
   });
 }
 
+/**
+ * Creates a new thread
+ * 
+ * @param username - username of the user who wants to create the thread
+ * 
+ * @param category - The category the thread should be in
+ * 
+ * @param title - the title of the thread
+ * 
+ * @param content - the bread-text of the comment
+ * 
+ * @returns A ThreadServiceResult object.
+ */
 export const postThread = async (
   username: string,
   category: string,
