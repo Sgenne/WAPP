@@ -27,10 +27,11 @@ interface CommentServiceResult {
 
 export const likeComment = async (
   commentId: number,
-  username: string
+  userId: number
 ): Promise<CommentServiceResult> => {
   let comment: Comment = comments[commentId];
-  let user: User = users[username];
+  let user: User = users[userId];
+  
   if (comment.authour.username != "Deleted") {
     if (!user.likedComments.includes(comment)) {
       user.likedComments.push(comment);
@@ -57,10 +58,10 @@ export const likeComment = async (
 
 export const disLikeComment = async (
   commentId: number,
-  username: string
+  userId: number
 ): Promise<CommentServiceResult> => {
   let comment: Comment = comments[commentId];
-  let user: User = users[username];
+  let user: User = users[userId];
   if (comment.authour.username != "Deleted") {
     if (!user.dislikedComments.includes(comment)) {
       user.dislikedComments.push(comment);
@@ -81,9 +82,18 @@ export const disLikeComment = async (
 
 export const editComment = async (
   commentId: number,
-  content: string
+  content: string,
+  userId: number
 ): Promise<CommentServiceResult> => {
   let comment: Comment = comments[commentId];
+
+  if (comment.authour.userId !== userId) {
+    return {
+      statusCode: 403,
+      message: "The user does not have permission to edit this comment.",
+    };
+  }
+
   if (comment.authour.username != "Deleted") {
     comment.content = content + "\nedited";
   }
@@ -95,11 +105,20 @@ export const editComment = async (
 };
 
 export const deleteComment = async (
-  commentId: number
+  commentId: number,
+  userId: number
 ): Promise<CommentServiceResult> => {
   let comment: Comment = comments[commentId];
-  if (comment.authour.username != "Deleted") {
-    comment.authour = users["Deleted"];
+
+  if (comment.authour.userId !== userId) {
+    return {
+      statusCode: 403,
+      message: "The user does not have permission to delete thic comment.",
+    };
+  }
+
+  if (comment.authour.username !== "Deleted") {
+    comment.authour = users[0];
     comment.content = "";
     comment.dislikes = 0;
     comment.likes = 0;
@@ -114,10 +133,10 @@ export const deleteComment = async (
 export const postReply = async (
   commentIdRoot: number,
   content: string,
-  username: string
+  userId: number
 ): Promise<CommentServiceResult> => {
   let root: Comment = comments[commentIdRoot];
-  let authour: User = users[username];
+  let authour: User = users[userId];
   let date: Date = new Date();
   let replies: Comment[] = [];
   let likes: number = 0;

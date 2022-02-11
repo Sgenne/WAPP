@@ -147,3 +147,10 @@ export const hasValidCommentId = body("commentId")
   .withMessage("No comment-id was provided.")
   .isNumeric()
   .withMessage("The comment-id was invalid.");
+
+/**
+ * Verifies that the request body has a valid user-id.
+ */
+export const hasValidUserId = body("userId")
+  .notEmpty()
+  .withMessage("No user-id was provided.");

@@ -1,11 +1,32 @@
 import { User } from "../model/user.interface";
 import bcrypt from "bcryptjs";
-import { Console } from "console";
 
 /**
  * Temporary in-memory store.
  */
-export const users: { [key: string]: User } = {};
+export const users: { [userId: string]: User } = {
+  0: {
+    userId: -1,
+    username: "Deleted",
+    email: "",
+    joinDate: new Date(),
+    birthDate: new Date(),
+    passwordHash: "",
+    likedThreads: [],
+    dislikedThreads: [],
+    likedComments: [],
+    dislikedComments: [],
+    visibleProperties: {
+      email: false,
+      joinDate: false,
+      birthDate: false,
+      bio: false,
+      image: false,
+      likedThreads: false,
+      unlikedThreads: false,
+    },
+  },
+};
 
 /**
  * The result of a user service.
@@ -31,9 +52,7 @@ interface UserServiceResult {
 /**
  * Updates the properties of a registered user.
  *
- * @param username - The username of the user to update.
- *
- * @param password - The password of the user to update.
+ * @param userId - The id of the user to update.
  *
  * @param update - An object whose defined properties
  * will be used to update the user.
@@ -41,8 +60,7 @@ interface UserServiceResult {
  * @returns A UserServiceResult object.
  */
 export const updateUser = async (
-  username: string,
-  password: string,
+  userId: number,
   update: {
     birthDate?: any;
     bio?: string;
@@ -50,19 +68,10 @@ export const updateUser = async (
     image?: any;
   }
 ): Promise<UserServiceResult> => {
-  const existingUser = users[username];
+  const existingUser = users[userId];
 
   if (!existingUser) {
     return { statusCode: 404, message: "User not found." };
-  }
-
-  const passwordIsValid = await bcrypt.compare(
-    password,
-    existingUser.passwordHash
-  );
-
-  if (!passwordIsValid) {
-    return { statusCode: 401, message: "The given password was invalid." };
   }
 
   if (update.birthDate) {
@@ -84,37 +93,32 @@ export const updateUser = async (
   };
 };
 
-/**
- * Attempts to sign a user in with the given username and password.
- *
- * @param username - The username to use when signing the user in.
- *
- * @param password - The password to use when signing the user in.
- *
- * @returns A UserServiceResult object.
- */
-export const signIn = async (
-  username: string,
+export const validatePassword = async (
+  userId: number,
   password: string
 ): Promise<UserServiceResult> => {
-  const existingUser = users[username];
+  const user = users[userId];
 
-  if (!existingUser) {
-    return { statusCode: 404, message: "User not found." };
+  if (!user) {
+    return {
+      statusCode: 404,
+      message: "No user with the given user-id exists.",
+    };
   }
 
-  const passwordIsValid = await bcrypt.compare(
-    password,
-    existingUser.passwordHash
-  );
+  const passwordIsValid = await bcrypt.compare(password, user.passwordHash);
+
   if (!passwordIsValid) {
-    return { statusCode: 401, message: "The given password was invalid." };
+    return {
+      statusCode: 401,
+      message: "The given password was incorrect.",
+    };
   }
 
   return {
     statusCode: 200,
-    message: "The user was signed in successfully.",
-    user: existingUser,
+    message: "The given password was valid.",
+    user: user,
   };
 };
 
@@ -137,15 +141,21 @@ export const register = async (
   password: string,
   birthDate: Date
 ): Promise<UserServiceResult> => {
-  if (users[username]) {
+  const existingUser = Object.values(users).find(
+    (user) => user.username === username
+  );
+
+  if (existingUser) {
     return {
       statusCode: 403,
       message: "A user with the given username already exists.",
     };
   }
 
+  const userId = new Date().getTime();
   const passwordHash = await hashPassword(password);
-  const newUser = {
+  const newUser: User = {
+    userId,
     email,
     username,
     passwordHash,
@@ -165,7 +175,7 @@ export const register = async (
       unlikedThreads: true,
     },
   };
-  users[username] = newUser;
+  users[userId] = newUser;
   return {
     statusCode: 201,
     message: "The new user was created successfully.",
@@ -176,69 +186,52 @@ export const register = async (
 /**
  * Attempts to delete a user.
  *
- * @param username - The username of the user to delete.
- *
- * @param password - The password of the user to delete.
+ * @param userId - The id of the user to delete.
  *
  * @returns A UserServiceResult object.
  */
 export const deleteUser = async (
-  username: string,
-  password: string
+  userId: number
 ): Promise<UserServiceResult> => {
-  const existingUser = users[username];
+  const existingUser = users[userId];
 
   if (!existingUser) {
     return { statusCode: 404, message: "user not found." };
   }
 
-  const passwordIsValid = await bcrypt.compare(
-    password,
-    existingUser.passwordHash
-  );
-
-  if (!passwordIsValid) {
-    return { statusCode: 401, message: "The given password was invalid." };
-  }
-
-  delete users[username];
+  delete users[userId];
 
   return { statusCode: 200, message: "The user was deleted successfully." };
 };
 
 /**
- * Returns the user object of the user with the given username, if one exists.
+ * Returns the user object of the user with the given id, if one exists.
  */
-export const getUser = async (username: string): Promise<UserServiceResult> => {
-  const existingUser = users[username];
+export const getUser = async (userId: number): Promise<UserServiceResult> => {
+  const existingUser = users[userId];
 
   if (!existingUser) {
     return { statusCode: 404, message: "User not found." };
   }
 
-  const exposedUser = { ...existingUser, passwordHash: "" };
-
   return {
     statusCode: 200,
     message: "User fetched successfully.",
-    user: exposedUser,
+    user: existingUser,
   };
 };
 
 /**
- * Updates the visible properties of the user with the given username and password.
+ * Updates the visible properties of the user with the given userId.
  *
- * @param username - The username of the user to update.
- *
- * @param password - The password of the user to update.
+ * @param userId - The id of the user to update.
  *
  * @param options  - An object describing which of the users properties should be visible.
  *
  * @returns A UserServiceResult object.
  */
 export const setVisibleProperties = async (
-  username: string,
-  password: string,
+  userId: number,
   options: {
     email: boolean;
     joinDate: boolean;
@@ -249,19 +242,10 @@ export const setVisibleProperties = async (
     unlikedThreads: boolean;
   }
 ): Promise<UserServiceResult> => {
-  const existingUser = users[username];
+  const existingUser = users[userId];
 
   if (!existingUser) {
     return { statusCode: 404, message: "User not found." };
-  }
-
-  const passwordIsValid = await bcrypt.compare(
-    password,
-    existingUser.passwordHash
-  );
-
-  if (!passwordIsValid) {
-    return { statusCode: 401, message: "Invalid password." };
   }
 
   existingUser.visibleProperties = options;

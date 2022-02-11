@@ -6,6 +6,7 @@ import {
   hasUsername,
   hasValidCommentId,
 } from "../utils/validation.util";
+import { isAuthenticated } from "../utils/auth.util";
 
 export const commentRouter = Router();
 
@@ -14,11 +15,12 @@ commentRouter.put(
   hasValidCommentId,
   hasUsername,
   handleValidationResult,
+  isAuthenticated,
   async (req: Request, res: Response) => {
     const commentID = req.body.commentID;
-    const username = req.body.username;
+    const userId = req.body.userId;
 
-    const result = await commentService.likeComment(commentID, username);
+    const result = await commentService.likeComment(commentID, userId);
 
     if (result.statusCode !== 200) {
       return res.status(result.statusCode).send({ message: result.message });
@@ -36,11 +38,12 @@ commentRouter.put(
   hasValidCommentId,
   hasUsername,
   handleValidationResult,
+  isAuthenticated,
   async (req: Request, res: Response) => {
     const commentID = req.body.commentID;
-    const username = req.body.username;
+    const userId = req.body.userId;
 
-    const result = await commentService.disLikeComment(commentID, username);
+    const result = await commentService.disLikeComment(commentID, userId);
 
     if (result.statusCode !== 200) {
       return res.status(result.statusCode).send({ message: result.message });
@@ -58,11 +61,13 @@ commentRouter.put(
   hasValidCommentId,
   hasContent,
   handleValidationResult,
+  isAuthenticated,
   async (req: Request, res: Response) => {
     const commentID = req.body.commentID;
     const content = req.body.content;
+    const userId = req.body.userId;
 
-    const result = await commentService.editComment(commentID, content);
+    const result = await commentService.editComment(commentID, content, userId);
 
     if (result.statusCode !== 200) {
       return res.status(result.statusCode).send({ message: result.message });
@@ -79,10 +84,12 @@ commentRouter.put(
   "/deleteComment",
   hasValidCommentId,
   handleValidationResult,
+  isAuthenticated,
   async (req: Request, res: Response) => {
     const commentID = req.body.commentID;
+    const userId = req.body.userId;
 
-    const result = await commentService.deleteComment(commentID);
+    const result = await commentService.deleteComment(commentID, userId);
 
     if (result.statusCode !== 200) {
       return res.status(result.statusCode).send({ message: result.message });
@@ -101,6 +108,7 @@ commentRouter.put(
   hasContent,
   hasUsername,
   handleValidationResult,
+  isAuthenticated,
   async (req: Request, res: Response) => {
     const commentID = req.body.commentID;
     const content = req.body.content;

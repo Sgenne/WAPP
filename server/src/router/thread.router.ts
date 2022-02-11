@@ -8,6 +8,7 @@ import {
   hasValidThreadId,
   hasValidThreadTitle,
 } from "../utils/validation.util";
+import { isAuthenticated } from "../utils/auth.util";
 
 export const threadRouter = Router();
 
@@ -16,6 +17,7 @@ threadRouter.put(
   hasValidThreadId,
   hasUsername,
   handleValidationResult,
+  isAuthenticated,
   async (req: Request, res: Response) => {
     const threadID = req.body.threadId;
     const username = req.body.username;
@@ -36,13 +38,13 @@ threadRouter.put(
 threadRouter.put(
   "/disLikeThread",
   hasValidThreadId,
-  hasUsername,
   handleValidationResult,
+  isAuthenticated,
   async (req: Request, res: Response) => {
     const threadID = req.body.threadId;
-    const username = req.body.username;
+    const userId = req.body.userId;
 
-    const result = await threadServices.disLikeThread(threadID, username);
+    const result = await threadServices.disLikeThread(threadID, userId);
 
     if (result.statusCode !== 200) {
       return res.status(result.statusCode).send({ message: result.message });
@@ -61,6 +63,7 @@ threadRouter.put(
   hasContent,
   hasValidThreadTitle,
   handleValidationResult,
+  isAuthenticated,
   async (req: Request, res: Response) => {
     const threadID = req.body.threadId;
     const content = req.body.content;
@@ -83,15 +86,15 @@ threadRouter.post(
   "/commentThread",
   hasValidThreadId,
   hasContent,
-  hasValidThreadTitle,
   handleValidationResult,
+  isAuthenticated,
   async (req: Request, res: Response) => {
     const threadID = req.body.threadId;
     const content = req.body.content;
-    const username = req.body.username;
+    const userId = req.body.userId;
 
     const result = await threadServices.commentThread(
-      username,
+      userId,
       threadID,
       content
     );
@@ -109,19 +112,19 @@ threadRouter.post(
 
 threadRouter.post(
   "/postThread",
-  hasUsername,
   hasCategory,
   hasValidThreadTitle,
   hasContent,
   handleValidationResult,
+  isAuthenticated,
   async (req: Request, res: Response) => {
-    const username = req.body.username;
+    const userId = req.body.userId;
     const category = req.body.category;
     const title = req.body.title;
     const content = req.body.content;
 
     const result = await threadServices.postThread(
-      username,
+      userId,
       category,
       title,
       content
@@ -142,10 +145,12 @@ threadRouter.delete(
   "/deleteThread",
   hasValidThreadId,
   handleValidationResult,
+  isAuthenticated,
   async (req: Request, res: Response) => {
     const threadId = req.body.threadId;
+    const userId = req.body.userId;
 
-    const result = await threadServices.deleteThread(threadId);
+    const result = await threadServices.deleteThread(threadId, userId);
 
     if (result.statusCode !== 200) {
       return res.status(result.statusCode).send({ message: result.message });

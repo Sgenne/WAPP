@@ -3,6 +3,11 @@ import { Comment } from "./comment.interface";
 
 export interface User {
   /**
+   * The id of the user.
+   */
+  userId: number;
+
+  /**
    * The username of the user.
    */
   username: string;

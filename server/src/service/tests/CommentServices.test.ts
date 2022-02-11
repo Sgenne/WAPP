@@ -15,7 +15,7 @@ import {
   commentThread,
   postThread,
 } from "../thread.service";
-import { register, signIn, users } from "../user.service";
+import { register, users } from "../user.service";
 
 const dummyUsername = "¯_(ツ)_/¯";
 const dummyCategory = "gaming";
@@ -35,30 +35,55 @@ beforeEach(async () => {
   Object.keys(threads).forEach((threadId) => delete threads[threadId]);
   Object.keys(users).forEach((username) => delete users[username]);
   Object.keys(comments).forEach((comment) => delete comments[comment]);
+
+  users[0] = {
+    userId: -1,
+    username: "Deleted",
+    email: "",
+    joinDate: new Date(),
+    birthDate: new Date(),
+    passwordHash: "",
+    likedThreads: [],
+    dislikedThreads: [],
+    likedComments: [],
+    dislikedComments: [],
+    visibleProperties: {
+      email: false,
+      joinDate: false,
+      birthDate: false,
+      bio: false,
+      image: false,
+      likedThreads: false,
+      unlikedThreads: false,
+    },
+  };
+
   categories.forEach((category, index) => delete categories[index]);
 
   //setting up a user and a thread
-  await register(dummyEmail, dummyUsername, dummyPassword, dummyDateOfBirth);
-  await register(
-    "deleteduser@gmail.com",
-    "Deleted",
+  const registerResult = await register(
+    dummyEmail,
+    dummyUsername,
     dummyPassword,
     dummyDateOfBirth
   );
 
+  if (!registerResult.user) throw new Error("Registration failed.");
+
+  user = registerResult.user;
+
   categories.push(dummyCategory);
   const threadres = await postThread(
-    dummyUsername,
+    user.userId,
     dummyCategory,
     dummyTitle,
     dummyContent
   );
-  if (threadres) user = users[dummyUsername];
   if (!threadres.thread) throw new Error("Thread failed");
   thread = threadres.thread;
   //posting a thread comment / root comment
   const commentres = await commentThread(
-    user.username,
+    user.userId,
     thread.threadId,
     dummyCommentContent
   );
@@ -66,68 +91,43 @@ beforeEach(async () => {
   rootComment = commentres.thread.replies[0];
 });
 
-/*
-    ================================
-    Like a comment
-    ================================
-    */
 test("Liking a comment as a valid user", async () => {
-  const result = await likeComment(rootComment.commentId, user.username);
+  const result = await likeComment(rootComment.commentId, user.userId);
   if (!result.comment) throw new Error("Comment is undefined.");
 
   expect(user.likedComments.includes(rootComment)).toBe(true);
   expect(result.statusCode).toBe(200);
 });
 
-/*
-    ================================
-    Like a comment twice
-    ================================
-    */
 test("Liking a comment twice as a valid user", async () => {
-  await likeComment(rootComment.commentId, user.username);
-  const result = await likeComment(rootComment.commentId, user.username);
+  await likeComment(rootComment.commentId, user.userId);
+  const result = await likeComment(rootComment.commentId, user.userId);
   if (!result.comment) throw new Error("Comment is undefined.");
 
   expect(user.likedComments.includes(rootComment)).toBe(false);
   expect(result.statusCode).toBe(200);
 });
 
-/*
-    ================================
-    Dislike a comment 
-    ================================
-    */
 test("Disliking a comment as a valid user", async () => {
-  const result = await disLikeComment(rootComment.commentId, user.username);
+  const result = await disLikeComment(rootComment.commentId, user.userId);
   if (!result.comment) throw new Error("Comment is undefined.");
 
   expect(user.dislikedComments.includes(rootComment)).toBe(true);
   expect(result.statusCode).toBe(200);
 });
 
-/*
-    ================================
-    Dislike a comment twice
-    ================================
-    */
 test("Disiking a comment twice as a valid user", async () => {
-  await disLikeComment(rootComment.commentId, user.username);
-  const result = await disLikeComment(rootComment.commentId, user.username);
+  await disLikeComment(rootComment.commentId, user.userId);
+  const result = await disLikeComment(rootComment.commentId, user.userId);
   if (!result.comment) throw new Error("Comment is undefined.");
 
   expect(user.dislikedComments.includes(rootComment)).toBe(false);
   expect(result.statusCode).toBe(200);
 });
 
-/*
-    ================================
-    Editing a comment
-    ================================
-    */
 test("Editing a comment as a valid user", async () => {
   const newText: string = "Amazing*";
-  const result = await editComment(rootComment.commentId, newText);
+  const result = await editComment(rootComment.commentId, newText, user.userId);
   if (!result.comment) throw new Error("Comment is undefined.");
 
   expect(result.comment.content.includes(newText)).toBe(true);
@@ -135,14 +135,9 @@ test("Editing a comment as a valid user", async () => {
   expect(result.statusCode).toBe(200);
 });
 
-/*
-    ================================
-    "Soft" deleting a comment
-    ================================
-    */
 test("deleting a comment as a valid user", async () => {
-  await disLikeComment(rootComment.commentId, user.username);
-  const result = await deleteComment(rootComment.commentId);
+  await disLikeComment(rootComment.commentId, user.userId);
+  const result = await deleteComment(rootComment.commentId, user.userId);
   if (!result.comment) throw new Error("Comment is undefined.");
 
   expect(result.comment.content).toBe("");
@@ -152,17 +147,12 @@ test("deleting a comment as a valid user", async () => {
   expect(result.statusCode).toBe(200);
 });
 
-/*
-    ================================
-    Reply to a comment
-    ================================
-    */
 test("replying to a comment as a valid user", async () => {
   const newComment = "I fully agree";
   const result = await postReply(
     rootComment.commentId,
     newComment,
-    user.username
+    user.userId
   );
   if (!result.comment) throw new Error("Comment is undefined.");
 

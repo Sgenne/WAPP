@@ -3,13 +3,14 @@ import { Request, Response, Router } from "express";
 import {
   handleValidationResult,
   hasPassword,
-  hasUsername,
   hasValidBirthDate,
   hasValidEmail,
   hasValidPassword,
+  hasValidUserId,
   hasValidUsername,
   hasVisiblePropertiesOptions,
 } from "../utils/validation.util";
+import { isAuthenticated } from "../utils/auth.util";
 
 export const userRouter = Router();
 
@@ -45,35 +46,11 @@ userRouter.post(
   }
 );
 
-userRouter.post(
-  "/sign-in",
-  hasUsername,
-  hasPassword,
-  handleValidationResult,
-  async (req: Request, res: Response) => {
-    const username = req.body.username;
-    const password = req.body.password;
-
-    const result = await userServices.signIn(username, password);
-
-    if (result.statusCode !== 200) {
-      return res.status(result.statusCode).send({ message: result.message });
-    }
-
-    res
-      .status(200)
-      .send({ message: "Signed in successfully.", user: result.user });
-  }
-);
-
 userRouter.put(
   "/update-user",
-  hasUsername,
-  hasPassword,
-  handleValidationResult,
+  isAuthenticated,
   async (req: Request, res: Response) => {
-    const username = req.body.username;
-    const password = req.body.password;
+    const userId = req.body.userId;
 
     const update = {
       birthDate: req.body.birthDate,
@@ -82,7 +59,7 @@ userRouter.put(
       password: req.body.newPassword,
     };
 
-    const result = await userServices.updateUser(username, password, update);
+    const result = await userServices.updateUser(userId, update);
 
     if (result.statusCode !== 200) {
       return res.status(result.statusCode).send({ message: result.message });
@@ -97,23 +74,20 @@ userRouter.put(
 
 userRouter.delete(
   "/delete-user",
-  hasUsername,
-  hasPassword,
-  handleValidationResult,
+  isAuthenticated,
   async (req: Request, res: Response) => {
-    const username = req.body.username;
-    const password = req.body.password;
+    const userId = req.body.userId;
 
-    const result = await userServices.deleteUser(username, password);
+    const result = await userServices.deleteUser(userId);
 
     return res.status(result.statusCode).send({ message: result.message });
   }
 );
 
-userRouter.get("/:username", async (req: Request, res: Response) => {
-  const username = req.params.username;
+userRouter.get("/:userId", async (req: Request, res: Response) => {
+  const userId = req.params.userId;
 
-  const result = await userServices.getUser(username);
+  const result = await userServices.getUser(+userId);
 
   if (result.statusCode !== 200) {
     return res.status(result.statusCode).send({ message: result.message });
@@ -124,20 +98,14 @@ userRouter.get("/:username", async (req: Request, res: Response) => {
 
 userRouter.put(
   "/edit-user-preferences",
-  hasUsername,
-  hasPassword,
+  isAuthenticated,
   hasVisiblePropertiesOptions,
   handleValidationResult,
   async (req: Request, res: Response) => {
     const options = req.body.options;
-    const username = req.body.username;
-    const password = req.body.password;
+    const userId = req.body.username;
 
-    const result = await userServices.setVisibleProperties(
-      username,
-      password,
-      options
-    );
+    const result = await userServices.setVisibleProperties(userId, options);
 
     if (result.statusCode !== 200) {
       return res.status(result.statusCode).send({ message: result.message });
@@ -147,5 +115,19 @@ userRouter.put(
       message: "Preferences updated successfully.",
       user: result.user,
     });
+  }
+);
+
+userRouter.post(
+  "/validate-password",
+  hasValidUserId,
+  hasPassword,
+  async (req: Request, res: Response) => {
+    const userId = req.body.userId;
+    const password = req.body.password;
+
+    const result = await userServices.validatePassword(userId, password);
+
+    res.status(result.statusCode).send({ message: result.message, user: result.user });
   }
 );

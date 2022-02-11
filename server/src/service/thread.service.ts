@@ -60,10 +60,10 @@ interface ThreadServiceResult {
  */
 export const likeThread = async (
   threadId: number,
-  username: string
+  userId: number
 ): Promise<ThreadServiceResult> => {
   let thread = threads[threadId];
-  let user = users[username];
+  let user = users[userId];
   if (user.dislikedThreads.includes(thread)) {
     user.dislikedThreads.forEach((item, index) => {
       if (item === thread) user.dislikedThreads.splice(index, 1);
@@ -97,10 +97,10 @@ export const likeThread = async (
  */
 export const disLikeThread = async (
   threadId: number,
-  username: string
+  userId: number
 ): Promise<ThreadServiceResult> => {
   let thread = threads[threadId];
-  let user = users[username];
+  let user = users[userId];
   if (user.likedThreads.includes(thread)) {
     user.likedThreads.forEach((item, index) => {
       if (item === thread) user.likedThreads.splice(index, 1);
@@ -139,7 +139,7 @@ export const editThread = async (
   content: string,
   title: string
 ): Promise<ThreadServiceResult> => {
-  if (threads[threadId] === undefined) {
+  if (!threads[threadId]) {
     return {
       statusCode: 400,
       message: "Thread does not exist",
@@ -177,12 +177,12 @@ export const editThread = async (
  * @returns A ThreadServiceResult object.
  */
 export const commentThread = async (
-  username: string,
+  userId: number,
   threadId: number,
   content: string
 ): Promise<ThreadServiceResult> => {
   let thread: Thread = threads[threadId];
-  let authour: User = users[username];
+  let authour: User = users[userId];
   let date: Date = new Date();
   let replies: Comment[] = [];
   let likes: number = 0;
@@ -214,9 +214,18 @@ export const commentThread = async (
  * @returns A ThreadServiceResult object.
  */
 export const deleteThread = async (
-  threadId: number
+  threadId: number,
+  userId: number
 ): Promise<ThreadServiceResult> => {
   let thread: Thread = threads[threadId];
+
+  if (thread.author.userId !== userId) {
+    return {
+      statusCode: 403,
+      message: "The user does not have permission to delete this thread.",
+    };
+  }
+
   thread.replies.forEach(function (element, index) {
     removeReplies(element);
     delete thread.replies[index];
@@ -249,13 +258,13 @@ function removeReplies(reply: Comment) {
  * @returns A ThreadServiceResult object.
  */
 export const postThread = async (
-  username: string,
+  userId: number,
   category: string,
   title: string,
   content: string
 ): Promise<ThreadServiceResult> => {
-  if (categories.includes(category) && users[username]) {
-    let author: User = users[username];
+  if (categories.includes(category) && users[userId]) {
+    let author: User = users[userId];
     let threadId: number = id++;
     let date: Date = new Date();
     let replies: Comment[] = [];

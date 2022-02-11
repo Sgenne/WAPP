@@ -22,10 +22,12 @@ test("Registering a user and then GETing that user should return the user.", asy
     birthDate: dummyDateOfBirth,
   });
 
+  const userId = registrationResult.body.user.userId;
+
   if (registrationResult.status !== 201)
     throw new Error("Registration failed.");
 
-  const getResult = await request.get(`/user/${dummyUsername}`);
+  const getResult = await request.get(`/user/${userId}`);
 
   expect(getResult.status).toBe(200);
 
@@ -34,60 +36,61 @@ test("Registering a user and then GETing that user should return the user.", asy
   expect(receivedUser.username).toBe(dummyUsername);
 });
 
-test("After editing a users password, sign in only works with the new pw.", async () => {
+test("After editing a users password, only the new password is valid.", async () => {
   const request = SuperTest(app);
   const newPassword = "newPassword";
 
-  await request.post("/user/register").send({
+  const registrationResult = await request.post("/user/register").send({
     username: dummyUsername,
     email: dummyEmail,
     password: dummyPassword,
     birthDate: dummyDateOfBirth,
   });
 
+  const userId = registrationResult.body.user.userId;
+
   await request.put("/user/update-user").send({
-    username: dummyUsername,
+    userId: userId,
     password: dummyPassword,
     newPassword: newPassword,
   });
 
   const [originalPasswordResult, newPasswordResult] = await Promise.all([
     request
-      .post("/user/sign-in")
-      .send({ username: dummyUsername, password: dummyPassword }),
+      .post("/user/validate-password")
+      .send({ userId: userId, password: dummyPassword }),
     request
-      .post("/user/sign-in")
-      .send({ username: dummyUsername, password: newPassword }),
+      .post("/user/validate-password")
+      .send({ userId: userId, password: newPassword }),
   ]);
 
   expect(originalPasswordResult.status).toBe(401);
   expect(originalPasswordResult.body.user).toBeUndefined();
 
   expect(newPasswordResult.status).toBe(200);
-  expect(newPasswordResult.body.user).toBeDefined();
 });
 
-test("Sign in fails with 404 after a user has been deleted.", async () => {
+test("GETing a user fails with 404 after that user has been deleted.", async () => {
   const request = SuperTest(app);
 
-  await request.post("/user/register").send({
+  const registerResult = await request.post("/user/register").send({
     username: dummyUsername,
     email: dummyEmail,
     password: dummyPassword,
     birthDate: dummyDateOfBirth,
   });
 
+  const userId = registerResult.body.user.userId;
+
   const deleteResult = await request.delete("/user/delete-user").send({
-    username: dummyUsername,
+    userId: userId,
     password: dummyPassword,
   });
 
   expect(deleteResult.status).toBe(200);
 
-  const signInResult = await request
-    .post("/user/sign-in")
-    .send({ username: dummyUsername, password: dummyPassword });
+  const getResult = await request.get("/user/" + userId).send();
 
-  expect(signInResult.status).toBe(404);
-  expect(signInResult.body.user).toBeUndefined();
+  expect(getResult.status).toBe(404);
+  expect(getResult.body.user).toBeUndefined();
 });
