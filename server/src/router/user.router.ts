@@ -128,6 +128,8 @@ userRouter.post(
 
     const result = await userServices.validatePassword(userId, password);
 
-    res.status(result.statusCode).send({ message: result.message, user: result.user });
+    res
+      .status(result.statusCode)
+      .send({ message: result.message, user: result.user });
   }
 );

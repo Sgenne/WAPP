@@ -31,15 +31,19 @@ export const likeComment = async (
 ): Promise<CommentServiceResult> => {
   let comment: Comment = comments[commentId];
   let user: User = users[userId];
-  
+
   if (comment.authour.username != "Deleted") {
+    if (user.dislikedComments.includes(comment)) {
+      let temp: number = user.dislikedComments.lastIndexOf(comment);
+      user.dislikedComments.splice(temp, 1);
+      comment.dislikes--;
+    }
     if (!user.likedComments.includes(comment)) {
       user.likedComments.push(comment);
       comment.likes++;
     } else {
-      user.likedComments.forEach((item, index) => {
-        if (item === comment) user.likedComments.splice(index, 1);
-      });
+      let temp: number = user.likedComments.lastIndexOf(comment);
+      user.likedComments.splice(temp, 1);
       comment.likes--;
     }
     return {
@@ -63,13 +67,17 @@ export const disLikeComment = async (
   let comment: Comment = comments[commentId];
   let user: User = users[userId];
   if (comment.authour.username != "Deleted") {
+    if (user.likedComments.includes(comment)) {
+      let temp: number = user.likedComments.lastIndexOf(comment);
+      user.likedComments.splice(temp, 1);
+      comment.dislikes--;
+    }
     if (!user.dislikedComments.includes(comment)) {
       user.dislikedComments.push(comment);
       comment.dislikes++;
     } else {
-      user.dislikedComments.forEach((item, index) => {
-        if (item === comment) user.dislikedComments.splice(index, 1);
-      });
+      let temp: number = user.dislikedComments.lastIndexOf(comment);
+      user.dislikedComments.splice(temp, 1);
       comment.dislikes--;
     }
   }
@@ -153,12 +161,12 @@ export const postReply = async (
   };
   root.replies.push(newComment);
   return {
-    statusCode: 200,
+    statusCode: 201,
     message: "Reply posted successfully",
     comment: newComment,
   };
 };
 
-function getCommentID() {
+function getCommentID(): number {
   return newComment();
 }

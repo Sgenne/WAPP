@@ -65,18 +65,16 @@ export const likeThread = async (
   let thread = threads[threadId];
   let user = users[userId];
   if (user.dislikedThreads.includes(thread)) {
-    user.dislikedThreads.forEach((item, index) => {
-      if (item === thread) user.dislikedThreads.splice(index, 1);
-    });
+    let temp: number = user.dislikedThreads.lastIndexOf(thread);
+    user.dislikedThreads.splice(temp, 1);
     thread.dislikes--;
   }
   if (!user.likedThreads.includes(thread)) {
     user.likedThreads.push(thread);
     thread.likes++;
   } else {
-    user.likedThreads.forEach((item, index) => {
-      if (item === thread) user.likedThreads.splice(index, 1);
-    });
+    let temp: number = user.likedThreads.lastIndexOf(thread);
+    user.likedThreads.splice(temp, 1);
     thread.likes--;
   }
   return {
@@ -200,7 +198,7 @@ export const commentThread = async (
   thread.replies.push(newComment);
   comments[newComment.commentId] = newComment;
   return {
-    statusCode: 200,
+    statusCode: 201,
     message: "Thread posted successfully",
     thread: thread,
   };
@@ -226,7 +224,7 @@ export const deleteThread = async (
     };
   }
 
-  thread.replies.forEach(function (element, index) {
+  thread.replies.forEach(function (element:Comment, index:number):void {
     removeReplies(element);
     delete thread.replies[index];
   });
@@ -237,8 +235,8 @@ export const deleteThread = async (
   };
 };
 
-function removeReplies(reply: Comment) {
-  reply.replies.forEach(function (element, index) {
+function removeReplies(reply: Comment): void {
+  reply.replies.forEach(function (element:Comment, index:number):void {
     removeReplies(element);
     delete reply.replies[index];
   });

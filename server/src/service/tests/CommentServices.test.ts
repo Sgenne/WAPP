@@ -1,5 +1,3 @@
-import { Thread } from "../../model/thread.interface";
-import { User } from "../../model/user.interface";
 import { Comment } from "../../model/comment.interface";
 import {
   likeComment,
@@ -16,6 +14,7 @@ import {
   postThread,
 } from "../thread.service";
 import { register, users } from "../user.service";
+import { threadId } from "worker_threads";
 
 const dummyUsername = "¯_(ツ)_/¯";
 const dummyCategory = "gaming";
@@ -26,15 +25,12 @@ const dummyPassword = "password";
 const dummyEmail = "email@email.com";
 const dummyDateOfBirth = new Date(1972, 11, 10);
 
-let user: User;
-let thread: Thread;
-let rootComment: Comment;
-
-// Clear users before each test.
+// Clear all arrays before each test.
 beforeEach(async () => {
   Object.keys(threads).forEach((threadId) => delete threads[threadId]);
   Object.keys(users).forEach((username) => delete users[username]);
   Object.keys(comments).forEach((comment) => delete comments[comment]);
+  categories.forEach((category, index) => delete categories[index]);
 
   users[0] = {
     userId: -1,
@@ -58,9 +54,10 @@ beforeEach(async () => {
     },
   };
 
-  categories.forEach((category, index) => delete categories[index]);
+  categories.push(dummyCategory);
+});
 
-  //setting up a user and a thread
+async function userSetup(): Promise<number> {
   const registerResult = await register(
     dummyEmail,
     dummyUsername,
@@ -70,64 +67,64 @@ beforeEach(async () => {
 
   if (!registerResult.user) throw new Error("Registration failed.");
 
-  user = registerResult.user;
+  return registerResult.user.userId;
+}
 
-  categories.push(dummyCategory);
+async function threadSetup(userId: number): Promise<number> {
   const threadres = await postThread(
-    user.userId,
+    userId,
     dummyCategory,
     dummyTitle,
     dummyContent
   );
   if (!threadres.thread) throw new Error("Thread failed");
-  thread = threadres.thread;
-  //posting a thread comment / root comment
-  const commentres = await commentThread(
-    user.userId,
-    thread.threadId,
-    dummyCommentContent
-  );
+  return threadres.thread.threadId;
+}
+
+async function commentSetup(userId: number, threadId: number): Promise<number> {
+  const commentres = await commentThread(userId, threadId, dummyCommentContent);
   if (!commentres.thread) throw new Error("Thread comment failed");
-  rootComment = commentres.thread.replies[0];
-});
+  return commentres.thread.replies[0].commentId;
+}
 
-test("Liking a comment as a valid user", async () => {
-  const result = await likeComment(rootComment.commentId, user.userId);
+/*
+  ================================
+  postReply
+  ================================
+  */
+
+test("replying to a comment as a valid user", async () => {
+  let userId: number = await userSetup();
+  let threadId: number = await threadSetup(userId);
+  let commentId: number = await commentSetup(userId, threadId);
+
+  const newComment = "I fully agree";
+  const result = await postReply(commentId, newComment, userId);
   if (!result.comment) throw new Error("Comment is undefined.");
 
-  expect(user.likedComments.includes(rootComment)).toBe(true);
-  expect(result.statusCode).toBe(200);
+  const user = users[userId];
+  const rootComment = comments[commentId];
+  expect(result.comment.content).toBe(newComment);
+  expect(result.comment.authour.username).toBe(user.username);
+  expect(result.comment.likes).toBe(0);
+  expect(result.comment.dislikes).toBe(0);
+  expect(rootComment.replies.includes(result.comment)).toBe(true);
+  expect(result.statusCode).toBe(201);
 });
 
-test("Liking a comment twice as a valid user", async () => {
-  await likeComment(rootComment.commentId, user.userId);
-  const result = await likeComment(rootComment.commentId, user.userId);
-  if (!result.comment) throw new Error("Comment is undefined.");
-
-  expect(user.likedComments.includes(rootComment)).toBe(false);
-  expect(result.statusCode).toBe(200);
-});
-
-test("Disliking a comment as a valid user", async () => {
-  const result = await disLikeComment(rootComment.commentId, user.userId);
-  if (!result.comment) throw new Error("Comment is undefined.");
-
-  expect(user.dislikedComments.includes(rootComment)).toBe(true);
-  expect(result.statusCode).toBe(200);
-});
-
-test("Disiking a comment twice as a valid user", async () => {
-  await disLikeComment(rootComment.commentId, user.userId);
-  const result = await disLikeComment(rootComment.commentId, user.userId);
-  if (!result.comment) throw new Error("Comment is undefined.");
-
-  expect(user.dislikedComments.includes(rootComment)).toBe(false);
-  expect(result.statusCode).toBe(200);
-});
+/*
+  ================================
+  editComment
+  ================================
+  */
 
 test("Editing a comment as a valid user", async () => {
+  let userId: number = await userSetup();
+  let threadId: number = await threadSetup(userId);
+  let commentId: number = await commentSetup(userId, threadId);
+
   const newText: string = "Amazing*";
-  const result = await editComment(rootComment.commentId, newText, user.userId);
+  const result = await editComment(commentId, newText, userId);
   if (!result.comment) throw new Error("Comment is undefined.");
 
   expect(result.comment.content.includes(newText)).toBe(true);
@@ -135,31 +132,159 @@ test("Editing a comment as a valid user", async () => {
   expect(result.statusCode).toBe(200);
 });
 
+/*
+  ================================
+  likeComment
+  ================================
+  */
+
+test("Liking comment succeeds if the comment exists and the user exists, and the comment is not deleted", async () => {
+  let userId: number = await userSetup();
+  let threadId: number = await threadSetup(userId);
+  let commentId: number = await commentSetup(userId, threadId);
+
+  const result = await likeComment(commentId, userId);
+  if (!result.comment) throw new Error("Comment is undefined.");
+
+  const user = users[userId];
+  const rootComment = comments[commentId];
+
+  expect(user.likedComments.includes(rootComment)).toBe(true);
+  expect(result.statusCode).toBe(200);
+});
+
+test("Liking comment fails if the comment exists and the user exists, and the comment is deleted", async () => {
+  let userId: number = await userSetup();
+  let threadId: number = await threadSetup(userId);
+  let commentId: number = await commentSetup(userId, threadId);
+  const user = users[userId];
+  const rootComment = comments[commentId];
+  deleteComment(commentId, userId);
+  await likeComment(commentId, userId);
+
+  expect(user.likedComments.includes(rootComment)).toBe(false);
+});
+
+test("Liking an already disliked thread succeeds if the thread exists and the user exists, also make sure that the dislike is removed", async () => {
+  let userId: number = await userSetup();
+  let threadId: number = await threadSetup(userId);
+  let commentId: number = await commentSetup(userId, threadId);
+  const user = users[userId];
+  const rootComment = comments[commentId];
+
+  await disLikeComment(commentId, userId);
+
+  expect(user.dislikedComments.includes(rootComment)).toBe(true);
+  expect(user.likedComments.includes(rootComment)).toBe(false);
+
+  await likeComment(commentId, userId);
+
+  expect(user.dislikedComments.includes(rootComment)).toBe(false);
+  expect(user.likedComments.includes(rootComment)).toBe(true);
+});
+
+test("Liking an already liked comment removes the previous like as an valid user", async () => {
+  let userId: number = await userSetup();
+  let threadId: number = await threadSetup(userId);
+  let commentId: number = await commentSetup(userId, threadId);
+
+  await likeComment(commentId, userId);
+  const result = await likeComment(commentId, userId);
+  if (!result.comment) throw new Error("Comment is undefined.");
+
+  const user = users[userId];
+  const rootComment = comments[commentId];
+
+  expect(user.likedComments.includes(rootComment)).toBe(false);
+  expect(result.statusCode).toBe(200);
+});
+
+/*
+  ================================
+  dislikeComment
+  ================================
+  */
+
+test("Disliking comment succeeds if the comment exists and the user exists, and the comment is not deleted", async () => {
+  let userId: number = await userSetup();
+  let threadId: number = await threadSetup(userId);
+  let commentId: number = await commentSetup(userId, threadId);
+
+  const result = await disLikeComment(commentId, userId);
+  if (!result.comment) throw new Error("Comment is undefined.");
+
+  const user = users[userId];
+  const rootComment = comments[commentId];
+
+  expect(user.dislikedComments.includes(rootComment)).toBe(true);
+  expect(result.statusCode).toBe(200);
+});
+
+test("Disliking comment fails if the comment exists and the user exists, and the comment is deleted", async () => {
+  let userId: number = await userSetup();
+  let threadId: number = await threadSetup(userId);
+  let commentId: number = await commentSetup(userId, threadId);
+  const user = users[userId];
+  const rootComment = comments[commentId];
+
+  deleteComment(commentId, userId);
+  await disLikeComment(commentId, userId);
+
+  expect(user.dislikedComments.includes(rootComment)).toBe(false);
+});
+
+test("Disliking an already liked thread succeeds if the thread exists and the user exists, also make sure that the like is removed", async () => {
+  let userId: number = await userSetup();
+  let threadId: number = await threadSetup(userId);
+  let commentId: number = await commentSetup(userId, threadId);
+  const user = users[userId];
+  const rootComment = comments[commentId];
+
+  await likeComment(commentId, userId);
+
+  expect(user.likedComments.includes(rootComment)).toBe(true);
+  expect(user.dislikedComments.includes(rootComment)).toBe(false);
+
+  await disLikeComment(commentId, userId);
+
+  expect(user.likedComments.includes(rootComment)).toBe(false);
+  expect(user.dislikedComments.includes(rootComment)).toBe(true);
+});
+
+test("Disliking an already liked comment removes the previous like as an valid user", async () => {
+  let userId: number = await userSetup();
+  let threadId: number = await threadSetup(userId);
+  let commentId: number = await commentSetup(userId, threadId);
+
+  await disLikeComment(commentId, userId);
+  const result = await disLikeComment(commentId, userId);
+  if (!result.comment) throw new Error("Comment is undefined.");
+
+  const user = users[userId];
+  const rootComment = comments[commentId];
+
+  expect(user.dislikedComments.includes(rootComment)).toBe(false);
+  expect(result.statusCode).toBe(200);
+});
+
+/*
+  ================================
+  deleteComment
+  ================================
+  */
+
 test("deleting a comment as a valid user", async () => {
-  await disLikeComment(rootComment.commentId, user.userId);
-  const result = await deleteComment(rootComment.commentId, user.userId);
+  let userId: number = await userSetup();
+  let threadId: number = await threadSetup(userId);
+  let commentId: number = await commentSetup(userId, threadId);
+
+  await disLikeComment(commentId, userId);
+  const result = await deleteComment(commentId, userId);
   if (!result.comment) throw new Error("Comment is undefined.");
 
   expect(result.comment.content).toBe("");
   expect(result.comment.authour.username).toBe("Deleted");
   expect(result.comment.likes).toBe(0);
   expect(result.comment.dislikes).toBe(0);
-  expect(result.statusCode).toBe(200);
-});
-
-test("replying to a comment as a valid user", async () => {
-  const newComment = "I fully agree";
-  const result = await postReply(
-    rootComment.commentId,
-    newComment,
-    user.userId
-  );
-  if (!result.comment) throw new Error("Comment is undefined.");
-
-  expect(result.comment.content).toBe(newComment);
-  expect(result.comment.authour.username).toBe(user.username);
-  expect(result.comment.likes).toBe(0);
-  expect(result.comment.dislikes).toBe(0);
-  expect(rootComment.replies.includes(result.comment)).toBe(true);
   expect(result.statusCode).toBe(200);
 });

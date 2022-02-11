@@ -19,12 +19,36 @@ const dummyPassword = "password";
 const dummyEmail = "email@email.com";
 const dummyDateOfBirth = new Date(1972, 11, 10);
 
-// Clear users before each test.
+// Clear all arrays before each test.
 beforeEach(async () => {
   Object.keys(threads).forEach((threadId) => delete threads[threadId]);
   Object.keys(users).forEach((userId) => delete users[userId]);
   categories.forEach((category, index) => delete categories[index]);
 });
+
+async function userSetup(): Promise<number> {
+  const registerResult = await register(
+    dummyEmail,
+    dummyUsername,
+    dummyPassword,
+    dummyDateOfBirth
+  );
+
+  if (!registerResult.user) throw new Error("Registration failed.");
+
+  return registerResult.user.userId;
+}
+
+async function threadSetup(userId: number): Promise<number> {
+  const threadres = await postThread(
+    userId,
+    dummyCategory,
+    dummyTitle,
+    dummyContent
+  );
+  if (!threadres.thread) throw new Error("Thread failed");
+  return threadres.thread.threadId;
+}
 
 /*
   ================================
@@ -32,16 +56,7 @@ beforeEach(async () => {
   ================================
   */
 test("Create thread succeds if username, category, title and content is provided.", async () => {
-  const registrationResult = await register(
-    dummyEmail,
-    dummyUsername,
-    dummyPassword,
-    dummyDateOfBirth
-  );
-
-  if (!registrationResult.user) throw new Error("User registration failed.");
-
-  const userId = registrationResult.user.userId;
+  const userId = await userSetup();
 
   categories.push(dummyCategory);
   const result = await postThread(
@@ -69,16 +84,7 @@ test("Create thread fails if no user with the given user-id exists.", async () =
 });
 
 test("Create thread fails if given category does not exists.", async () => {
-  const registrationResult = await register(
-    dummyEmail,
-    dummyUsername,
-    dummyPassword,
-    dummyDateOfBirth
-  );
-
-  if (!registrationResult.user) throw new Error("Registration failed.");
-
-  const userId = registrationResult.user.userId;
+  const userId = await userSetup();
 
   const result = await postThread(
     userId,
@@ -97,31 +103,11 @@ test("Create thread fails if given category does not exists.", async () => {
   ================================
   */
 test("Editing an existing thread with the correct variables succeeds.", async () => {
-  const registrationResult = await register(
-    dummyEmail,
-    dummyUsername,
-    dummyPassword,
-    dummyDateOfBirth
-  );
-
-  if (!registrationResult.user) throw new Error("Registration failed.");
-
-  const userId = registrationResult.user.userId;
+  const userId = await userSetup();
   categories.push(dummyCategory);
-  const thread = await postThread(
-    userId,
-    dummyCategory,
-    dummyTitle,
-    dummyContent
-  );
-  if (thread.thread?.threadId === undefined)
-    throw new Error("Thread is undefined.");
+  const threadId = await threadSetup(userId);
 
-  const result = await editThread(
-    thread.thread.threadId,
-    "凸༼ຈل͜ຈ༽凸",
-    "Lenny faces uwu"
-  );
+  const result = await editThread(threadId, "凸༼ຈل͜ຈ༽凸", "Lenny faces uwu");
   if (!result.thread) throw new Error("Thread is undefined.");
 
   expect(result.thread.author.username).toBe(dummyUsername);
@@ -133,12 +119,10 @@ test("Editing an existing thread with the correct variables succeeds.", async ()
 });
 
 test("Attempting to edit a thread that doesn't exist fails.", async () => {
-  await register(dummyEmail, dummyUsername, dummyPassword, dummyDateOfBirth);
+  await userSetup();
   categories.push(dummyCategory);
 
   const result = await editThread(100, "凸༼ຈل͜ຈ༽凸", "Lenny faces uwu");
-  //if (!result.thread) throw new Error("Thread is undefined.");
-
   expect(result.thread).toBeUndefined;
   expect(result.statusCode).toBe(400);
 });
@@ -150,27 +134,12 @@ test("Attempting to edit a thread that doesn't exist fails.", async () => {
   */
 
 test("Liking thread succeeds if the thread exists and the user exists", async () => {
-  const registrationResult = await register(
-    dummyEmail,
-    dummyUsername,
-    dummyPassword,
-    dummyDateOfBirth
-  );
-
-  if (!registrationResult.user) throw new Error("Registration failed.");
-
-  const userId = registrationResult.user.userId;
+  const userId = await userSetup();
 
   categories.push(dummyCategory);
-  const postResult = await postThread(
-    userId,
-    dummyCategory,
-    dummyTitle,
-    dummyContent
-  );
-  if (!postResult.thread) throw new Error("Thread is undefined.");
+  const threadId = await threadSetup(userId);
 
-  const likeResult = await likeThread(postResult.thread.threadId, userId);
+  const likeResult = await likeThread(threadId, userId);
   if (!likeResult.thread) throw new Error("Thread is undefined.");
 
   const user = users[userId];
@@ -185,38 +154,43 @@ test("Liking thread succeeds if the thread exists and the user exists", async ()
 });
 
 test("Liking an already disliked thread succeeds if the thread exists and the user exists, also make sure that the dislike is removed", async () => {
-  const registrationResult = await register(
-    dummyEmail,
-    dummyUsername,
-    dummyPassword,
-    dummyDateOfBirth
-  );
-  if (!registrationResult.user) throw new Error("Registration failed.");
-
-  const userId = registrationResult.user.userId;
+  const userId = await userSetup();
   categories.push(dummyCategory);
 
-  const postResult = await postThread(
-    userId,
-    dummyCategory,
-    dummyTitle,
-    dummyContent
-  );
-  if (!postResult.thread) throw new Error("Thread is undefined.");
-
-  const threadId = postResult.thread.threadId;
+  const threadId = await threadSetup(userId);
 
   const user = users[userId];
 
+  const thread = threads[threadId];
+
   await disLikeThread(threadId, userId);
 
-  expect(user.dislikedThreads.includes(postResult.thread)).toBe(true);
-  expect(user.likedThreads.includes(postResult.thread)).toBe(false);
+  expect(user.dislikedThreads.includes(thread)).toBe(true);
+  expect(user.likedThreads.includes(thread)).toBe(false);
 
   await likeThread(threadId, userId);
 
-  expect(user.likedThreads.includes(postResult.thread)).toBe(true);
-  expect(user.dislikedThreads.includes(postResult.thread)).toBe(false);
+  expect(user.likedThreads.includes(thread)).toBe(true);
+  expect(user.dislikedThreads.includes(thread)).toBe(false);
+});
+
+test("Liking an already liked thread removes the previous like", async () => {
+  const userId = await userSetup();
+  categories.push(dummyCategory);
+
+  const threadId = await threadSetup(userId);
+
+  const user = users[userId];
+
+  const thread = threads[threadId];
+
+  await likeThread(threadId, userId);
+
+  expect(user.likedThreads.includes(thread)).toBe(true);
+
+  await likeThread(threadId, userId);
+
+  expect(user.likedThreads.includes(thread)).toBe(false);
 });
 
 /*
@@ -226,26 +200,11 @@ test("Liking an already disliked thread succeeds if the thread exists and the us
   */
 
 test("Disliking a thread adds that thread to the users list of disliked threads.", async () => {
-  const registrationResult = await register(
-    dummyEmail,
-    dummyUsername,
-    dummyPassword,
-    dummyDateOfBirth
-  );
-  if (!registrationResult.user) throw new Error("Registration failed.");
-
-  const userId = registrationResult.user.userId;
+  const userId = await userSetup();
 
   categories.push(dummyCategory);
-  const postResult = await postThread(
-    userId,
-    dummyCategory,
-    dummyTitle,
-    dummyContent
-  );
-  if (!postResult.thread) throw new Error("Thread is undefined.");
 
-  const threadId = postResult.thread.threadId;
+  const threadId = await threadSetup(userId);
 
   await disLikeThread(threadId, userId);
 
@@ -257,26 +216,11 @@ test("Disliking a thread adds that thread to the users list of disliked threads.
 });
 
 test("Disliking an already liked thread succeeds if the thread exists and the user exists, also make sure that the like is removed", async () => {
-  const registrationResult = await register(
-    dummyEmail,
-    dummyUsername,
-    dummyPassword,
-    dummyDateOfBirth
-  );
-  if (!registrationResult.user) throw new Error("Registration failed.");
-
-  const userId = registrationResult.user.userId;
+  const userId = await userSetup();
 
   categories.push(dummyCategory);
-  const postResult = await postThread(
-    userId,
-    dummyCategory,
-    dummyTitle,
-    dummyContent
-  );
-  if (!postResult.thread) throw new Error("Thread is undefined.");
 
-  const threadId = postResult.thread.threadId;
+  const threadId = await threadSetup(userId);
 
   await likeThread(threadId, userId);
 
@@ -292,34 +236,36 @@ test("Disliking an already liked thread succeeds if the thread exists and the us
   expect(user.dislikedThreads.includes(thread)).toBe(true);
 });
 
+test("Disliking an already disliked thread removes the previous dislike", async () => {
+  const userId = await userSetup();
+  categories.push(dummyCategory);
+
+  const threadId = await threadSetup(userId);
+
+  const user = users[userId];
+  const thread = threads[threadId];
+
+  await disLikeThread(threadId, userId);
+
+  expect(user.dislikedThreads.includes(thread)).toBe(true);
+
+  await disLikeThread(threadId, userId);
+
+  expect(user.dislikedThreads.includes(thread)).toBe(false);
+});
+
 /*
   ================================
   commentThread
   ================================
   */
 
-test("Registering a user with an occupied username fails", async () => {
-  const registrationResult = await register(
-    dummyEmail,
-    dummyUsername,
-    dummyPassword,
-    dummyDateOfBirth
-  );
-  if (!registrationResult.user) throw new Error("Registration failed.");
-
-  const userId = registrationResult.user.userId;
+test("Commenting on a thread with a vaild user succeds", async () => {
+  const userId = await userSetup();
 
   categories.push(dummyCategory);
 
-  const postResult = await postThread(
-    userId,
-    dummyCategory,
-    dummyTitle,
-    dummyContent
-  );
-  if (!postResult.thread) throw new Error("Thread is undefined.");
-
-  const threadId = postResult.thread.threadId;
+  const threadId = await threadSetup(userId);
 
   const commentResult = await commentThread(
     userId,
@@ -331,7 +277,7 @@ test("Registering a user with an occupied username fails", async () => {
   expect(commentResult.thread.replies.length).toBe(1);
   expect(commentResult.thread.replies[0].content).toBe("Markus was here hehe");
   expect(commentResult.thread.replies[0].authour.userId).toBe(userId);
-  expect(commentResult.statusCode).toBe(200);
+  expect(commentResult.statusCode).toBe(201);
 });
 
 /*
@@ -341,26 +287,11 @@ test("Registering a user with an occupied username fails", async () => {
   */
 
 test("After deleting a user, that user is no longer stored.", async () => {
-  const registrationResult = await register(
-    dummyEmail,
-    dummyUsername,
-    dummyPassword,
-    dummyDateOfBirth
-  );
-  if (!registrationResult.user) throw new Error("Registration failed.");
-
-  const userId = registrationResult.user.userId;
+  const userId = await userSetup();
 
   categories.push(dummyCategory);
-  const postResult = await postThread(
-    userId,
-    dummyCategory,
-    dummyTitle,
-    dummyContent
-  );
-  if (!postResult.thread) throw new Error("Thread is undefined.");
 
-  const threadId = postResult.thread.threadId;
+  const threadId = await threadSetup(userId);
 
   const result = await deleteThread(threadId, userId);
 
