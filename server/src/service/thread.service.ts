@@ -17,17 +17,18 @@ export const categories: string[] = [
   "Guianan Cock-of-the-rock",
 ];
 /**
- * Global variable to know what id to assign next thread
+ * Global variable to know what id to assign next thread.
  */
 let id: number = 0;
+
 /**
- * Global variable to know what id to assign next comment
+ * Global variable to know what id to assign next comment.
  */
 let commentID: number = 0;
 
-export function newComment(): number {
+export const newComment = (): number => {
   return commentID++;
-}
+};
 
 /**
  * The result of a thread service.
@@ -50,7 +51,7 @@ interface ThreadServiceResult {
 }
 
 /**
- * User likes a thread
+ * User likes a thread.
  *
  * @param threadId - id of the thread the user likes.
  *
@@ -62,30 +63,32 @@ export const likeThread = async (
   threadId: number,
   userId: number
 ): Promise<ThreadServiceResult> => {
-  let thread = threads[threadId];
-  let user = users[userId];
+  const thread = threads[threadId];
+  const user = users[userId];
+
   if (user.dislikedThreads.includes(thread)) {
-    let temp: number = user.dislikedThreads.lastIndexOf(thread);
-    user.dislikedThreads.splice(temp, 1);
+    user.dislikedThreads = user.dislikedThreads.filter(
+      (elem) => elem !== thread
+    );
     thread.dislikes--;
   }
+
   if (!user.likedThreads.includes(thread)) {
     user.likedThreads.push(thread);
     thread.likes++;
   } else {
-    let temp: number = user.likedThreads.lastIndexOf(thread);
-    user.likedThreads.splice(temp, 1);
+    user.likedThreads = user.likedThreads.filter((elem) => elem !== thread);
     thread.likes--;
   }
   return {
     statusCode: 200,
-    message: "Thread like status changed successfully",
+    message: "Thread like status changed successfully.",
     thread: thread,
   };
 };
 
 /**
- * User dislikes a thread
+ * User dislikes a thread.
  *
  * @param threadId - id of the thread the user dislikes.
  *
@@ -97,23 +100,24 @@ export const disLikeThread = async (
   threadId: number,
   userId: number
 ): Promise<ThreadServiceResult> => {
-  let thread = threads[threadId];
-  let user = users[userId];
+  const thread = threads[threadId];
+  const user = users[userId];
+
   if (user.likedThreads.includes(thread)) {
-    user.likedThreads.forEach((item, index) => {
-      if (item === thread) user.likedThreads.splice(index, 1);
-    });
+    user.likedThreads = user.likedThreads.filter((elem) => elem !== thread);
     thread.likes--;
   }
+
   if (!user.dislikedThreads.includes(thread)) {
     user.dislikedThreads.push(thread);
     thread.dislikes++;
   } else {
-    user.dislikedThreads.forEach((item, index) => {
-      if (item === thread) user.dislikedThreads.splice(index, 1);
-    });
+    user.dislikedThreads = user.dislikedThreads.filter(
+      (elem) => elem !== thread
+    );
     thread.dislikes--;
   }
+
   return {
     statusCode: 200,
     message: "Thread dislike status changed successfully",
@@ -122,13 +126,13 @@ export const disLikeThread = async (
 };
 
 /**
- * Edits the content of a thread
+ * Edits the content of a thread.
  *
- * @param threadId - The thread to edit
+ * @param threadId - The id of the thread to edit.
  *
- * @param content - The new content of the thread
+ * @param content - The new content of the thread.
  *
- * @param title - can change the title of the thread
+ * @param title - The new title of the thread.
  *
  * @returns A ThreadServiceResult object.
  */
@@ -137,16 +141,17 @@ export const editThread = async (
   content: string,
   title: string
 ): Promise<ThreadServiceResult> => {
-  if (!threads[threadId]) {
+  const thread: Thread = threads[threadId];
+
+  if (!thread) {
     return {
-      statusCode: 400,
-      message: "Thread does not exist",
-      thread: undefined,
+      statusCode: 404,
+      message: "Thread does not exist.",
     };
   }
-  let thread = threads[threadId];
-  var today: Date = new Date();
-  var date: string =
+
+  const today: Date = new Date();
+  const date: string =
     "\nlast edited " +
     today.getFullYear() +
     "-" +
@@ -156,21 +161,22 @@ export const editThread = async (
   content += date;
   thread.content = content;
   thread.title = title;
+
   return {
     statusCode: 200,
-    message: "Thread edited successfully",
+    message: "Thread edited successfully.",
     thread: thread,
   };
 };
 
 /**
- * Creates a new comment to a thread
+ * Creates a new comment to a thread.
  *
- * @param username - username of the user who wants to comment
+ * @param userId - The id of the user who wants to comment.
  *
- * @param threadId - the thread to comment on
+ * @param threadId - The id of the thread to comment on.
  *
- * @param content - the bread-text of the comment
+ * @param content - The content of the comment.
  *
  * @returns A ThreadServiceResult object.
  */
@@ -179,13 +185,13 @@ export const commentThread = async (
   threadId: number,
   content: string
 ): Promise<ThreadServiceResult> => {
-  let thread: Thread = threads[threadId];
-  let authour: User = users[userId];
-  let date: Date = new Date();
-  let replies: Comment[] = [];
-  let likes: number = 0;
-  let dislikes: number = 0;
-  let commentId: number = commentID++;
+  const thread: Thread = threads[threadId];
+  const authour: User = users[userId];
+  const date: Date = new Date();
+  const replies: Comment[] = [];
+  const likes: number = 0;
+  const dislikes: number = 0;
+  const commentId: number = commentID++;
   const newComment: Comment = {
     content,
     authour,
@@ -195,19 +201,20 @@ export const commentThread = async (
     dislikes,
     commentId,
   };
+
   thread.replies.push(newComment);
   comments[newComment.commentId] = newComment;
   return {
     statusCode: 201,
-    message: "Thread posted successfully",
+    message: "Thread posted successfully.",
     thread: thread,
   };
 };
 
 /**
- * Deletes a thread
+ * Deletes a thread.
  *
- * @param threadId - The thread to delete
+ * @param threadId - The thread to delete.
  *
  * @returns A ThreadServiceResult object.
  */
@@ -215,7 +222,7 @@ export const deleteThread = async (
   threadId: number,
   userId: number
 ): Promise<ThreadServiceResult> => {
-  let thread: Thread = threads[threadId];
+  const thread: Thread = threads[threadId];
 
   if (thread.author.userId !== userId) {
     return {
@@ -224,34 +231,35 @@ export const deleteThread = async (
     };
   }
 
-  thread.replies.forEach(function (element:Comment, index:number):void {
+  thread.replies.forEach((element: Comment, index: number): void => {
     removeReplies(element);
     delete thread.replies[index];
   });
   delete threads[threadId];
+
   return {
     statusCode: 200,
-    message: "Thread deleted successfully",
+    message: "Thread deleted successfully.",
   };
 };
 
-function removeReplies(reply: Comment): void {
-  reply.replies.forEach(function (element:Comment, index:number):void {
+const removeReplies = (reply: Comment): void => {
+  reply.replies.forEach((element: Comment, index: number): void => {
     removeReplies(element);
     delete reply.replies[index];
   });
-}
+};
 
 /**
- * Creates a new thread
+ * Creates a new thread.
  *
- * @param username - username of the user who wants to create the thread
+ * @param userId - id of the user who wants to create the thread.
  *
- * @param category - The category the thread should be in
+ * @param category - The category the thread should be in.
  *
- * @param title - the title of the thread
+ * @param title - The title of the thread.
  *
- * @param content - the bread-text of the comment
+ * @param content - The text of the comment.
  *
  * @returns A ThreadServiceResult object.
  */
@@ -261,35 +269,33 @@ export const postThread = async (
   title: string,
   content: string
 ): Promise<ThreadServiceResult> => {
-  if (categories.includes(category) && users[userId]) {
-    let author: User = users[userId];
-    let threadId: number = id++;
-    let date: Date = new Date();
-    let replies: Comment[] = [];
-    let likes: number = 0;
-    let dislikes: number = 0;
-    const newThread: Thread = {
-      likes,
-      dislikes,
-      title,
-      content,
-      author,
-      date,
-      category,
-      replies,
-      threadId,
-    };
-
-    threads[threadId] = newThread;
-    return {
-      statusCode: 200,
-      message: "Thread posted successfully",
-      thread: newThread,
-    };
+  if (!categories.includes(category)) {
+    return { statusCode: 400, message: "The given category was invalid." };
   }
+
+  const author: User = users[userId];
+  const threadId: number = id++;
+  const date: Date = new Date();
+  const replies: Comment[] = [];
+  const likes: number = 0;
+  const dislikes: number = 0;
+
+  const newThread: Thread = {
+    likes,
+    dislikes,
+    title,
+    content,
+    author,
+    date,
+    category,
+    replies,
+    threadId,
+  };
+
+  threads[threadId] = newThread;
   return {
-    statusCode: 400,
-    message: "Invalid inputs",
-    thread: undefined,
+    statusCode: 200,
+    message: "Thread posted successfully.",
+    thread: newThread,
   };
 };

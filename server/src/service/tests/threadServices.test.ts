@@ -75,14 +75,6 @@ test("Create thread succeds if username, category, title and content is provided
   expect(result.statusCode).toBe(200);
 });
 
-test("Create thread fails if no user with the given user-id exists.", async () => {
-  categories.push(dummyCategory);
-  const result = await postThread(123, dummyCategory, dummyTitle, dummyContent);
-
-  expect(result.thread).toBeUndefined;
-  expect(result.statusCode).toBe(400);
-});
-
 test("Create thread fails if given category does not exists.", async () => {
   const userId = await userSetup();
 
@@ -124,7 +116,7 @@ test("Attempting to edit a thread that doesn't exist fails.", async () => {
 
   const result = await editThread(100, "凸༼ຈل͜ຈ༽凸", "Lenny faces uwu");
   expect(result.thread).toBeUndefined;
-  expect(result.statusCode).toBe(400);
+  expect(result.statusCode).toBe(404);
 });
 
 /*

@@ -68,10 +68,10 @@ export const updateUser = async (
     image?: any;
   }
 ): Promise<UserServiceResult> => {
-  const existingUser = users[userId];
+  const existingUser: User = users[userId];
 
   if (!existingUser) {
-    return { statusCode: 404, message: "User not found." };
+    return { statusCode: 404, message: "No user with the given id was found." };
   }
 
   if (update.birthDate) {
@@ -97,16 +97,19 @@ export const validatePassword = async (
   userId: number,
   password: string
 ): Promise<UserServiceResult> => {
-  const user = users[userId];
+  const user: User = users[userId];
 
   if (!user) {
     return {
       statusCode: 404,
-      message: "No user with the given user-id exists.",
+      message: "No user with the given id exists.",
     };
   }
 
-  const passwordIsValid = await bcrypt.compare(password, user.passwordHash);
+  const passwordIsValid: boolean = await bcrypt.compare(
+    password,
+    user.passwordHash
+  );
 
   if (!passwordIsValid) {
     return {
@@ -141,7 +144,7 @@ export const register = async (
   password: string,
   birthDate: Date
 ): Promise<UserServiceResult> => {
-  const existingUser = Object.values(users).find(
+  const existingUser: User | undefined = Object.values(users).find(
     (user) => user.username === username
   );
 
@@ -193,7 +196,7 @@ export const register = async (
 export const deleteUser = async (
   userId: number
 ): Promise<UserServiceResult> => {
-  const existingUser = users[userId];
+  const existingUser: User = users[userId];
 
   if (!existingUser) {
     return { statusCode: 404, message: "user not found." };
@@ -208,7 +211,7 @@ export const deleteUser = async (
  * Returns the user object of the user with the given id, if one exists.
  */
 export const getUser = async (userId: number): Promise<UserServiceResult> => {
-  const existingUser = users[userId];
+  const existingUser: User = users[userId];
 
   if (!existingUser) {
     return { statusCode: 404, message: "User not found." };
@@ -242,7 +245,7 @@ export const setVisibleProperties = async (
     unlikedThreads: boolean;
   }
 ): Promise<UserServiceResult> => {
-  const existingUser = users[userId];
+  const existingUser: User = users[userId];
 
   if (!existingUser) {
     return { statusCode: 404, message: "User not found." };
@@ -263,7 +266,7 @@ export const setVisibleProperties = async (
  * @param password - The password to hash and salt.
  */
 const hashPassword = async (password: string): Promise<string> => {
-  const salt = await bcrypt.genSalt();
-  const hashed = await bcrypt.hash(password, salt);
+  const salt: string = await bcrypt.genSalt();
+  const hashed: string = await bcrypt.hash(password, salt);
   return hashed;
 };

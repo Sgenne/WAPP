@@ -29,61 +29,70 @@ export const likeComment = async (
   commentId: number,
   userId: number
 ): Promise<CommentServiceResult> => {
-  let comment: Comment = comments[commentId];
-  let user: User = users[userId];
+  const comment: Comment = comments[commentId];
+  const user: User = users[userId];
 
-  if (comment.authour.username != "Deleted") {
-    if (user.dislikedComments.includes(comment)) {
-      let temp: number = user.dislikedComments.lastIndexOf(comment);
-      user.dislikedComments.splice(temp, 1);
-      comment.dislikes--;
-    }
-    if (!user.likedComments.includes(comment)) {
-      user.likedComments.push(comment);
-      comment.likes++;
-    } else {
-      let temp: number = user.likedComments.lastIndexOf(comment);
-      user.likedComments.splice(temp, 1);
-      comment.likes--;
-    }
-    return {
-      statusCode: 200,
-      message: "Comment like status changed successfully",
-      comment: comment,
-    };
-  } else {
+  if (comment.authour.username === "Deleted") {
     return {
       statusCode: 400,
-      message: "Comment or User doesnt exist",
-      comment: undefined,
+      message: "The specified comment is deleted.",
     };
   }
+
+  if (user.dislikedComments.includes(comment)) {
+    user.dislikedComments = user.dislikedComments.filter(
+      (elem) => elem !== comment
+    );
+    comment.dislikes--;
+  }
+
+  if (!user.likedComments.includes(comment)) {
+    user.likedComments.push(comment);
+    comment.likes++;
+  } else {
+    user.likedComments = user.likedComments.filter((elem) => elem !== comment);
+    comment.likes--;
+  }
+
+  return {
+    statusCode: 200,
+    message: "Comment like status changed successfully.",
+    comment: comment,
+  };
 };
 
 export const disLikeComment = async (
   commentId: number,
   userId: number
 ): Promise<CommentServiceResult> => {
-  let comment: Comment = comments[commentId];
-  let user: User = users[userId];
-  if (comment.authour.username != "Deleted") {
-    if (user.likedComments.includes(comment)) {
-      let temp: number = user.likedComments.lastIndexOf(comment);
-      user.likedComments.splice(temp, 1);
-      comment.dislikes--;
-    }
-    if (!user.dislikedComments.includes(comment)) {
-      user.dislikedComments.push(comment);
-      comment.dislikes++;
-    } else {
-      let temp: number = user.dislikedComments.lastIndexOf(comment);
-      user.dislikedComments.splice(temp, 1);
-      comment.dislikes--;
-    }
+  const comment: Comment = comments[commentId];
+  const user: User = users[userId];
+
+  if (comment.authour.username === "Deleted") {
+    return {
+      statusCode: 400,
+      message: "The specified comment is deleted.",
+    };
   }
+
+  if (user.likedComments.includes(comment)) {
+    user.likedComments = user.likedComments.filter((elem) => elem !== comment);
+    comment.dislikes--;
+  }
+
+  if (!user.dislikedComments.includes(comment)) {
+    user.dislikedComments.push(comment);
+    comment.dislikes++;
+  } else {
+    user.dislikedComments = user.dislikedComments.filter(
+      (elem) => elem !== comment
+    );
+    comment.dislikes--;
+  }
+
   return {
     statusCode: 200,
-    message: "Comment dislike status changed successfully",
+    message: "Comment dislike status changed successfully.",
     comment: comment,
   };
 };
@@ -93,7 +102,7 @@ export const editComment = async (
   content: string,
   userId: number
 ): Promise<CommentServiceResult> => {
-  let comment: Comment = comments[commentId];
+  const comment: Comment = comments[commentId];
 
   if (comment.authour.userId !== userId) {
     return {
@@ -102,12 +111,12 @@ export const editComment = async (
     };
   }
 
-  if (comment.authour.username != "Deleted") {
+  if (comment.authour.username !== "Deleted") {
     comment.content = content + "\nedited";
   }
   return {
     statusCode: 200,
-    message: "Comment edited successfully",
+    message: "Comment edited successfully.",
     comment: comment,
   };
 };
@@ -116,7 +125,7 @@ export const deleteComment = async (
   commentId: number,
   userId: number
 ): Promise<CommentServiceResult> => {
-  let comment: Comment = comments[commentId];
+  const comment: Comment = comments[commentId];
 
   if (comment.authour.userId !== userId) {
     return {
@@ -125,15 +134,21 @@ export const deleteComment = async (
     };
   }
 
-  if (comment.authour.username !== "Deleted") {
-    comment.authour = users[0];
-    comment.content = "";
-    comment.dislikes = 0;
-    comment.likes = 0;
+  if (comment.authour.username === "Deleted") {
+    return {
+      statusCode: 403,
+      message: "The comment is already deleted.",
+    };
   }
+
+  comment.authour = users[0];
+  comment.content = "";
+  comment.dislikes = 0;
+  comment.likes = 0;
+
   return {
     statusCode: 200,
-    message: "Comment hidden successfully",
+    message: "Comment deleted successfully.",
     comment: comment,
   };
 };
