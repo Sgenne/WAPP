@@ -1,4 +1,3 @@
-import { Comment } from "../../model/comment.interface";
 import {
   likeComment,
   disLikeComment,
@@ -15,7 +14,6 @@ import {
   postThread,
 } from "../thread.service";
 import { register, users } from "../user.service";
-import { threadId } from "worker_threads";
 
 const dummyUsername = "¯_(ツ)_/¯";
 const dummyCategory = "gaming";
