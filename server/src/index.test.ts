@@ -1,6 +1,8 @@
 import { app } from "./start";
 import SuperTest from "supertest";
 import { users } from "./service/user.service";
+import { threads } from "./service/thread.service";
+import { comments } from "./service/comment.service";
 
 const dummyUsername = "username";
 const dummyPassword = "password";
@@ -8,9 +10,61 @@ const dummyEmail = "email@email.com";
 const dummyDateOfBirth = new Date(1972, 11, 10);
 
 // Clear users before each test.
-beforeEach(async () =>
-  Object.keys(users).forEach((username) => delete users[username])
-);
+beforeEach(async () => {
+  Object.keys(threads).forEach((threadId) => delete threads[threadId]);
+  Object.keys(users).forEach((username) => delete users[username]);
+  Object.keys(comments).forEach((comment) => delete comments[comment]);
+});
+
+test("Updating an existing user's visible properties successfully returns 200.", async () => {
+  const request = SuperTest(app);
+
+  const registrationResult = await request.post("/user/register").send({
+    username: dummyUsername,
+    email: dummyEmail,
+    password: dummyPassword,
+    birthDate: dummyDateOfBirth,
+  });
+
+  const userId = registrationResult.body.user.userId;
+
+  const editResult = await request.put("/user/edit-user-preferences").send({
+    userId: userId,
+    password: dummyPassword,
+    options: {
+      email: false,
+      joinDate: false,
+      birthDate: false,
+      bio: false,
+      image: false,
+      likedThreads: false,
+      dislikedThreads: false,
+    },
+  });
+
+  expect(editResult.status).toBe(200);
+});
+
+test("Registering a user with an occupied username results in status code 403.", async () => {
+  const request = SuperTest(app);
+
+  await request.post("/user/register").send({
+    username: dummyUsername,
+    email: dummyEmail,
+    password: dummyPassword,
+    birthDate: dummyDateOfBirth,
+  });
+
+  const registrationResult = await request.post("/user/register").send({
+    username: dummyUsername,
+    email: "email2@email.com",
+    password: "thisisthepassword",
+    birthDate: new Date(2000, 1, 1),
+  });
+
+  expect(registrationResult.status).toBe(403);
+  expect(registrationResult.body.user).toBeUndefined();
+});
 
 test("Registering a user and then GETing that user should return the user.", async () => {
   const request = SuperTest(app);

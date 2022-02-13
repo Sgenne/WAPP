@@ -44,7 +44,7 @@ export const hasValidPassword = body("password")
   .withMessage("No password was provided")
   .custom((value) => !/\s/.test(value))
   .withMessage("No whitespace is allowed in the password.")
-  .isLength({ min: 5, max: 16 })
+  .isLength({ min: 5, max: 42 })
   .withMessage("The given password was invalid.");
 
 /**

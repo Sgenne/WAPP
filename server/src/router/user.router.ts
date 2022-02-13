@@ -61,10 +61,6 @@ userRouter.put(
 
     const result = await userServices.updateUser(userId, update);
 
-    if (result.statusCode !== 200) {
-      return res.status(result.statusCode).send({ message: result.message });
-    }
-
     res.status(200).send({
       message: "User information updated successfully.",
       user: result.user,
@@ -103,13 +99,9 @@ userRouter.put(
   handleValidationResult,
   async (req: Request, res: Response) => {
     const options = req.body.options;
-    const userId = req.body.username;
+    const userId = req.body.userId;
 
     const result = await userServices.setVisibleProperties(userId, options);
-
-    if (result.statusCode !== 200) {
-      return res.status(result.statusCode).send({ message: result.message });
-    }
 
     res.status(200).send({
       message: "Preferences updated successfully.",

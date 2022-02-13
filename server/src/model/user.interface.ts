@@ -72,6 +72,6 @@ export interface User {
     bio: boolean;
     image: boolean;
     likedThreads: boolean;
-    unlikedThreads: boolean;
+    dislikedThreads: boolean;
   };
 }

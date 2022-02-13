@@ -50,7 +50,7 @@ beforeEach(async () => {
       bio: false,
       image: false,
       likedThreads: false,
-      unlikedThreads: false,
+      dislikedThreads: false,
     },
   };
 

@@ -18,6 +18,7 @@ export const isAuthenticated = async (
     res.status(400).send({
       message: "Invalid input. Please provide a user-id and password.",
     });
+    return;
   }
 
   const result = await validatePassword(userId, password);

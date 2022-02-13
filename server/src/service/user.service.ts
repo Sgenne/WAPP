@@ -23,7 +23,7 @@ export const users: { [userId: string]: User } = {
       bio: false,
       image: false,
       likedThreads: false,
-      unlikedThreads: false,
+      dislikedThreads: false,
     },
   },
 };
@@ -175,7 +175,7 @@ export const register = async (
       bio: true,
       image: true,
       likedThreads: true,
-      unlikedThreads: true,
+      dislikedThreads: true,
     },
   };
   users[userId] = newUser;
@@ -242,7 +242,7 @@ export const setVisibleProperties = async (
     bio: boolean;
     image: boolean;
     likedThreads: boolean;
-    unlikedThreads: boolean;
+    dislikedThreads: boolean;
   }
 ): Promise<UserServiceResult> => {
   const existingUser: User = users[userId];
