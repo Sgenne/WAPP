@@ -59,7 +59,6 @@ export const getThread = async (
   threadId: number
 ): Promise<ThreadServiceResult> => {
   const thread = threads[threadId];
-  console.log(thread);
   if(thread){
     return {
       statusCode: 200,

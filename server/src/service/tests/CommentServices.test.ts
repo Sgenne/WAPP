@@ -6,6 +6,7 @@ import {
   deleteComment,
   postReply,
   comments,
+  getComment,
 } from "../comment.service";
 import {
   categories,
@@ -111,6 +112,32 @@ test("replying to a comment as a valid user", async () => {
   expect(rootComment.replies.includes(result.comment.commentId)).toBe(true);
   expect(result.statusCode).toBe(201);
 });
+
+/*
+  ================================
+  getComment
+  ================================
+  */
+  test("Get comment succeds if given id exists.", async () => {
+    categories.push(dummyCategory);
+    const userId = await userSetup();
+  
+    const threadId = await threadSetup(userId);
+
+    const commentId = await commentSetup(userId, threadId);
+
+    const result = await getComment(commentId);
+  
+    expect(result.statusCode).toBe(200);
+  });
+
+  test("Create comment fails if given id does not exists.", async () => {
+    const result = await getComment(0);
+
+
+    expect(result.comment).toBeUndefined;
+    expect(result.statusCode).toBe(404);
+  });
 
 /*
   ================================

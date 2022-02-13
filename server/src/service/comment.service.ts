@@ -101,6 +101,30 @@ export const disLikeComment = async (
   };
 };
 
+/**
+ * 
+ * @param commentId The id of the comment to get
+ * 
+ * @returns a comment with the specified id
+ */
+ export const getComment = async (
+  commentId: number
+): Promise<CommentServiceResult> => {
+  const comment = comments[commentId];
+  if(comment){
+    return {
+      statusCode: 200,
+      message: "Comment has successfully been recived.",
+      comment: comment,
+    };
+  }
+  return {
+    statusCode: 404,
+    message: "Comment could not be found",
+    comment: comment,
+  };
+};
+
 export const editComment = async (
   commentId: number,
   content: string,
