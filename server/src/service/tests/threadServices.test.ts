@@ -7,6 +7,7 @@ import {
   commentThread,
   deleteThread,
   postThread,
+  getThread,
 } from "../thread.service";
 
 import { register, users } from "../user.service";
@@ -88,6 +89,32 @@ test("Create thread fails if given category does not exists.", async () => {
   expect(result.thread).toBeUndefined;
   expect(result.statusCode).toBe(400);
 });
+
+/*
+  ================================
+  getThread
+  ================================
+  */
+  test("Get thread succeds if given id exists.", async () => {
+    categories.push(dummyCategory);
+    const userId = await userSetup();
+  
+    const threadId = await threadSetup(userId);
+
+    const result = await getThread(threadId);
+  
+    expect(result.statusCode).toBe(200);
+  });
+
+  test("Create thread fails if given id does not exists.", async () => {
+    const result = await getThread(0);
+
+
+    expect(result.thread).toBeUndefined;
+    expect(result.statusCode).toBe(404);
+  });
+
+
 
 /*
   ================================
