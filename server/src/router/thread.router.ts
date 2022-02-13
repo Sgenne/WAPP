@@ -9,6 +9,7 @@ import {
   hasValidThreadTitle,
 } from "../utils/validation.util";
 import { isAuthenticated } from "../utils/auth.util";
+import { threadId } from "worker_threads";
 
 export const threadRouter = Router();
 
@@ -99,7 +100,7 @@ threadRouter.post(
       content
     );
 
-    if (result.statusCode !== 200) {
+    if (result.statusCode !== 201) {
       return res.status(result.statusCode).send({ message: result.message });
     }
 
@@ -140,6 +141,18 @@ threadRouter.post(
     });
   }
 );
+
+threadRouter.get("/:threadId", async (req: Request, res: Response) => {
+  const userId = req.params.threadId;
+
+  const result = await threadServices.getThread(+threadId);
+
+  if (result.statusCode !== 200) {
+    return res.status(result.statusCode).send({ message: result.message });
+  }
+
+  res.status(200).send({ message: result.message, user: result.thread });
+});
 
 threadRouter.delete(
   "/deleteThread",

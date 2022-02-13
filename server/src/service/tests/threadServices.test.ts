@@ -7,7 +7,9 @@ import {
   commentThread,
   deleteThread,
   postThread,
+  getThread,
 } from "../thread.service";
+import { comments } from "../comment.service";
 
 import { register, users } from "../user.service";
 
@@ -23,6 +25,7 @@ const dummyDateOfBirth = new Date(1972, 11, 10);
 beforeEach(async () => {
   Object.keys(threads).forEach((threadId) => delete threads[threadId]);
   Object.keys(users).forEach((userId) => delete users[userId]);
+  Object.keys(comments).forEach((commentId) => delete users[commentId]);
   categories.forEach((category, index) => delete categories[index]);
 });
 
@@ -68,7 +71,7 @@ test("Create thread succeds if username, category, title and content is provided
 
   if (!result.thread) throw new Error("User is undefined.");
 
-  expect(result.thread.author.username).toBe(dummyUsername);
+  expect(users[result.thread.author].username).toBe(dummyUsername);
   expect(result.thread.category).toBe(dummyCategory);
   expect(result.thread.title).toBe(dummyTitle);
   expect(result.thread.content).toBe(dummyContent);
@@ -91,6 +94,32 @@ test("Create thread fails if given category does not exists.", async () => {
 
 /*
   ================================
+  getThread
+  ================================
+  */
+  test("Get thread succeds if given id exists.", async () => {
+    categories.push(dummyCategory);
+    const userId = await userSetup();
+  
+    const threadId = await threadSetup(userId);
+
+    const result = await getThread(threadId);
+  
+    expect(result.statusCode).toBe(200);
+  });
+
+  test("Create thread fails if given id does not exists.", async () => {
+    const result = await getThread(0);
+
+
+    expect(result.thread).toBeUndefined;
+    expect(result.statusCode).toBe(404);
+  });
+
+
+
+/*
+  ================================
   editThread
   ================================
   */
@@ -102,7 +131,7 @@ test("Editing an existing thread with the correct variables succeeds.", async ()
   const result = await editThread(threadId, "凸༼ຈل͜ຈ༽凸", "Lenny faces uwu");
   if (!result.thread) throw new Error("Thread is undefined.");
 
-  expect(result.thread.author.username).toBe(dummyUsername);
+  expect(result.thread.author).toBe(userId);
   expect(result.thread.category).toBe(dummyCategory);
   expect(result.thread.title).toBe("Lenny faces uwu");
   expect(result.thread.content.includes("凸༼ຈل͜ຈ༽凸")).toBe(true);
@@ -136,13 +165,13 @@ test("Liking thread succeeds if the thread exists and the user exists", async ()
 
   const user = users[userId];
 
-  expect(likeResult.thread.author.username).toBe(dummyUsername);
+  expect(likeResult.thread.author).toBe(userId);
   expect(likeResult.thread.category).toBe(dummyCategory);
   expect(likeResult.thread.title).toBe(dummyTitle);
   expect(likeResult.thread.content).toBe(dummyContent);
   expect(likeResult.thread.likes).toBe(1);
   expect(likeResult.statusCode).toBe(200);
-  expect(user.likedThreads.includes(likeResult.thread)).toBe(true);
+  expect(user.likedThreads.includes(likeResult.thread.threadId)).toBe(true);
 });
 
 test("Liking an already disliked thread succeeds if the thread exists and the user exists, also make sure that the dislike is removed", async () => {
@@ -157,13 +186,13 @@ test("Liking an already disliked thread succeeds if the thread exists and the us
 
   await disLikeThread(threadId, userId);
 
-  expect(user.dislikedThreads.includes(thread)).toBe(true);
-  expect(user.likedThreads.includes(thread)).toBe(false);
+  expect(user.dislikedThreads.includes(thread.threadId)).toBe(true);
+  expect(user.likedThreads.includes(thread.threadId)).toBe(false);
 
   await likeThread(threadId, userId);
 
-  expect(user.likedThreads.includes(thread)).toBe(true);
-  expect(user.dislikedThreads.includes(thread)).toBe(false);
+  expect(user.likedThreads.includes(thread.threadId)).toBe(true);
+  expect(user.dislikedThreads.includes(thread.threadId)).toBe(false);
 });
 
 test("Liking an already liked thread removes the previous like", async () => {
@@ -178,11 +207,11 @@ test("Liking an already liked thread removes the previous like", async () => {
 
   await likeThread(threadId, userId);
 
-  expect(user.likedThreads.includes(thread)).toBe(true);
+  expect(user.likedThreads.includes(thread.threadId)).toBe(true);
 
   await likeThread(threadId, userId);
 
-  expect(user.likedThreads.includes(thread)).toBe(false);
+  expect(user.likedThreads.includes(thread.threadId)).toBe(false);
 });
 
 /*
@@ -204,7 +233,7 @@ test("Disliking a thread adds that thread to the users list of disliked threads.
   const thread = threads[threadId];
 
   expect(thread.dislikes).toBe(1);
-  expect(user.dislikedThreads.includes(thread)).toBe(true);
+  expect(user.dislikedThreads.includes(thread.threadId)).toBe(true);
 });
 
 test("Disliking an already liked thread succeeds if the thread exists and the user exists, also make sure that the like is removed", async () => {
@@ -219,13 +248,13 @@ test("Disliking an already liked thread succeeds if the thread exists and the us
   const user = users[userId];
   const thread = threads[threadId];
 
-  expect(user.dislikedThreads.includes(thread)).toBe(false);
-  expect(user.likedThreads.includes(thread)).toBe(true);
+  expect(user.dislikedThreads.includes(thread.threadId)).toBe(false);
+  expect(user.likedThreads.includes(thread.threadId)).toBe(true);
 
   await disLikeThread(threadId, userId);
 
-  expect(user.likedThreads.includes(thread)).toBe(false);
-  expect(user.dislikedThreads.includes(thread)).toBe(true);
+  expect(user.likedThreads.includes(thread.threadId)).toBe(false);
+  expect(user.dislikedThreads.includes(thread.threadId)).toBe(true);
 });
 
 test("Disliking an already disliked thread removes the previous dislike", async () => {
@@ -239,11 +268,11 @@ test("Disliking an already disliked thread removes the previous dislike", async 
 
   await disLikeThread(threadId, userId);
 
-  expect(user.dislikedThreads.includes(thread)).toBe(true);
+  expect(user.dislikedThreads.includes(thread.threadId)).toBe(true);
 
   await disLikeThread(threadId, userId);
 
-  expect(user.dislikedThreads.includes(thread)).toBe(false);
+  expect(user.dislikedThreads.includes(thread.threadId)).toBe(false);
 });
 
 /*
@@ -267,8 +296,10 @@ test("Commenting on a thread with a vaild user succeds", async () => {
   if (!commentResult.thread) throw new Error("Thread is undefined.");
 
   expect(commentResult.thread.replies.length).toBe(1);
-  expect(commentResult.thread.replies[0].content).toBe("Markus was here hehe");
-  expect(commentResult.thread.replies[0].authour.userId).toBe(userId);
+  expect(comments[commentResult.thread.replies[0]].content).toBe(
+    "Markus was here hehe"
+  );
+  expect(comments[commentResult.thread.replies[0]].authour).toBe(userId);
   expect(commentResult.statusCode).toBe(201);
 });
 

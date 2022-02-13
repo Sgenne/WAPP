@@ -102,7 +102,7 @@ commentRouter.put(
   }
 );
 
-commentRouter.put(
+commentRouter.post(
   "/replyComment",
   hasValidCommentId,
   hasContent,
@@ -124,9 +124,21 @@ commentRouter.put(
       return res.status(result.statusCode).send({ message: result.message });
     }
 
-    res.status(200).send({
+    res.status(201).send({
       message: "Like status changed successfully.",
       comment: result.comment,
     });
   }
 );
+
+commentRouter.get("/:commentId", async (req: Request, res: Response) => {
+  const commentId = req.params.commentId;
+
+  const result = await commentService.getComment(+commentId);
+
+  if (result.statusCode !== 200) {
+    return res.status(result.statusCode).send({ message: result.message });
+  }
+
+  res.status(200).send({ message: result.message, user: result.comment });
+});

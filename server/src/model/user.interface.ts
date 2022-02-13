@@ -1,6 +1,3 @@
-import { Thread } from "./thread.interface";
-import { Comment } from "./comment.interface";
-
 export interface User {
   /**
    * The id of the user.
@@ -45,22 +42,22 @@ export interface User {
   /**
    * The threads that the user has liked.
    */
-  likedThreads: Thread[];
+  likedThreads: number[];
 
   /**
    * The threads that the user has disliked.
    */
-  dislikedThreads: Thread[];
+  dislikedThreads: number[];
 
   /**
    * The comments that the user has liked.
    */
-  likedComments: Comment[];
+  likedComments: number[];
 
   /**
    * The comments that the user had disliked.
    */
-  dislikedComments: Comment[];
+  dislikedComments: number[];
 
   /**
    * Indicates which of the users properties should be visible on their profile page.
