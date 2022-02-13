@@ -1,6 +1,3 @@
-import { Thread } from "./thread.interface";
-import { Comment } from "./comment.interface";
-
 export interface User {
   /**
    * The id of the user.
