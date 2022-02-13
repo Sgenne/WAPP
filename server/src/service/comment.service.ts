@@ -25,6 +25,12 @@ interface CommentServiceResult {
   comment?: Comment;
 }
 
+/**
+ * user liking a comment
+ * @param commentId - id of the comment the user tries to like
+ * @param userId - id of the user trying to like
+ * @returns - the liked comment
+ */
 export const likeComment = async (
   commentId: number,
   userId: number
@@ -63,6 +69,12 @@ export const likeComment = async (
   };
 };
 
+/**
+ * user disliking a comment
+ * @param commentId - id of the comment the user tries to dislike
+ * @param userId - id of the user trying to dislike
+ * @returns - the disliked comment
+ */
 export const disLikeComment = async (
   commentId: number,
   userId: number
@@ -102,16 +114,16 @@ export const disLikeComment = async (
 };
 
 /**
- * 
+ *
  * @param commentId The id of the comment to get
- * 
+ *
  * @returns a comment with the specified id
  */
- export const getComment = async (
+export const getComment = async (
   commentId: number
 ): Promise<CommentServiceResult> => {
   const comment = comments[commentId];
-  if(comment){
+  if (comment) {
     return {
       statusCode: 200,
       message: "Comment has successfully been recived.",
@@ -125,6 +137,13 @@ export const disLikeComment = async (
   };
 };
 
+/**
+ * user changes the content of a comment
+ * @param commentId - id of the comment being changed
+ * @param content - the new content for the comment
+ * @param userId - id of the user trying to change the comment
+ * @returns - the edited comment
+ */
 export const editComment = async (
   commentId: number,
   content: string,
@@ -148,7 +167,12 @@ export const editComment = async (
     comment: comment,
   };
 };
-
+/**
+ * user removes their comment from a thread
+ * @param commentId - id of the comment being removed
+ * @param userId - id of the user trying to remove the comment
+ * @returns - the blank/delted comment
+ */
 export const deleteComment = async (
   commentId: number,
   userId: number
@@ -180,7 +204,13 @@ export const deleteComment = async (
     comment: comment,
   };
 };
-
+/**
+ * user posts a reply to a comment
+ * @param commentIdRoot - id of the root comment that the user is replying to
+ * @param content - the content of the comment
+ * @param userId - userID of the user making the comment
+ * @returns - the reply that was posted
+ */
 export const postReply = async (
   commentIdRoot: number,
   content: string,
