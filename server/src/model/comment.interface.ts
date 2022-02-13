@@ -2,9 +2,9 @@ import { User } from "./user.interface";
 
 export interface Comment {
   content: string;
-  authour: User;
+  authour: number;
   date: Date;
-  replies: Comment[];
+  replies: number[];
   likes: number;
   dislikes: number;
   commentId: number;

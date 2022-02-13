@@ -66,18 +66,18 @@ export const likeThread = async (
   const thread = threads[threadId];
   const user = users[userId];
 
-  if (user.dislikedThreads.includes(thread)) {
+  if (user.dislikedThreads.includes(threadId)) {
     user.dislikedThreads = user.dislikedThreads.filter(
-      (elem) => elem !== thread
+      (elem) => elem !== threadId
     );
     thread.dislikes--;
   }
 
-  if (!user.likedThreads.includes(thread)) {
-    user.likedThreads.push(thread);
+  if (!user.likedThreads.includes(threadId)) {
+    user.likedThreads.push(threadId);
     thread.likes++;
   } else {
-    user.likedThreads = user.likedThreads.filter((elem) => elem !== thread);
+    user.likedThreads = user.likedThreads.filter((elem) => elem !== threadId);
     thread.likes--;
   }
   return {
@@ -103,17 +103,17 @@ export const disLikeThread = async (
   const thread = threads[threadId];
   const user = users[userId];
 
-  if (user.likedThreads.includes(thread)) {
-    user.likedThreads = user.likedThreads.filter((elem) => elem !== thread);
+  if (user.likedThreads.includes(threadId)) {
+    user.likedThreads = user.likedThreads.filter((elem) => elem !== threadId);
     thread.likes--;
   }
 
-  if (!user.dislikedThreads.includes(thread)) {
-    user.dislikedThreads.push(thread);
+  if (!user.dislikedThreads.includes(threadId)) {
+    user.dislikedThreads.push(threadId);
     thread.dislikes++;
   } else {
     user.dislikedThreads = user.dislikedThreads.filter(
-      (elem) => elem !== thread
+      (elem) => elem !== threadId
     );
     thread.dislikes--;
   }
@@ -186,9 +186,9 @@ export const commentThread = async (
   content: string
 ): Promise<ThreadServiceResult> => {
   const thread: Thread = threads[threadId];
-  const authour: User = users[userId];
+  const authour: number = userId;
   const date: Date = new Date();
-  const replies: Comment[] = [];
+  const replies: number[] = [];
   const likes: number = 0;
   const dislikes: number = 0;
   const commentId: number = commentID++;
@@ -202,7 +202,7 @@ export const commentThread = async (
     commentId,
   };
 
-  thread.replies.push(newComment);
+  thread.replies.push(commentId);
   comments[newComment.commentId] = newComment;
   return {
     statusCode: 201,
@@ -224,15 +224,15 @@ export const deleteThread = async (
 ): Promise<ThreadServiceResult> => {
   const thread: Thread = threads[threadId];
 
-  if (thread.author.userId !== userId) {
+  if (userId !== userId) {
     return {
       statusCode: 403,
       message: "The user does not have permission to delete this thread.",
     };
   }
 
-  thread.replies.forEach((element: Comment, index: number): void => {
-    removeReplies(element);
+  thread.replies.forEach((element: number, index: number): void => {
+    removeReplies(comments[element]);
     delete thread.replies[index];
   });
   delete threads[threadId];
@@ -244,8 +244,8 @@ export const deleteThread = async (
 };
 
 const removeReplies = (reply: Comment): void => {
-  reply.replies.forEach((element: Comment, index: number): void => {
-    removeReplies(element);
+  reply.replies.forEach((element: number, index: number): void => {
+    removeReplies(comments[element]);
     delete reply.replies[index];
   });
 };
@@ -273,10 +273,10 @@ export const postThread = async (
     return { statusCode: 400, message: "The given category was invalid." };
   }
 
-  const author: User = users[userId];
+  const author: number = userId;
   const threadId: number = id++;
   const date: Date = new Date();
-  const replies: Comment[] = [];
+  const replies: number[] = [];
   const likes: number = 0;
   const dislikes: number = 0;
 

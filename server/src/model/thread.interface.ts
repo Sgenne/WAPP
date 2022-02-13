@@ -6,9 +6,9 @@ export interface Thread {
   dislikes: number;
   title: string;
   content: string;
-  author: User;
+  author: number;
   date: Date;
   category: string;
-  replies: Comment[]; //Comment type later
+  replies: number[]; //Comment type later
   threadId: number;
 }

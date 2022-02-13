@@ -32,25 +32,27 @@ export const likeComment = async (
   const comment: Comment = comments[commentId];
   const user: User = users[userId];
 
-  if (comment.authour.username === "Deleted") {
+  if (users[comment.authour].username === "Deleted") {
     return {
       statusCode: 400,
       message: "The specified comment is deleted.",
     };
   }
 
-  if (user.dislikedComments.includes(comment)) {
+  if (user.dislikedComments.includes(commentId)) {
     user.dislikedComments = user.dislikedComments.filter(
-      (elem) => elem !== comment
+      (elem) => elem !== commentId
     );
     comment.dislikes--;
   }
 
-  if (!user.likedComments.includes(comment)) {
-    user.likedComments.push(comment);
+  if (!user.likedComments.includes(commentId)) {
+    user.likedComments.push(commentId);
     comment.likes++;
   } else {
-    user.likedComments = user.likedComments.filter((elem) => elem !== comment);
+    user.likedComments = user.likedComments.filter(
+      (elem) => elem !== commentId
+    );
     comment.likes--;
   }
 
@@ -68,24 +70,26 @@ export const disLikeComment = async (
   const comment: Comment = comments[commentId];
   const user: User = users[userId];
 
-  if (comment.authour.username === "Deleted") {
+  if (users[comment.authour].username === "Deleted") {
     return {
       statusCode: 400,
       message: "The specified comment is deleted.",
     };
   }
 
-  if (user.likedComments.includes(comment)) {
-    user.likedComments = user.likedComments.filter((elem) => elem !== comment);
+  if (user.likedComments.includes(commentId)) {
+    user.likedComments = user.likedComments.filter(
+      (elem) => elem !== commentId
+    );
     comment.dislikes--;
   }
 
-  if (!user.dislikedComments.includes(comment)) {
-    user.dislikedComments.push(comment);
+  if (!user.dislikedComments.includes(commentId)) {
+    user.dislikedComments.push(commentId);
     comment.dislikes++;
   } else {
     user.dislikedComments = user.dislikedComments.filter(
-      (elem) => elem !== comment
+      (elem) => elem !== commentId
     );
     comment.dislikes--;
   }
@@ -104,14 +108,14 @@ export const editComment = async (
 ): Promise<CommentServiceResult> => {
   const comment: Comment = comments[commentId];
 
-  if (comment.authour.userId !== userId) {
+  if (comment.authour !== userId) {
     return {
       statusCode: 403,
       message: "The user does not have permission to edit this comment.",
     };
   }
 
-  if (comment.authour.username !== "Deleted") {
+  if (users[comment.authour].username !== "Deleted") {
     comment.content = content + "\nedited";
   }
   return {
@@ -127,21 +131,21 @@ export const deleteComment = async (
 ): Promise<CommentServiceResult> => {
   const comment: Comment = comments[commentId];
 
-  if (comment.authour.userId !== userId) {
+  if (comment.authour !== userId) {
     return {
       statusCode: 403,
       message: "The user does not have permission to delete thic comment.",
     };
   }
 
-  if (comment.authour.username === "Deleted") {
+  if (users[comment.authour].username === "Deleted") {
     return {
       statusCode: 403,
       message: "The comment is already deleted.",
     };
   }
 
-  comment.authour = users[0];
+  comment.authour = 0;
   comment.content = "";
   comment.dislikes = 0;
   comment.likes = 0;
@@ -159,9 +163,9 @@ export const postReply = async (
   userId: number
 ): Promise<CommentServiceResult> => {
   let root: Comment = comments[commentIdRoot];
-  let authour: User = users[userId];
+  let authour: number = userId;
   let date: Date = new Date();
-  let replies: Comment[] = [];
+  let replies: number[] = [];
   let likes: number = 0;
   let dislikes: number = 0;
   let commentId: number = getCommentID();
@@ -174,7 +178,7 @@ export const postReply = async (
     dislikes,
     commentId,
   };
-  root.replies.push(newComment);
+  root.replies.push(commentId);
   return {
     statusCode: 201,
     message: "Reply posted successfully",
