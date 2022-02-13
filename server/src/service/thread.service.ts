@@ -51,6 +51,30 @@ interface ThreadServiceResult {
 }
 
 /**
+ * 
+ * @param threadId The id of the thread to get
+ * @returns a thread with the specified id
+ */
+export const getThread = async (
+  threadId: number
+): Promise<ThreadServiceResult> => {
+  const thread = threads[threadId];
+  console.log(thread);
+  if(thread){
+    return {
+      statusCode: 200,
+      message: "Thread has successfully been recived.",
+      thread: thread,
+    };
+  }
+  return {
+    statusCode: 404,
+    message: "Thread could not be found",
+    thread: undefined,
+  };
+};
+
+/**
  * User likes a thread.
  *
  * @param threadId - id of the thread the user likes.
