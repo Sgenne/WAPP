@@ -93,6 +93,16 @@ export const updateUser = async (
   };
 };
 
+/**
+ * Validates that the given password matches the stored password hash of the 
+ * user with the given id.
+ * 
+ * @param userId - The id of the user.
+ * 
+ * @param password - The password to validate.
+ * 
+ * @returns A UserServiceResult object.
+ */
 export const validatePassword = async (
   userId: number,
   password: string
