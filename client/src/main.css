@@ -75,3 +75,12 @@ header button:hover {
   align-items: center;
   text-align: center;
 }
+
+.register {
+  border: 2px solid red;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+}
