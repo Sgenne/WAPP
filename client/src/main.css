@@ -13,13 +13,13 @@ body {
   background-color: #fafafa;
 }
 
-header {
-  height: 100px;
-  background-color: white;
-  border-bottom: 1px solid grey;
+input {
+  padding: 4px;
+  font-weight: 600;
+  border: 2px solid #555454;
 }
 
-header button {
+button {
   padding: 8px;
   border-radius: 5px;
   background-color: white;
@@ -27,8 +27,18 @@ header button {
   font-weight: 600;
 }
 
-header button:hover {
+button:hover {
   background-color: #eeeeee;
+}
+
+button:disabled {
+  background-color: white;
+}
+
+header {
+  height: 100px;
+  background-color: white;
+  border-bottom: 1px solid grey;
 }
 
 .header__logo {
@@ -58,8 +68,6 @@ header button:hover {
 
 .header__search input {
   width: 80%;
-  padding: 4px;
-  font-weight: 600;
   border-radius: 5px 0 0 5px;
   border-right: none;
 }
@@ -76,11 +84,42 @@ header button:hover {
   text-align: center;
 }
 
-.register {
-  border: 2px solid red;
-  height: 100%;
+.register,
+.sign-in {
   display: flex;
   flex-direction: column;
   align-items: center;
-  
+  justify-content: space-between;
+}
+
+.register__input-container,
+.sign-in__input-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.register__buttons {
+  display: flex;
+  justify-content: space-evenly;
+  width: 80%;
+}
+
+.modal__content {
+  position: absolute;
+  z-index: 10;
+  background-color: #fafafa;
+  left: 50%;
+  padding: 40px;
+  transform: translate(-50%);
+  border-radius: 5px;
+}
+
+.modal__background {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.6);
+  top: 0;
+  width: 100%;
+  height: 100vh;
 }
