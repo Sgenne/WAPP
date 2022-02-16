@@ -13,6 +13,20 @@ body {
   background-color: #fafafa;
 }
 
+a:link,
+a:link:hover,
+a:visited,
+a:visited:hover {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul, li {
+  list-style-type: none; /* Remove bullets */
+  padding: 0; /* Remove padding */
+  margin: 0; /* Remove margins */
+}
+
 header {
   height: 100px;
   background-color: white;
@@ -82,5 +96,38 @@ header button:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
-  
+}
+
+.wholePage {
+  max-width: 1000px;
+  margin: 6rem auto;
+  padding: 14px;
+  font-size: 1.1em;
+  background-color: #70b4c1;
+}
+
+.category-box {
+  background-color: white;
+  border-radius: 5px;
+  padding: 8px;
+  margin-bottom: 2%;
+}
+
+.category-box__threads {
+  list-style: none;
+}
+
+.row__avatar {
+  height: 4em;
+  width: 4em;
+}
+
+.row__thread-title {
+  margin-left: 2%;
+  display: inline;
+  padding: auto;
+}
+
+.category-box__thread-desc {
+  margin-top: 1em;
 }
