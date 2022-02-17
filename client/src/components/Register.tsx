@@ -1,12 +1,19 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import axios from "axios";
 import Modal from "./Modal";
+import { AuthContext } from "../context/AuthContext";
 
 const Register = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [birthDate, setBirthDate] = useState("");
+
+  const authContext = useContext(AuthContext);
+
+  const closeHandler = () => {
+    authContext.setShowRegister(false);
+  };
 
   const usernameChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -44,7 +51,7 @@ const Register = () => {
   };
 
   return (
-    <Modal>
+    <Modal onBackgroundClick={closeHandler}>
       <div className="register">
         <div className="register__input-container">
           <label>Username: </label>
@@ -91,7 +98,7 @@ const Register = () => {
           <button onClick={submitClickHandler} disabled={!validInput}>
             Register
           </button>
-          <button>Cancel</button>
+          <button onClick={closeHandler}>Cancel</button>
         </div>
       </div>
     </Modal>
