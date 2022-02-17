@@ -94,13 +94,13 @@ export const updateUser = async (
 };
 
 /**
- * Validates that the given password matches the stored password hash of the 
+ * Validates that the given password matches the stored password hash of the
  * user with the given id.
- * 
+ *
  * @param userId - The id of the user.
- * 
+ *
  * @param password - The password to validate.
- * 
+ *
  * @returns A UserServiceResult object.
  */
 export const validatePassword = async (
@@ -230,6 +230,31 @@ export const getUser = async (userId: number): Promise<UserServiceResult> => {
   return {
     statusCode: 200,
     message: "User fetched successfully.",
+    user: existingUser,
+  };
+};
+
+/**
+ * Returns the user with the given username if one exists.
+ * @param username - The username of the returned user.
+ * @returns A UserServiceResult object.
+ */
+export const getUserByUsername = async (
+  username: string
+): Promise<UserServiceResult> => {
+  const existingUser = Object.values(users).find(
+    (user) => user.username === username
+  );
+
+  if (!existingUser)
+    return {
+      statusCode: 404,
+      message: "No user with the given username exists.",
+    };
+
+  return {
+    statusCode: 200,
+    message: "The user was found successfully.",
     user: existingUser,
   };
 };

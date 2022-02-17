@@ -12,6 +12,11 @@ export interface AuthContextState {
   userId?: string;
 
   /**
+   * The username of the user if they are signed in.
+   */
+  username?: string;
+
+  /**
    * The password of the user if they are signed in.
    */
   password?: string;
@@ -25,6 +30,11 @@ export interface AuthContextState {
    * Updates the stored id.
    */
   setUserId: React.Dispatch<React.SetStateAction<string | undefined>>;
+
+  /**
+   * Updates the stored username.
+   */
+  setUsername: React.Dispatch<React.SetStateAction<string | undefined>>;
 
   /**
    * Updates the stored password.
@@ -61,6 +71,7 @@ const defaultState: AuthContextState = {
   isSignedIn: false,
   setIsSignedIn: () => {},
   setUserId: () => {},
+  setUsername: () => {},
   setPassword: () => {},
   showSignIn: false,
   setShowSignIn: () => {},
@@ -82,6 +93,7 @@ export const AuthContext = createContext<AuthContextState>(defaultState);
 export const AuthContextProvider = (props: { children: JSX.Element }) => {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [userId, setUserId] = useState<string>();
+  const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
   const [showSignIn, setShowSignIn] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
@@ -93,6 +105,8 @@ export const AuthContextProvider = (props: { children: JSX.Element }) => {
         setIsSignedIn,
         userId,
         setUserId,
+        username,
+        setUsername,
         password,
         setPassword,
         showSignIn,

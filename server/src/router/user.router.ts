@@ -3,6 +3,7 @@ import { Request, Response, Router } from "express";
 import {
   handleValidationResult,
   hasPassword,
+  hasUsername,
   hasValidBirthDate,
   hasValidEmail,
   hasValidPassword,
@@ -111,17 +112,34 @@ userRouter.put(
 );
 
 userRouter.post(
-  "/validate-password",
-  hasValidUserId,
+  "/sign-in",
+  hasUsername,
   hasPassword,
   async (req: Request, res: Response) => {
-    const userId = req.body.userId;
+    const username = req.body.username;
     const password = req.body.password;
 
-    const result = await userServices.validatePassword(userId, password);
+    const userResult = await userServices.getUserByUsername(username);
 
-    res
-      .status(result.statusCode)
-      .send({ message: result.message, user: result.user });
+    const user = userResult.user;
+
+    if (!user) {
+      res.status(userResult.statusCode).send({ message: userResult.message });
+      return;
+    }
+
+    const validationResult = await userServices.validatePassword(
+      user.userId,
+      password
+    );
+
+    if (validationResult.statusCode !== 200) {
+      res
+        .status(validationResult.statusCode)
+        .send({ message: validationResult.message });
+      return;
+    }
+
+    res.status(200).send({ message: "The user was verified.", user: user });
   }
 );
