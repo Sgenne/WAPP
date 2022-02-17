@@ -133,8 +133,9 @@ header {
 }
 
 .row__avatar {
-  height: 4em;
-  width: 4em;
+  height: 70px;
+  width: 70px;
+  padding: 0;
 }
 
 .row__thread-title {
@@ -177,4 +178,26 @@ header {
   top: 0;
   width: 100%;
   height: 100vh;
+}
+
+.threadLikes {
+  display: inline;
+  margin-left: 5px;
+}
+
+.threadPrevCont {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.newThreadButton {
+  padding: 0px 10px 0 5px;
+}
+
+.threadButtonSpan {
+  margin-top: 10px;
+  display: inline-block;
 }

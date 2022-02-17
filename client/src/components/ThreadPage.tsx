@@ -6,24 +6,30 @@ const ThreadPage = () => {
   for (var i = 0; i < 8; i++) {
     list[i] = <ThreadComment />;
   }
+  const title:string = "Title - A new hope";
+  const context:string = "Luke Skywalker joins forces with a Jedi Knight, a cocky pilot, a Wookiee and two droids to save the galaxy from the Empire's world-destroying battle station, while also attempting to rescue Princess Leia from the mysterious Darth Vader."
+  const author: string = "Luke"
+  const discrod = require('./../resources/img/discrod.png');
+  const likes: number = 1336;
+  const dislikes: number = 419;
   return (
     <div className="wholePage">
       <ul>
         <li>
           <div className="category-box container-fluid px-4">
             <div className="row">
-              <img src="resources/img/discrod.png" className="row__avatar" />
+              <img src={discrod} className="row__avatar" />
               <div className="col row">
                 <h3 className="thread-title col-12">
                   <a href="thread.html" className="link">
                     
-                    /*TODO title*/
+                    {title}
                   </a>
                 </h3>
                 <p className="row__thread-title col-3">
                   <a href="thread.html" className="link">
                    
-                    /*TODO User*/
+                    {author}
                   </a>
                 </p>
                 <p className="row__thread-title col-3">
@@ -35,18 +41,21 @@ const ThreadPage = () => {
             </div>
             <div className="category-box__thread-desc">
               <p>
-                Category1 Description. On the road again Just can't wait to get
-                on the road again The life I love is making music with my
-                friends And I can't wait to get on the road again...
+                {context}
               </p>
             </div>
             <div className="row">
               <div className="col-2">
                 <FaThumbsUp />
-                Likes
+                <p className="threadLikes">
+                {likes}
+                </p>
               </div>
               <div className="col-2">
-                <FaThumbsDown /> Dislikes
+                <FaThumbsDown /> 
+                <p className="threadLikes">
+                {dislikes}
+                </p>
               </div>
               <div className="col-2">Reply</div>
             </div>

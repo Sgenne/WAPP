@@ -1,7 +1,9 @@
 import { useContext } from "react";
 import Header from "./components/Header";
 import Register from "./components/Register";
+import ThreadPage from "./components/ThreadPage";
 import { AuthContext } from "./context/AuthContext";
+import CategoryPage from "./components/CategoryPage";
 import Router from "./Router";
 
 const App = () => {
@@ -16,7 +18,7 @@ const App = () => {
       <Header />
       {/* Show Register component if authContext.showRegister is true */}
       {authContext.showRegister && <Register />}
-      <Router />
+      <CategoryPage />
     </div>
   );
 };
