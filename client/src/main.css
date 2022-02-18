@@ -246,3 +246,32 @@ header {
   background-color: #ffffff;
   min-height: 200px;
 }
+
+.profile-page__image {
+  width: 15%;
+  max-width: 100em;
+  border-radius: 100%;
+}
+
+.profile-page__userInfo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.profile-page__thread-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+}
+.profile-page__thread-buttons > button {
+  margin: 1px;
+}
+
+.profile-page__displayedThreads {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}

@@ -37,7 +37,7 @@ export interface User {
   /**
    * The profile picture of the user.
    */
-  image?: any;
+  image?: string;
 
   /**
    * The threads that the user has liked.

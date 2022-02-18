@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import ProfilePage from "./components/ProfilePage";
 import ThreadPage from "./components/ThreadPage";
 
 const Router = () => {
@@ -12,8 +13,9 @@ const Router = () => {
       />
       <Route
         path="/profile"
-        element={<div>Hello! This is the profile page of a user!</div>}
+        element={<ProfilePage />}
       />
+      
       {/* 
         Keep this route at bottom to catch urls that don't match anything else. 
         Replace with real 404 page.
