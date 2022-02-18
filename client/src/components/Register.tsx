@@ -1,7 +1,8 @@
 import { useState, useContext } from "react";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import Modal from "./Modal";
 import { AuthContext } from "../context/AuthContext";
+import { User } from "../../../server/src/model/user.interface";
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -41,13 +42,26 @@ const Register = () => {
 
   const submitClickHandler = async () => {
     if (!validInput) return;
+    let result: AxiosResponse;
+    try {
+      result = await axios.post("http://localhost:8080/user/register", {
+        username: username,
+        password: password,
+        email: email,
+        birthDate: birthDate,
+      });
+    } catch (error) {
+      console.log(error);
+      return;
+    }
 
-    await axios.post("http://localhost:8080/user/register", {
-      username: username,
-      password: password,
-      email: email,
-      birthDate: birthDate,
-    });
+    const user: User = result.data.user;
+
+    authContext.setIsSignedIn(true);
+    authContext.setUserId(user.userId.toString());
+    authContext.setUsername(username);
+    authContext.setPassword(password);
+    authContext.setShowRegister(false);
   };
 
   return (

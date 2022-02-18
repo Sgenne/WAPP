@@ -111,11 +111,11 @@ test("After editing a users password, only the new password is valid.", async ()
 
   const [originalPasswordResult, newPasswordResult] = await Promise.all([
     request
-      .post("/user/validate-password")
-      .send({ userId: userId, password: dummyPassword }),
+      .post("/user/sign-in")
+      .send({ username: dummyUsername, password: dummyPassword }),
     request
-      .post("/user/validate-password")
-      .send({ userId: userId, password: newPassword }),
+      .post("/user/sign-in")
+      .send({ username: dummyUsername, password: newPassword }),
   ]);
 
   expect(originalPasswordResult.status).toBe(401);
