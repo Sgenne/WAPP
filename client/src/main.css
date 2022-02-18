@@ -201,3 +201,48 @@ header {
   margin-top: 10px;
   display: inline-block;
 }
+
+#catigory-title {
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+#toolbox {
+  background-color: #f5f5f5;
+  width: 20%;
+  margin-top: 0%;
+  margin-right: 2%;
+  height: 10em;
+  float: left;
+}
+
+#postthread {
+  padding: 2%;
+  background-color: #f5f5f5;
+  width: 100%;
+  border-radius: 5px;
+}
+
+#threadinput {
+  width: 100%;
+  margin: 1% 0%;
+}
+
+#subThread {
+  margin: 1% 5%;
+}
+
+#submitbut {
+  /*border: 2px solid red;*/
+  display: flex;
+  justify-content: flex-end;
+}
+
+#quill {
+  background-color: #ffffff;
+}
+
+.ql-container {
+  background-color: #ffffff;
+  min-height: 200px;
+}
