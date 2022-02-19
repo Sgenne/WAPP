@@ -11,15 +11,7 @@ const Router = () => {
         path="/create-thread"
         element={<div>Hello! This is the page for creating a thread!</div>}
       />
-      <Route
-        path="/profile"
-        element={<ProfilePage />}
-      />
-      
-      {/* 
-        Keep this route at bottom to catch urls that don't match anything else. 
-        Replace with real 404 page.
-       */}
+      <Route path="/profile" element={<ProfilePage />} />
       <Route path="*" element={<div>Uh oh... No page was found 😿</div>} />
     </Routes>
   );

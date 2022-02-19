@@ -3,10 +3,12 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import Modal from "./Modal";
 import { User } from "../../../server/src/model/user.interface";
+import ErrorMessage from "./ErrorMessage";
 
 const SignIn = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const authContext = useContext(AuthContext);
 
@@ -37,12 +39,16 @@ const SignIn = () => {
         }
       );
     } catch (error) {
-      console.log(error);
+      if (!(axios.isAxiosError(error) && error.response)) {
+        setErrorMessage("Something went wrong while signing in.");
+        return;
+      }
+
+      setErrorMessage(error.response.data.message);
       return;
     }
 
     const signedInUser: User = signInResult.data.user;
-
     authContext.setIsSignedIn(true);
     authContext.setUserId(signedInUser.userId.toString());
     authContext.setUsername(username);
@@ -55,6 +61,9 @@ const SignIn = () => {
   return (
     <Modal onBackgroundClick={closeHandler}>
       <div className="sign-in">
+        <div className="sign-in__error-message">
+          <ErrorMessage>{errorMessage}</ErrorMessage>
+        </div>
         <div className="sign-in__input-container">
           <label>Username: </label>
           <input

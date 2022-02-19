@@ -156,7 +156,13 @@ header {
   margin-bottom: 8px;
 }
 
-.register__buttons {
+.register__error-message,
+.sign-in__error-message {
+  max-width: 80%;
+}
+
+.register__buttons,
+.sign-in__buttons {
   display: flex;
   justify-content: space-evenly;
   width: 80%;
@@ -274,4 +280,17 @@ header {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+}
+
+.error-message {
+  background-color: rgb(255, 71, 51);
+  font-weight: 600;
+  color: white;
+  padding: 6px;
+  text-align: center;
+  border-radius: 5px;
+}
+
+.hide {
+  display: none;
 }

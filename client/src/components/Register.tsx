@@ -3,12 +3,14 @@ import axios, { AxiosResponse } from "axios";
 import Modal from "./Modal";
 import { AuthContext } from "../context/AuthContext";
 import { User } from "../../../server/src/model/user.interface";
+import ErrorMessage from "./ErrorMessage";
 
 const Register = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [birthDate, setBirthDate] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const authContext = useContext(AuthContext);
 
@@ -51,7 +53,12 @@ const Register = () => {
         birthDate: birthDate,
       });
     } catch (error) {
-      console.log(error);
+      if (!(axios.isAxiosError(error) && error.response)) {
+        setErrorMessage("Something went wrong while signing in.");
+        return;
+      }
+
+      setErrorMessage(error.response.data.message);
       return;
     }
 
@@ -64,9 +71,14 @@ const Register = () => {
     authContext.setShowRegister(false);
   };
 
+  console.log("errorMessage: ", errorMessage);
+
   return (
     <Modal onBackgroundClick={closeHandler}>
       <div className="register">
+        <div className="register__error-message">
+          <ErrorMessage>{errorMessage}</ErrorMessage>
+        </div>
         <div className="register__input-container">
           <label>Username: </label>
           <input
