@@ -1,4 +1,5 @@
 import { User } from "../model/user.interface";
+import * as imageServices from "./image.service";
 import bcrypt from "bcryptjs";
 
 /**
@@ -6,14 +7,14 @@ import bcrypt from "bcryptjs";
  */
 export const users: { [userId: string]: User } = {
   0: {
-    userId: -1,
+    userId: 0,
     username: "Deleted",
     email: "",
     joinDate: new Date(),
     birthDate: new Date(),
     passwordHash: "",
     bio: "",
-    image: "",
+    image: imageServices.DEFAULT_IMAGE_ID,
     likedThreads: [],
     dislikedThreads: [],
     likedComments: [],
@@ -175,7 +176,7 @@ export const register = async (
     username,
     passwordHash,
     bio: "",
-    image: "",
+    image: imageServices.DEFAULT_IMAGE_ID,
     birthDate,
     likedThreads: [],
     dislikedThreads: [],
@@ -296,6 +297,40 @@ export const setVisibleProperties = async (
     statusCode: 200,
     message: "Visible properties updated successfully.",
     user: existingUser,
+  };
+};
+
+export const updateProfilePicture = async (
+  userId: number,
+  image: { imageBuffer: Buffer; filename: string }
+): Promise<UserServiceResult> => {
+  const user = users[userId];
+
+  if (!user) {
+    return {
+      statusCode: 404,
+      message: "User not found.",
+    };
+  }
+
+  const previousProfilePicture = imageServices.images[user.image];
+
+  const storageResult = await imageServices.storeImage(image);
+  const storedImage = storageResult.image;
+
+  if (!storedImage) {
+    return storageResult;
+  }
+
+  if (!previousProfilePicture.isDefault) {
+    imageServices.deleteImage(user.image);
+  }
+
+  user.image = storedImage.imageId;
+  return {
+    message: "The profile picture was updated successfully.",
+    statusCode: 200,
+    user: user,
   };
 };
 

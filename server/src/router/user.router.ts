@@ -7,11 +7,11 @@ import {
   hasValidBirthDate,
   hasValidEmail,
   hasValidPassword,
-  hasValidUserId,
   hasValidUsername,
   hasVisiblePropertiesOptions,
 } from "../utils/validation.util";
 import { isAuthenticated } from "../utils/auth.util";
+import { handleUploadedImage } from "../utils/image.util";
 
 export const userRouter = Router();
 
@@ -101,7 +101,6 @@ userRouter.put(
   "/set-visible-properties",
   isAuthenticated,
   hasVisiblePropertiesOptions,
-  hasValidUserId,
   handleValidationResult,
   async (req: Request, res: Response) => {
     const options = req.body.options;
@@ -127,12 +126,12 @@ userRouter.post(
   "/sign-in",
   hasUsername,
   hasPassword,
+  handleValidationResult,
   async (req: Request, res: Response) => {
     const username = req.body.username;
     const password = req.body.password;
 
     const userResult = await userServices.getUserByUsername(username);
-
     const user = userResult.user;
 
     if (!user) {
@@ -155,5 +154,24 @@ userRouter.post(
     res
       .status(200)
       .send({ message: "The user was verified.", userId: user.userId });
+  }
+);
+
+userRouter.post(
+  "/upload-profile-picture",
+  handleUploadedImage,
+  isAuthenticated,
+  async (req: Request, res: Response) => {
+    // Can safely cast to Express.Multer.File as handleUploadedImage will
+    // return an error message to the client if req.file is undefined.
+    const image = req.file as Express.Multer.File;
+    const userId: number = req.body.userId;
+
+    const result = await userServices.updateProfilePicture(userId, {
+      imageBuffer: image.buffer,
+      filename: image.originalname,
+    });
+
+    res.status(result.statusCode).send({ message: result.message });
   }
 );

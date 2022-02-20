@@ -1,9 +1,5 @@
 import { app } from "./start";
-
-/**
- * App Variables
- */
-const PORT: number = 8080;
+import { PORT } from "./utils/app.util";
 
 /**
  * Server Activation

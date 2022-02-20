@@ -7,6 +7,7 @@ import {
   comments,
   getComment,
 } from "../comment.service";
+import { DEFAULT_IMAGE_ID } from "../image.service";
 import {
   categories,
   threads,
@@ -39,7 +40,7 @@ beforeEach(async () => {
     birthDate: new Date(),
     passwordHash: "",
     bio: "",
-    image: "",
+    image: DEFAULT_IMAGE_ID,
     likedThreads: [],
     dislikedThreads: [],
     likedComments: [],
