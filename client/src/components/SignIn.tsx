@@ -48,9 +48,10 @@ const SignIn = () => {
       return;
     }
 
-    const signedInUser: User = signInResult.data.user;
+    const userId = signInResult.data.userId;
+
     authContext.setIsSignedIn(true);
-    authContext.setUserId(signedInUser.userId.toString());
+    authContext.setUserId(userId);
     authContext.setUsername(username);
     authContext.setPassword(password);
     authContext.setShowSignIn(false);

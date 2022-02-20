@@ -62,16 +62,14 @@ const Register = () => {
       return;
     }
 
-    const user: User = result.data.user;
+    const userId: string = result.data.userId;
 
     authContext.setIsSignedIn(true);
-    authContext.setUserId(user.userId.toString());
+    authContext.setUserId(userId);
     authContext.setUsername(username);
     authContext.setPassword(password);
     authContext.setShowRegister(false);
   };
-
-  console.log("errorMessage: ", errorMessage);
 
   return (
     <Modal onBackgroundClick={closeHandler}>
