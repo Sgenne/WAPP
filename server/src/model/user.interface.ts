@@ -27,7 +27,7 @@ export interface User {
   /**
    * The biography of the user.
    */
-  bio?: string;
+  bio: string;
 
   /**
    * A hashed and salted version of the users password.
@@ -37,7 +37,7 @@ export interface User {
   /**
    * The profile picture of the user.
    */
-  image?: string;
+  image: string;
 
   /**
    * The threads that the user has liked.

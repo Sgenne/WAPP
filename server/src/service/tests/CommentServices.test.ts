@@ -38,6 +38,8 @@ beforeEach(async () => {
     joinDate: new Date(),
     birthDate: new Date(),
     passwordHash: "",
+    bio: "",
+    image: "",
     likedThreads: [],
     dislikedThreads: [],
     likedComments: [],
