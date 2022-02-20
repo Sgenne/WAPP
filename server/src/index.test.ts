@@ -26,9 +26,9 @@ test("Updating an existing user's visible properties successfully returns 200.",
     birthDate: dummyDateOfBirth,
   });
 
-  const userId = registrationResult.body.user.userId;
+  const userId = registrationResult.body.userId;
 
-  const editResult = await request.put("/user/edit-user-preferences").send({
+  const editResult = await request.put("/user/set-visible-properties").send({
     userId: userId,
     password: dummyPassword,
     options: {
@@ -76,7 +76,7 @@ test("Registering a user and then GETing that user should return the user.", asy
     birthDate: dummyDateOfBirth,
   });
 
-  const userId = registrationResult.body.user.userId;
+  const userId = registrationResult.body.userId;
 
   if (registrationResult.status !== 201)
     throw new Error("Registration failed.");
@@ -101,7 +101,7 @@ test("After editing a users password, only the new password is valid.", async ()
     birthDate: dummyDateOfBirth,
   });
 
-  const userId = registrationResult.body.user.userId;
+  const userId = registrationResult.body.userId;
 
   await request.put("/user/update-user").send({
     userId: userId,
@@ -134,7 +134,7 @@ test("GETing a user fails with 404 after that user has been deleted.", async () 
     birthDate: dummyDateOfBirth,
   });
 
-  const userId = registerResult.body.user.userId;
+  const userId = registerResult.body.userId;
 
   const deleteResult = await request.delete("/user/delete-user").send({
     userId: userId,

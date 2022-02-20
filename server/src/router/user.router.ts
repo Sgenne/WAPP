@@ -27,7 +27,6 @@ userRouter.post(
     const username = req.body.username;
     const password = req.body.password;
     const birthDateParam = req.body.birthDate;
-
     const birthDate = new Date(birthDateParam);
 
     const result = await userServices.register(
@@ -36,13 +35,17 @@ userRouter.post(
       password,
       birthDate
     );
-    if (result.statusCode !== 201) {
+
+    const user = result.user;
+
+    if (!user) {
       res.status(result.statusCode).send({ message: result.message });
       return;
     }
+
     res.status(201).send({
       message: "The new user was created successfully",
-      user: result.user,
+      userId: user.userId,
     });
   }
 );
@@ -60,11 +63,10 @@ userRouter.put(
       password: req.body.newPassword,
     };
 
-    const result = await userServices.updateUser(userId, update);
+    await userServices.updateUser(userId, update);
 
     res.status(200).send({
       message: "User information updated successfully.",
-      user: result.user,
     });
   }
 );
@@ -86,7 +88,9 @@ userRouter.get("/:userId", async (req: Request, res: Response) => {
 
   const result = await userServices.getUser(+userId);
 
-  if (result.statusCode !== 200) {
+  const user = result.user;
+
+  if (!user) {
     return res.status(result.statusCode).send({ message: result.message });
   }
 
@@ -94,9 +98,10 @@ userRouter.get("/:userId", async (req: Request, res: Response) => {
 });
 
 userRouter.put(
-  "/edit-user-preferences",
+  "/set-visible-properties",
   isAuthenticated,
   hasVisiblePropertiesOptions,
+  hasValidUserId,
   handleValidationResult,
   async (req: Request, res: Response) => {
     const options = req.body.options;
@@ -104,9 +109,16 @@ userRouter.put(
 
     const result = await userServices.setVisibleProperties(userId, options);
 
+    const user = result.user;
+
+    if (!user) {
+      res.status(result.statusCode).send({ message: result.message });
+      return;
+    }
+
     res.status(200).send({
       message: "Preferences updated successfully.",
-      user: result.user,
+      userId: user.userId,
     });
   }
 );
@@ -140,6 +152,8 @@ userRouter.post(
       return;
     }
 
-    res.status(200).send({ message: "The user was verified.", user: user });
+    res
+      .status(200)
+      .send({ message: "The user was verified.", userId: user.userId });
   }
 );

@@ -16,7 +16,7 @@ export const handleValidationResult = (
 
   if (!errors.isEmpty()) {
     const errorMessage = errors.array()[0];
-    res.status(400).send({ message: errorMessage });
+    res.status(400).send({ message: errorMessage.msg });
     return;
   }
   next();
