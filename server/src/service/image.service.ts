@@ -14,8 +14,14 @@ const defaultImage: Image = {
   isDefault: true,
 };
 
-export const images: { [imageId: number]: Image } = {
+export const images: { [imageId: string]: Image } = {
   [0]: defaultImage,
+  [1]: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/ToastedWhiteBread.jpg/800px-ToastedWhiteBread.jpg",
+    filename: "ToastedWhiteBread.jpg",
+    imageId: 1,
+  },
 };
 
 /**
@@ -75,17 +81,8 @@ export const storeImage = async (image: {
 };
 
 export const deleteImage = async (
-  imageId: number
+  image: Image
 ): Promise<ImageServiceResult> => {
-  const image: Image | undefined = images[imageId];
-
-  if (!image) {
-    return {
-      statusCode: 404,
-      message: "No image with the given id exists.",
-    };
-  }
-
   const imagePath = getImagePath(image.filename);
   try {
     await unlink(imagePath);
@@ -96,7 +93,7 @@ export const deleteImage = async (
     };
   }
 
-  delete images[imageId];
+  delete images[image.imageId];
 
   return {
     statusCode: 200,

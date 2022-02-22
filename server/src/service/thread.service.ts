@@ -7,7 +7,44 @@ import { comments } from "./comment.service";
 /**
  * Temporary in-memory store of all threads.
  */
-export const threads: { [key: string]: Thread } = {};
+export const threads: { [threadId: string]: Thread } = {
+  [1]: {
+    author: 1,
+    content:
+      "Toast is bread that has been browned by radiant heat. The browning is the result of a Maillard reaction, altering the flavor of the bread and making it firmer so that it is easier to spread toppings on it. Toasting is a common method of making stale bread more palatable. Bread is often toasted using a toaster, but toaster ovens are also used. Pre-sliced bread is most commonly used.",
+    title: "About me",
+    date: new Date(),
+    threadId: 1,
+    likes: 10,
+    dislikes: 3,
+    category: "bread",
+    replies: [],
+  },
+  [2]: {
+    author: 1,
+    content:
+      "Toast is a common breakfast food. Bagels and English muffins are also toasted.",
+    title: "Breakfast",
+    date: new Date(),
+    threadId: 2,
+    likes: 20,
+    dislikes: 11,
+    category: "bread",
+    replies: [],
+  },
+  [3]: {
+    author: 1,
+    content:
+      "A more recent cultural phenomenon is the popularity of avocado toast, which is toast spread with mashed avocado. It is associated with the Millennial generation in particular as a stereotypical food consumed by that group.",
+    title: "A modern version",
+    date: new Date(),
+    threadId: 3,
+    likes: 3,
+    dislikes: 11,
+    category: "bread",
+    replies: [],
+  },
+};
 /**
  * Temporary in-memory store of all categories.
  */
@@ -15,6 +52,7 @@ export const categories: string[] = [
   "dogs",
   "cats",
   "Guianan Cock-of-the-rock",
+  "bread",
 ];
 /**
  * Global variable to know what id to assign next thread.
@@ -45,13 +83,18 @@ interface ThreadServiceResult {
   message: string;
 
   /**
-   * The thread that was acted upon.
+   * The thread that was acted upon if the service was successfull.
    */
   thread?: Thread;
+
+  /**
+   * The threads that were acted upon if the service was successfull.
+   */
+  threads?: Thread[];
 }
 
 /**
- * 
+ *
  * @param threadId The id of the thread to get
  * @returns a thread with the specified id
  */
@@ -59,7 +102,7 @@ export const getThread = async (
   threadId: number
 ): Promise<ThreadServiceResult> => {
   const thread = threads[threadId];
-  if(thread){
+  if (thread) {
     return {
       statusCode: 200,
       message: "Thread has successfully been recived.",
@@ -70,6 +113,34 @@ export const getThread = async (
     statusCode: 404,
     message: "Thread could not be found",
     thread: undefined,
+  };
+};
+
+/**
+ * Returns the threads created by the user with the given id.
+ *
+ * @param userId - The id of the author of the threads to return.
+ *
+ * @returns A ThreadServiceResult object.
+ */
+export const getThreadsByAuthor = async (
+  userId: number
+): Promise<ThreadServiceResult> => {
+  const user = users[userId];
+
+  if (!user) {
+    return { statusCode: 404, message: "No user with the given id exists." };
+  }
+
+  const authoredThreads = Object.values(threads).filter(
+    (thread) => thread.author === userId
+  );
+
+  return {
+    statusCode: 200,
+    message:
+      "The threads created by the user were found and returned successfully.",
+    threads: authoredThreads,
   };
 };
 

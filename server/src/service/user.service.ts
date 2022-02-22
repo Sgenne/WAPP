@@ -1,5 +1,5 @@
 import { User } from "../model/user.interface";
-import * as imageServices from "./image.service";
+import { images, DEFAULT_IMAGE_ID, storeImage, deleteImage } from "./image.service";
 import bcrypt from "bcryptjs";
 
 /**
@@ -14,7 +14,7 @@ export const users: { [userId: string]: User } = {
     birthDate: new Date(),
     passwordHash: "",
     bio: "",
-    image: imageServices.DEFAULT_IMAGE_ID,
+    image: images[DEFAULT_IMAGE_ID],
     likedThreads: [],
     dislikedThreads: [],
     likedComments: [],
@@ -27,6 +27,30 @@ export const users: { [userId: string]: User } = {
       image: false,
       likedThreads: false,
       dislikedThreads: false,
+    },
+  },
+  1: {
+    userId: 1,
+    username: "Toast",
+    email: "toast@gmail.com",
+    joinDate: new Date(2022, 1, 22),
+    birthDate: new Date(2000, 5, 18),
+    passwordHash:
+      "$2a$10$6cl/uWNIxhokhH8GR4BlQuTVMDlT1ptZm64vNoSPSdr5Ngeci2aEG",
+    bio: "I'm burnt",
+    image: images[1],
+    likedThreads: [],
+    dislikedThreads: [],
+    likedComments: [],
+    dislikedComments: [],
+    visibleProperties: {
+      email: true,
+      joinDate: true,
+      birthDate: true,
+      bio: true,
+      image: true,
+      likedThreads: true,
+      dislikedThreads: true,
     },
   },
 };
@@ -76,7 +100,6 @@ export const updateUser = async (
   if (!existingUser) {
     return { statusCode: 404, message: "No user with the given id was found." };
   }
-
   if (update.birthDate) {
     existingUser["birthDate"] = update.birthDate;
   }
@@ -85,9 +108,6 @@ export const updateUser = async (
   }
   if (update.password) {
     existingUser["passwordHash"] = await hashPassword(update.password);
-  }
-  if (update.image) {
-    existingUser["image"] = update.image;
   }
   return {
     statusCode: 200,
@@ -176,7 +196,7 @@ export const register = async (
     username,
     passwordHash,
     bio: "",
-    image: imageServices.DEFAULT_IMAGE_ID,
+    image: images[DEFAULT_IMAGE_ID],
     birthDate,
     likedThreads: [],
     dislikedThreads: [],
@@ -313,9 +333,9 @@ export const updateProfilePicture = async (
     };
   }
 
-  const previousProfilePicture = imageServices.images[user.image];
+  const previousProfilePicture = user.image;
 
-  const storageResult = await imageServices.storeImage(image);
+  const storageResult = await storeImage(image);
   const storedImage = storageResult.image;
 
   if (!storedImage) {
@@ -323,10 +343,10 @@ export const updateProfilePicture = async (
   }
 
   if (!previousProfilePicture.isDefault) {
-    imageServices.deleteImage(user.image);
+    deleteImage(user.image);
   }
 
-  user.image = storedImage.imageId;
+  user.image = storedImage;
   return {
     message: "The profile picture was updated successfully.",
     statusCode: 200,

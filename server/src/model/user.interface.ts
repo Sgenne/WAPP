@@ -1,3 +1,5 @@
+import { Image } from "./image.interface";
+
 export interface User {
   /**
    * The id of the user.
@@ -37,7 +39,7 @@ export interface User {
   /**
    * The profile picture of the user.
    */
-  image: number;
+  image: Image;
 
   /**
    * The threads that the user has liked.

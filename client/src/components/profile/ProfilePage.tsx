@@ -1,16 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { formatDate } from "../../utils/formatUtils";
 import ProfileListItem from "./ProfileListItem";
+import { Thread } from "../../../../server/src/model/thread.interface";
+import axios, { AxiosResponse } from "axios";
+import { User } from "../../../../server/src/model/user.interface";
 ///////////////////////////////////START OF DUMMIES///////////////////////////////////////////////////////////////
-const dummy = {
-  username: "Toast",
-  userId: 1,
-  image:
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/ToastedWhiteBread.jpg/800px-ToastedWhiteBread.jpg",
-  bio: "I'm burnt",
-  likedThread: [],
-  dislikedThread: [],
-};
+
+const dummyUserId = 1;
+
 const dummyThreads = [
   {
     author: 1,
@@ -55,35 +52,72 @@ const dummyComments = [
     date: new Date().toISOString(),
   },
 ];
-///////////////////////////////////END OF DUMMIES///////////////////////////////////////////////////////////////
-const defaultImage =
-  "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png";
-const defaultBio = "";
 
-let displayedThreads = dummyThreads.map((thread) => (
-  <li>
-    <h4>{thread.title}</h4>
-    <span>Posted at: {thread.date.substring(0, 10)}</span>
-  </li>
-));
+///////////////////////////////////END OF DUMMIES///////////////////////////////////////////////////////////////
+
 const ProfilePage = () => {
+  const [user, setUser] = useState<User>();
+  const [createdThreads, setCreatedThreads] = useState<Thread[]>([]);
   const [listItems, setListItems] = useState<JSX.Element[]>([]);
 
-  const userImage = dummy.image || defaultImage;
-  const userBio = dummy.bio || defaultBio;
+  useEffect(() => {
+    fetchUser(dummyUserId);
+    fetchCreatedThreads(dummyUserId);
+  }, []);
+
+  const fetchUser = async (userId: Number) => {
+    let response: AxiosResponse;
+
+    try {
+      response = await axios.get<{ user: User }>(
+        `http://localhost:8080/user/${userId}`
+      );
+    } catch (error) {
+      console.log(error); // TODO: Show error
+      return;
+    }
+    setUser(response.data.user);
+  };
+
+  const fetchCreatedThreads = async (userId: Number): Promise<void> => {
+    let response: AxiosResponse;
+
+    try {
+      response = await axios.get<{ threads: Thread[] }>(
+        `http://localhost:8080/thread/author/${userId}`
+      );
+    } catch (error) {
+      console.log(error); // TODO: Show error
+      return;
+    }
+    const fetchedThreads: Thread[] = response.data.threads;
+
+    setCreatedThreads(fetchedThreads);
+    setListItems(
+      fetchedThreads.map((thread) => (
+        <ProfileListItem
+          header={thread.title}
+          content={thread.content}
+          date={formatDate(new Date(thread.date))}
+        />
+      ))
+    );
+  };
 
   const threadClickHandler = () => {
-    const threadListItems = dummyThreads.map((thread) => (
+    // send GET to /thread/author/:userId
+    const threadListItems = createdThreads.map((thread) => (
       <ProfileListItem
         header={thread.title}
         content={thread.content}
-        date={thread.date}
+        date={formatDate(new Date(thread.date))}
       />
     ));
     setListItems(threadListItems);
   };
 
   const commentClickHandler = () => {
+    // send GET to /comment/author/:userId
     const commentListItems = dummyComments.map((comment) => (
       <ProfileListItem
         header={comment.parentThread.title}
@@ -94,7 +128,8 @@ const ProfilePage = () => {
     setListItems(commentListItems);
   };
 
-  const likedClickHandler = () => {
+  // send GET to /thread/liked-by/:userId
+  const likedThreadsClickHandler = () => {
     const likedListItems = dummyThreads.map((thread) => (
       <ProfileListItem
         header={thread.title}
@@ -105,7 +140,8 @@ const ProfilePage = () => {
     setListItems(likedListItems);
   };
 
-  const dislikedClickHandler = () => {
+  // send GET to /comment/liked-by/:userId
+  const likedCommentsClickHandler = () => {
     const dislikedListItems = dummyThreads.map((thread) => (
       <ProfileListItem
         header={thread.title}
@@ -116,18 +152,24 @@ const ProfilePage = () => {
     setListItems(dislikedListItems);
   };
 
+  if (!user) return <div>Loading...........</div>;
+
   return (
     <div className="profile-page">
       <div className="profile-page__userInfo">
-        <img className="profile-page__image" src={userImage} />
-        <h1 className="profile-page__username"> {dummy.username}</h1>
-        <p className="profile-page__bio"> {userBio}</p>
+        <img
+          className="profile-page__image"
+          src={user.image.imageUrl}
+          alt="profile"
+        />
+        <h1 className="profile-page__username"> {user.username}</h1>
+        <p className="profile-page__bio"> {user.bio}</p>
       </div>
       <div className="profile-page__thread-buttons">
         <button onClick={threadClickHandler}>Threads</button>
         <button onClick={commentClickHandler}>Comments</button>
-        <button onClick={likedClickHandler}>Liked</button>
-        <button onClick={dislikedClickHandler}>Disliked</button>
+        <button onClick={likedThreadsClickHandler}>Liked Threads</button>
+        <button onClick={likedCommentsClickHandler}>Liked Comments</button>
       </div>
       <ul className="profile-page__displayed-threads">{listItems}</ul>
     </div>

@@ -7,7 +7,7 @@ import {
   comments,
   getComment,
 } from "../comment.service";
-import { DEFAULT_IMAGE_ID } from "../image.service";
+import { DEFAULT_IMAGE_ID, images } from "../image.service";
 import {
   categories,
   threads,
@@ -40,7 +40,7 @@ beforeEach(async () => {
     birthDate: new Date(),
     passwordHash: "",
     bio: "",
-    image: DEFAULT_IMAGE_ID,
+    image: images[DEFAULT_IMAGE_ID],
     likedThreads: [],
     dislikedThreads: [],
     likedComments: [],
@@ -119,26 +119,25 @@ test("replying to a comment as a valid user", async () => {
   getComment
   ================================
   */
-  test("Get comment succeds if given id exists.", async () => {
-    categories.push(dummyCategory);
-    const userId = await userSetup();
-  
-    const threadId = await threadSetup(userId);
+test("Get comment succeds if given id exists.", async () => {
+  categories.push(dummyCategory);
+  const userId = await userSetup();
 
-    const commentId = await commentSetup(userId, threadId);
+  const threadId = await threadSetup(userId);
 
-    const result = await getComment(commentId);
-  
-    expect(result.statusCode).toBe(200);
-  });
+  const commentId = await commentSetup(userId, threadId);
 
-  test("Create comment fails if given id does not exists.", async () => {
-    const result = await getComment(0);
+  const result = await getComment(commentId);
 
+  expect(result.statusCode).toBe(200);
+});
 
-    expect(result.comment).toBeUndefined;
-    expect(result.statusCode).toBe(404);
-  });
+test("Create comment fails if given id does not exists.", async () => {
+  const result = await getComment(0);
+
+  expect(result.comment).toBeUndefined;
+  expect(result.statusCode).toBe(404);
+});
 
 /*
   ================================
@@ -311,7 +310,6 @@ test("deleting a comment as a valid user", async () => {
   if (!result.comment) throw new Error("Comment is undefined.");
 
   expect(result.comment.content).toBe("");
-  //expect(result.comment.authour.username).toBe("Deleted");
   expect(result.comment.likes).toBe(0);
   expect(result.comment.dislikes).toBe(0);
   expect(result.statusCode).toBe(200);

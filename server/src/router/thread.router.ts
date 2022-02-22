@@ -143,7 +143,7 @@ threadRouter.post(
 );
 
 threadRouter.get("/:threadId", async (req: Request, res: Response) => {
-  const userId = req.params.threadId;
+  const threadId = req.params.threadId;
 
   const result = await threadServices.getThread(+threadId);
 
@@ -152,6 +152,19 @@ threadRouter.get("/:threadId", async (req: Request, res: Response) => {
   }
 
   res.status(200).send({ message: result.message, user: result.thread });
+});
+
+threadRouter.get("/author/:userId", async (req: Request, res: Response) => {
+  const userId = req.params.userId;
+
+  const result = await threadServices.getThreadsByAuthor(+userId);
+
+  if (!result.threads) {
+    res.status(result.statusCode).send({ message: result.message });
+    return;
+  }
+
+  res.status(200).send({ message: result.message, threads: result.threads });
 });
 
 threadRouter.delete(
