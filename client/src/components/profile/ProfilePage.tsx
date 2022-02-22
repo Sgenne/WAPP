@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { formatDate } from "../../utils/formatUtils";
 import ProfileListItem from "./ProfileListItem";
 ///////////////////////////////////START OF DUMMIES///////////////////////////////////////////////////////////////
 const dummy = {
@@ -35,20 +36,20 @@ const dummyThreads = [
 ];
 const dummyComments = [
   {
-    parentThread: dummyThreads[0], 
+    parentThread: dummyThreads[0],
     author: 1,
     content: "I also like to be soaked in butter",
     date: new Date().toISOString(),
   },
   {
-    parentThread: dummyThreads[0], 
+    parentThread: dummyThreads[0],
     author: 1,
     content:
       "I like to be covered in jelly while my partner prefers peanutbutter",
     date: new Date().toISOString(),
   },
   {
-    parentThread: dummyThreads[0], 
+    parentThread: dummyThreads[0],
     author: 1,
     content: "I like to be soaked in chocospread",
     date: new Date().toISOString(),
@@ -98,7 +99,7 @@ const ProfilePage = () => {
       <ProfileListItem
         header={thread.title}
         content={thread.content}
-        date={thread.date}
+        date={formatDate(new Date(thread.date))}
       />
     ));
     setListItems(likedListItems);
@@ -116,7 +117,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <div>
+    <div className="profile-page">
       <div className="profile-page__userInfo">
         <img className="profile-page__image" src={userImage} />
         <h1 className="profile-page__username"> {dummy.username}</h1>

@@ -11,9 +11,11 @@ const App = () => {
   return (
     <div>
       <Header />
-      {authContext.showRegister && <Register />}
-      {authContext.showSignIn && <SignIn />}
-      <Router />
+      <div className="app__content">
+        {authContext.showRegister && <Register />}
+        {authContext.showSignIn && <SignIn />}
+        <Router />
+      </div>
     </div>
   );
 };
