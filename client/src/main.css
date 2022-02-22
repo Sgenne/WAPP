@@ -270,12 +270,13 @@ header {
   justify-content: center;
   align-items: center;
   flex-direction: row;
+  margin-bottom: 1em;
 }
 .profile-page__thread-buttons > button {
   margin: 1px;
 }
 
-.profile-page__displayedThreads {
+.profile-page__displayed-threads {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -294,3 +295,18 @@ header {
 .hide {
   display: none;
 }
+
+.profile-list-item {
+  border: 2px solid red;
+  width: 40%;
+}
+
+.profile-list-item__date {
+
+ color: #8a8a8a;
+ font-size: 0.8rem;
+}
+
+
+
+

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ProfileListItem from "./ProfileListItem";
 ///////////////////////////////////START OF DUMMIES///////////////////////////////////////////////////////////////
 const dummy = {
   username: "Toast",
@@ -34,17 +35,20 @@ const dummyThreads = [
 ];
 const dummyComments = [
   {
+    parentThread: dummyThreads[0], 
     author: 1,
     content: "I also like to be soaked in butter",
     date: new Date().toISOString(),
   },
   {
+    parentThread: dummyThreads[0], 
     author: 1,
     content:
       "I like to be covered in jelly while my partner prefers peanutbutter",
     date: new Date().toISOString(),
   },
   {
+    parentThread: dummyThreads[0], 
     author: 1,
     content: "I like to be soaked in chocospread",
     date: new Date().toISOString(),
@@ -62,43 +66,53 @@ let displayedThreads = dummyThreads.map((thread) => (
   </li>
 ));
 const ProfilePage = () => {
+  const [listItems, setListItems] = useState<JSX.Element[]>([]);
+
   const userImage = dummy.image || defaultImage;
   const userBio = dummy.bio || defaultBio;
 
   const threadClickHandler = () => {
-    displayedThreads = dummyThreads.map((thread) => (
-      <li>
-        <h4>{thread.title}</h4>
-        <span>Posted at: {thread.date.substring(0, 10)}</span>
-      </li>
+    const threadListItems = dummyThreads.map((thread) => (
+      <ProfileListItem
+        header={thread.title}
+        content={thread.content}
+        date={thread.date}
+      />
     ));
+    setListItems(threadListItems);
   };
 
   const commentClickHandler = () => {
-    displayedThreads = dummyThreads.map((thread) => (
-      <li>
-        <h4>{thread.title}</h4>
-        <span>Posted at: {thread.date.substring(0, 10)}</span>
-      </li>
+    const commentListItems = dummyComments.map((comment) => (
+      <ProfileListItem
+        header={comment.parentThread.title}
+        content={comment.content}
+        date={comment.date}
+      />
     ));
+    setListItems(commentListItems);
   };
 
   const likedClickHandler = () => {
-    displayedThreads = dummyThreads.map((thread) => (
-      <li>
-        <h4>{thread.title}</h4>
-        <span>Posted at: {thread.date.substring(0, 10)}</span>
-      </li>
+    const likedListItems = dummyThreads.map((thread) => (
+      <ProfileListItem
+        header={thread.title}
+        content={thread.content}
+        date={thread.date}
+      />
     ));
+    setListItems(likedListItems);
   };
 
   const dislikedClickHandler = () => {
-    displayedThreads = dummyThreads.map((thread) => (
-      <li>
-        <h4>{thread.title}</h4>
-        <span>Posted at: {thread.date.substring(0, 10)}</span>
-      </li>
+    const dislikedListItems = dummyThreads.map((thread) => (
+      <ProfileListItem
+        header={thread.title}
+        content={thread.content}
+        date={thread.date}
+      />
     ));
+    setListItems(dislikedListItems);
   };
 
   return (
@@ -114,7 +128,7 @@ const ProfilePage = () => {
         <button onClick={likedClickHandler}>Liked</button>
         <button onClick={dislikedClickHandler}>Disliked</button>
       </div>
-      <ul className="profile-page__displayedThreads">{displayedThreads}</ul>
+      <ul className="profile-page__displayed-threads">{listItems}</ul>
     </div>
   );
 };

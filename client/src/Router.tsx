@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import ProfilePage from "./components/ProfilePage";
+import ProfilePage from "./components/profile/ProfilePage";
 import ThreadPage from "./components/ThreadPage";
 
 const Router = () => {
