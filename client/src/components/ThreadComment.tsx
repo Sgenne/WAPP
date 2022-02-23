@@ -1,8 +1,9 @@
-const ThreadComment = () => {
+const ThreadComment = (props: {threadId: number}) => {
   const commentId: number = 0;
   const author: string = "anakin";
   const context: string = "I am a father";
   return (
+
     <li>
       <div className="category-box container-fluid px-4">
         <div className="row">

@@ -1,8 +1,8 @@
 import { Comment } from "../model/comment.interface";
 import { Thread } from "../model/thread.interface";
-import { User } from "../model/user.interface";
 import { users } from "./user.service";
 import { comments } from "./comment.service";
+import { Category } from "../model/category.interface";
 
 /**
  * Temporary in-memory store of all threads.
@@ -17,7 +17,7 @@ export const threads: { [threadId: string]: Thread } = {
     threadId: 1,
     likes: 10,
     dislikes: 3,
-    category: "bread",
+    category: 0,
     replies: [],
   },
   [2]: {
@@ -29,7 +29,7 @@ export const threads: { [threadId: string]: Thread } = {
     threadId: 2,
     likes: 20,
     dislikes: 11,
-    category: "bread",
+    category: 1,
     replies: [],
   },
   [3]: {
@@ -41,19 +41,33 @@ export const threads: { [threadId: string]: Thread } = {
     threadId: 3,
     likes: 3,
     dislikes: 11,
-    category: "bread",
+    category: 2,
     replies: [],
   },
 };
 /**
  * Temporary in-memory store of all categories.
  */
-export const categories: string[] = [
-  "dogs",
-  "cats",
-  "Guianan Cock-of-the-rock",
-  "bread",
-];
+export const categories: { [key: string]: Category } = {};
+
+categories[0] = {
+  title: "dogs",
+  description: "dogs says wuuf",
+  CategoryId: 0,
+};
+
+categories[1] = {
+  title: "cats",
+  description: "cats say mjau",
+  CategoryId: 1,
+};
+
+categories[2] = {
+  title: "Guianan Cock-of-the-rock",
+  description: "something random which is what the f is this",
+  CategoryId: 2,
+};
+
 /**
  * Global variable to know what id to assign next thread.
  */
@@ -91,6 +105,26 @@ interface ThreadServiceResult {
    * The threads that were acted upon if the service was successfull.
    */
   threads?: Thread[];
+}
+
+/**
+ * The result of a thread service.
+ */
+interface CategoryServiceResult {
+  /**
+   * An HTTP status code describing the result of the attempted operation.
+   */
+  statusCode: number;
+
+  /**
+   * A message describing the result of the attempted operation.
+   */
+  message: string;
+
+  /**
+   * The thread that was acted upon.
+   */
+  category?: Category[];
 }
 
 /**
@@ -379,11 +413,11 @@ const removeReplies = (reply: Comment): void => {
  */
 export const postThread = async (
   userId: number,
-  category: string,
+  category: number,
   title: string,
   content: string
 ): Promise<ThreadServiceResult> => {
-  if (!categories.includes(category)) {
+  if (!categories[category]) {
     return { statusCode: 400, message: "The given category was invalid." };
   }
 
@@ -411,5 +445,58 @@ export const postThread = async (
     statusCode: 200,
     message: "Thread posted successfully.",
     thread: newThread,
+  };
+};
+
+/**
+ *
+ * @returns A list of all categories
+ */
+export const getCategories = async (): Promise<CategoryServiceResult> => {
+  const category: Category[] = [];
+
+  for (const key in categories) {
+    category.push(categories[key]);
+  }
+
+  if (category.length > 0) {
+    return {
+      statusCode: 200,
+      message: "Categories has successfully been recived.",
+      category: category,
+    };
+  }
+  return {
+    statusCode: 404,
+    message: "Categories could not be found",
+    category: undefined,
+  };
+};
+
+/**
+ *
+ * @returns A list of three threads
+ */
+export const getSampleThreads = async (
+  cat: number
+): Promise<ThreadServiceResult> => {
+  const threadArr: Thread[] = [];
+
+  for (const key in threads) {
+    if (threads[key].category === cat) threadArr.push(threads[key]);
+    if (threadArr.length === 3) break;
+  }
+
+  if (threadArr.length <= 3) {
+    return {
+      statusCode: 200,
+      message: "Threads has successfully been recived.",
+      threads: threadArr,
+    };
+  }
+  return {
+    statusCode: 404,
+    message: "Threads could not be found",
+    thread: undefined,
   };
 };
