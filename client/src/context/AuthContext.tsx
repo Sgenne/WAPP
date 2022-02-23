@@ -9,7 +9,7 @@ export interface AuthContextState {
   /**
    * The id of the user if they are signed in.
    */
-  userId?: string;
+  userId?: number;
 
   /**
    * The username of the user if they are signed in.
@@ -29,7 +29,7 @@ export interface AuthContextState {
   /**
    * Updates the stored id.
    */
-  setUserId: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setUserId: React.Dispatch<React.SetStateAction<number | undefined>>;
 
   /**
    * Updates the stored username.
@@ -92,7 +92,7 @@ export const AuthContext = createContext<AuthContextState>(defaultState);
  */
 export const AuthContextProvider = (props: { children: JSX.Element }) => {
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const [userId, setUserId] = useState<string>();
+  const [userId, setUserId] = useState<number>();
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
   const [showSignIn, setShowSignIn] = useState(false);
