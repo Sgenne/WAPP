@@ -150,18 +150,27 @@ threadRouter.get("/categories", async (req: Request, res: Response) => {
     return res.status(result.statusCode).send({ message: result.message });
   }
 
-  res.status(200).send({ message: result.message, categories: result.category });
+  res
+    .status(200)
+    .send({ message: result.message, categories: result.category });
 });
 
-threadRouter.get("/sampleThreads/:categoryId", async (req: Request, res: Response) => {
-  const result = await threadServices.getSampleThreads(+req.params.categoryId);
+threadRouter.get(
+  "/sampleThreads/:categoryId",
+  async (req: Request, res: Response) => {
+    const result = await threadServices.getSampleThreads(
+      +req.params.categoryId
+    );
 
-  if (result.statusCode !== 200) {
-    return res.status(result.statusCode).send({ message: result.message });
+    if (result.statusCode !== 200) {
+      return res.status(result.statusCode).send({ message: result.message });
+    }
+
+    res
+      .status(200)
+      .send({ message: result.message, categories: result.threads });
   }
-
-  res.status(200).send({ message: result.message, categories: result.threads });
-});
+);
 
 threadRouter.get("/:threadId", async (req: Request, res: Response) => {
   const threadId = req.params.threadId;
@@ -190,7 +199,15 @@ threadRouter.get("/author/:userId", async (req: Request, res: Response) => {
 
 threadRouter.get(
   "/likedThreads/:userId",
-  
+  async (req: Request, res: Response) => {
+    const userId = req.params.userId;
+
+    const result = await threadServices.getLikedThreads(+userId);
+
+    res
+      .status(result.statusCode)
+      .send({ message: result.message, threads: result.threads });
+  }
 );
 threadRouter.delete(
   "/deleteThread",

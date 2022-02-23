@@ -8,7 +8,7 @@ import { Category } from "../model/category.interface";
  * Temporary in-memory store of all threads.
  */
 export const threads: { [threadId: string]: Thread } = {
-  [1]: {
+  1: {
     author: 1,
     content:
       "Toast is bread that has been browned by radiant heat. The browning is the result of a Maillard reaction, altering the flavor of the bread and making it firmer so that it is easier to spread toppings on it. Toasting is a common method of making stale bread more palatable. Bread is often toasted using a toaster, but toaster ovens are also used. Pre-sliced bread is most commonly used.",
@@ -20,7 +20,7 @@ export const threads: { [threadId: string]: Thread } = {
     category: 0,
     replies: [],
   },
-  [2]: {
+  2: {
     author: 1,
     content:
       "Toast is a common breakfast food. Bagels and English muffins are also toasted.",
@@ -32,7 +32,7 @@ export const threads: { [threadId: string]: Thread } = {
     category: 1,
     replies: [],
   },
-  [3]: {
+  3: {
     author: 1,
     content:
       "A more recent cultural phenomenon is the popularity of avocado toast, which is toast spread with mashed avocado. It is associated with the Millennial generation in particular as a stereotypical food consumed by that group.",
@@ -43,6 +43,17 @@ export const threads: { [threadId: string]: Thread } = {
     dislikes: 11,
     category: 2,
     replies: [],
+  },
+  4: {
+    author: 2,
+    content: "How large is a Cock-of-the-rock",
+    title: "A question about Cocks-of-the-rocks",
+    date: new Date(),
+    threadId: 3,
+    likes: 0,
+    dislikes: 0,
+    category: 2,
+    replies: [0],
   },
 };
 /**
@@ -177,6 +188,7 @@ export const getThreadsByAuthor = async (
     threads: authoredThreads,
   };
 };
+
 export const getLikedThreads = async (
   userId: number
 ): Promise<ThreadServiceResult> => {
@@ -334,7 +346,7 @@ export const commentThread = async (
   content: string
 ): Promise<ThreadServiceResult> => {
   const thread: Thread = threads[threadId];
-  const authour: number = userId;
+  const author: number = userId;
   const date: Date = new Date();
   const replies: number[] = [];
   const likes: number = 0;
@@ -342,7 +354,7 @@ export const commentThread = async (
   const commentId: number = commentID++;
   const newComment: Comment = {
     content,
-    authour,
+    author,
     date,
     replies,
     likes,

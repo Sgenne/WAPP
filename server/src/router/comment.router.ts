@@ -131,12 +131,28 @@ commentRouter.post(
   }
 );
 
+commentRouter.get(
+  "/likedComments/:userId",
+  async (req: Request, res: Response) => {
+    const userId = req.params.userId;
+
+    const result = await commentService.getLikedComments(+userId);
+
+    res
+      .status(result.statusCode)
+      .send({ message: result.message, comments: result.comments });
+  }
+);
+
 commentRouter.get("/author/:userId", async (req: Request, res: Response) => {
   const userId = req.params.userId;
 
+  const result = await commentService.getCommentsByAuthor(+userId);
 
-
-})
+  res
+    .status(result.statusCode)
+    .send({ message: result.message, comments: result.comments });
+});
 
 commentRouter.get("/:commentId", async (req: Request, res: Response) => {
   const commentId = req.params.commentId;
@@ -149,4 +165,3 @@ commentRouter.get("/:commentId", async (req: Request, res: Response) => {
 
   res.status(200).send({ message: result.message, user: result.comment });
 });
-

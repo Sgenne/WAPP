@@ -2,62 +2,19 @@ import React, { useEffect, useState } from "react";
 import { formatDate } from "../../utils/formatUtils";
 import ProfileListItem from "./ProfileListItem";
 import { Thread } from "../../../../server/src/model/thread.interface";
+import { Comment } from "../../../../server/src/model/comment.interface";
 import axios, { AxiosResponse } from "axios";
 import { User } from "../../../../server/src/model/user.interface";
 ///////////////////////////////////START OF DUMMIES///////////////////////////////////////////////////////////////
 
 const dummyUserId = 1;
 
-const dummyThreads = [
-  {
-    author: 1,
-    content:
-      "Toast is bread that has been browned by radiant heat. The browning is the result of a Maillard reaction, altering the flavor of the bread and making it firmer so that it is easier to spread toppings on it. Toasting is a common method of making stale bread more palatable. Bread is often toasted using a toaster, but toaster ovens are also used. Pre-sliced bread is most commonly used.",
-    title: "About me",
-    date: new Date().toISOString(),
-  },
-  {
-    author: 1,
-    content:
-      "Toast is bread that has been browned by radiant heat. The browning is the result of a Maillard reaction, altering the flavor of the bread and making it firmer so that it is easier to spread toppings on it. Toasting is a common method of making stale bread more palatable. Bread is often toasted using a toaster, but toaster ovens are also used. Pre-sliced bread is most commonly used.",
-    title: "About me",
-    date: new Date().toISOString(),
-  },
-  {
-    author: 1,
-    content:
-      "Toast is bread that has been browned by radiant heat. The browning is the result of a Maillard reaction, altering the flavor of the bread and making it firmer so that it is easier to spread toppings on it. Toasting is a common method of making stale bread more palatable. Bread is often toasted using a toaster, but toaster ovens are also used. Pre-sliced bread is most commonly used.",
-    title: "About me",
-    date: new Date().toISOString(),
-  },
-];
-const dummyComments = [
-  {
-    parentThread: dummyThreads[0],
-    author: 1,
-    content: "I also like to be soaked in butter",
-    date: new Date().toISOString(),
-  },
-  {
-    parentThread: dummyThreads[0],
-    author: 1,
-    content:
-      "I like to be covered in jelly while my partner prefers peanutbutter",
-    date: new Date().toISOString(),
-  },
-  {
-    parentThread: dummyThreads[0],
-    author: 1,
-    content: "I like to be soaked in chocospread",
-    date: new Date().toISOString(),
-  },
-];
-
 ///////////////////////////////////END OF DUMMIES///////////////////////////////////////////////////////////////
 
 const ProfilePage = () => {
   const [user, setUser] = useState<User>();
   const [createdThreads, setCreatedThreads] = useState<Thread[]>([]);
+  const [createdComments, setCreatedComments] = useState<Comment[]>([]);
   const [likedThreads, setLikedThreads] = useState<Thread[]>([]);
   const [likedComments, setLikedComments] = useState<Comment[]>([]);
   const [listItems, setListItems] = useState<JSX.Element[]>([]);
@@ -65,6 +22,7 @@ const ProfilePage = () => {
   useEffect(() => {
     fetchUser(dummyUserId);
     fetchCreatedThreads(dummyUserId);
+    fetchCreatedComments(dummyUserId);
     fetchLikedThreads(dummyUserId);
     fetchLikedComments(dummyUserId);
   }, []);
@@ -108,17 +66,35 @@ const ProfilePage = () => {
     );
   };
 
-  const fetchLikedThreads = async (userId: Number) => {
+
+  const fetchCreatedComments = async (userId: number) => {
     let response: AxiosResponse;
 
     try {
-      response = await axios.get<{ threads: Thread[] }>(
-        `http://localhost:8080/thread/liked-threads/`
+      response = await axios.get<{ comments: Comment[] }>(
+        `http://localhost:8080/comment/author/${userId}`
       );
     } catch (error) {
       console.log(error); // TODO: Show error
       return;
     }
+
+    setCreatedComments(response.data.comments)
+  } 
+
+  const fetchLikedThreads = async (userId: Number) => {
+    let response: AxiosResponse;
+
+    try {
+      response = await axios.get<{ threads: Thread[] }>(
+        `http://localhost:8080/thread/likedThreads/${dummyUserId}`
+      );
+    } catch (error) {
+      console.log(error); // TODO: Show error
+      return;
+    }
+
+    console.log("fetched liked threads: ", response.data.threads)
 
     setLikedThreads(response.data.threads);
   };
@@ -128,12 +104,14 @@ const ProfilePage = () => {
 
     try {
       response = await axios.get<{ comments: Comment[] }>(
-        `http://localhost:8080/thread/liked-threads/`
+        `http://localhost:8080/comment/likedComments/${userId}`
       );
     } catch (error) {
       console.log(error); // TODO: Show error
       return;
     }
+
+    console.log("comments liked: ", response.data.comments)
 
     setLikedComments(response.data.comments);
   };
@@ -152,11 +130,11 @@ const ProfilePage = () => {
 
   const commentClickHandler = () => {
     // send GET to /comment/author/:userId
-    const commentListItems = dummyComments.map((comment) => (
+    const commentListItems = createdComments.map((comment) => (
       <ProfileListItem
-        header={comment.parentThread.title}
+        header={""}
         content={comment.content}
-        date={comment.date}
+        date={formatDate(new Date(comment.date))}
       />
     ));
     setListItems(commentListItems);
@@ -176,11 +154,11 @@ const ProfilePage = () => {
 
   // send GET to /comment/liked-by/:userId
   const likedCommentsClickHandler = () => {
-    const commentListItems = dummyThreads.map((thread) => (
+    const commentListItems = likedComments.map((comment) => (
       <ProfileListItem
-        header={thread.title}
-        content={thread.content}
-        date={thread.date}
+        header={""}
+        content={comment.content}
+        date={formatDate(new Date(comment.date))}
       />
     ));
     setListItems(commentListItems);

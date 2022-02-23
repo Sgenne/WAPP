@@ -1,5 +1,10 @@
 import { User } from "../model/user.interface";
-import { images, DEFAULT_IMAGE_ID, storeImage, deleteImage } from "./image.service";
+import {
+  images,
+  DEFAULT_IMAGE_ID,
+  storeImage,
+  deleteImage,
+} from "./image.service";
 import bcrypt from "bcryptjs";
 
 /**
@@ -39,6 +44,30 @@ export const users: { [userId: string]: User } = {
       "$2a$10$6cl/uWNIxhokhH8GR4BlQuTVMDlT1ptZm64vNoSPSdr5Ngeci2aEG",
     bio: "I'm burnt",
     image: images[1],
+    likedThreads: [4],
+    dislikedThreads: [],
+    likedComments: [0],
+    dislikedComments: [],
+    visibleProperties: {
+      email: true,
+      joinDate: true,
+      birthDate: true,
+      bio: true,
+      image: true,
+      likedThreads: true,
+      dislikedThreads: true,
+    },
+  },
+  2: {
+    userId: 2,
+    username: "Gobsmack",
+    email: "gob@gmail.com",
+    joinDate: new Date(2022, 1, 22),
+    birthDate: new Date(2000, 5, 18),
+    passwordHash:
+      "$2a$10$6cl/uWNIxhokhH8GR4BlQuTVMDlT1ptZm64vNoSPSdr5Ngeci2aEG",
+    bio: "We were utterly gobsmacked when we spotted John at a restaurant on Friday night, after having attended his funeral that very morning!",
+    image: images[DEFAULT_IMAGE_ID],
     likedThreads: [],
     dislikedThreads: [],
     likedComments: [],

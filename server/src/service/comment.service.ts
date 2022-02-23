@@ -3,7 +3,27 @@ import { User } from "../model/user.interface";
 import { getUser, users } from "./user.service";
 import { newComment } from "./thread.service";
 
-export const comments: { [key: string]: Comment } = {};
+export const comments: { [key: string]: Comment } = {
+  0: {
+    content: "Asking for a friend",
+    date: new Date(),
+    author: 2,
+    replies: [],
+    likes: 1,
+    dislikes: 0,
+    commentId: 0,
+  },
+  1: {
+    content:
+      "Wow, what a question. The average cock-of-the-rock is about 12 inches.",
+    date: new Date(),
+    author: 1,
+    replies: [],
+    likes: 0,
+    dislikes: 0,
+    commentId: 1,
+  },
+};
 
 /**
  * The result of a comment service.
@@ -40,7 +60,7 @@ export const likeComment = async (
   const comment: Comment = comments[commentId];
   const user: User = users[userId];
 
-  if (users[comment.authour].username === "Deleted") {
+  if (users[comment.author].username === "Deleted") {
     return {
       statusCode: 400,
       message: "The specified comment is deleted.",
@@ -84,7 +104,7 @@ export const disLikeComment = async (
   const comment: Comment = comments[commentId];
   const user: User = users[userId];
 
-  if (users[comment.authour].username === "Deleted") {
+  if (users[comment.author].username === "Deleted") {
     return {
       statusCode: 400,
       message: "The specified comment is deleted.",
@@ -139,6 +159,11 @@ export const getComment = async (
   };
 };
 
+/**
+ * Returns the comments from a specified user.
+ *
+ * @param userId - The id of the author of the returned comments.
+ */
 export const getCommentsByAuthor = async (
   userId: number
 ): Promise<CommentServiceResult> => {
@@ -151,13 +176,34 @@ export const getCommentsByAuthor = async (
   }
 
   const createdComments = Object.values(comments).filter(
-    (comment) => comment.authour === userId
+    (comment) => comment.author === userId
   );
 
   return {
     statusCode: 200,
     message: "The created comments were found and returned successfully.",
     comments: createdComments,
+  };
+};
+
+export const getLikedComments = async (userId: number) => {
+  const { user, statusCode, message } = await getUser(userId);
+
+  if (!user) {
+    return {
+      statusCode: statusCode,
+      message: message,
+    };
+  }
+
+  const likedComments = Object.values(comments).filter((comment) =>
+    user.likedComments.includes(comment.commentId)
+  );
+
+  return {
+    statusCode: 200,
+    message: "The liked comments were found and returned successfully.",
+    comments: likedComments,
   };
 };
 
@@ -175,14 +221,14 @@ export const editComment = async (
 ): Promise<CommentServiceResult> => {
   const comment: Comment = comments[commentId];
 
-  if (comment.authour !== userId) {
+  if (comment.author !== userId) {
     return {
       statusCode: 403,
       message: "The user does not have permission to edit this comment.",
     };
   }
 
-  if (users[comment.authour].username !== "Deleted") {
+  if (users[comment.author].username !== "Deleted") {
     comment.content = content + "\nedited";
   }
   return {
@@ -203,21 +249,21 @@ export const deleteComment = async (
 ): Promise<CommentServiceResult> => {
   const comment: Comment = comments[commentId];
 
-  if (comment.authour !== userId) {
+  if (comment.author !== userId) {
     return {
       statusCode: 403,
       message: "The user does not have permission to delete thic comment.",
     };
   }
 
-  if (users[comment.authour].username === "Deleted") {
+  if (users[comment.author].username === "Deleted") {
     return {
       statusCode: 403,
       message: "The comment is already deleted.",
     };
   }
 
-  comment.authour = 0;
+  comment.author = 0;
   comment.content = "";
   comment.dislikes = 0;
   comment.likes = 0;
@@ -241,7 +287,7 @@ export const postReply = async (
   userId: number
 ): Promise<CommentServiceResult> => {
   let root: Comment = comments[commentIdRoot];
-  let authour: number = userId;
+  let author: number = userId;
   let date: Date = new Date();
   let replies: number[] = [];
   let likes: number = 0;
@@ -249,7 +295,7 @@ export const postReply = async (
   let commentId: number = getCommentID();
   const newComment: Comment = {
     content,
-    authour,
+    author,
     date,
     replies,
     likes,
