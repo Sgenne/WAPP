@@ -143,6 +143,26 @@ export const getThreadsByAuthor = async (
     threads: authoredThreads,
   };
 };
+export const getLikedThreads = async (
+  userId: number
+): Promise<ThreadServiceResult> => {
+  const user = users[userId];
+  if (!user) {
+    return { statusCode: 404, message: "No user with the given id exists." };
+  }
+  const result: Thread[] = [];
+  Object.keys(threads).forEach((threadId) => {
+    if (user.likedThreads.includes(+threadId)) {
+      result.push(threads[threadId]);
+    }
+  });
+  return {
+    statusCode: 200,
+    message:
+      "The threads liked by the user were found and returned successfully.",
+    threads: result,
+  };
+};
 
 /**
  * User likes a thread.

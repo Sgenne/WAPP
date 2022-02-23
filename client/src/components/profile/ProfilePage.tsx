@@ -58,11 +58,15 @@ const dummyComments = [
 const ProfilePage = () => {
   const [user, setUser] = useState<User>();
   const [createdThreads, setCreatedThreads] = useState<Thread[]>([]);
+  const [likedThreads, setLikedThreads] = useState<Thread[]>([]);
+  const [likedComments, setLikedComments] = useState<Comment[]>([]);
   const [listItems, setListItems] = useState<JSX.Element[]>([]);
 
   useEffect(() => {
     fetchUser(dummyUserId);
     fetchCreatedThreads(dummyUserId);
+    fetchLikedThreads(dummyUserId);
+    fetchLikedComments(dummyUserId);
   }, []);
 
   const fetchUser = async (userId: Number) => {
@@ -104,6 +108,36 @@ const ProfilePage = () => {
     );
   };
 
+  const fetchLikedThreads = async (userId: Number) => {
+    let response: AxiosResponse;
+
+    try {
+      response = await axios.get<{ threads: Thread[] }>(
+        `http://localhost:8080/thread/liked-threads/`
+      );
+    } catch (error) {
+      console.log(error); // TODO: Show error
+      return;
+    }
+
+    setLikedThreads(response.data.threads);
+  };
+
+  const fetchLikedComments = async (userId: Number) => {
+    let response: AxiosResponse;
+
+    try {
+      response = await axios.get<{ comments: Comment[] }>(
+        `http://localhost:8080/thread/liked-threads/`
+      );
+    } catch (error) {
+      console.log(error); // TODO: Show error
+      return;
+    }
+
+    setLikedComments(response.data.comments);
+  };
+
   const threadClickHandler = () => {
     // send GET to /thread/author/:userId
     const threadListItems = createdThreads.map((thread) => (
@@ -130,26 +164,26 @@ const ProfilePage = () => {
 
   // send GET to /thread/liked-by/:userId
   const likedThreadsClickHandler = () => {
-    const likedListItems = dummyThreads.map((thread) => (
+    const threadListItems = likedThreads.map((thread) => (
       <ProfileListItem
         header={thread.title}
         content={thread.content}
         date={formatDate(new Date(thread.date))}
       />
     ));
-    setListItems(likedListItems);
+    setListItems(threadListItems);
   };
 
   // send GET to /comment/liked-by/:userId
   const likedCommentsClickHandler = () => {
-    const dislikedListItems = dummyThreads.map((thread) => (
+    const commentListItems = dummyThreads.map((thread) => (
       <ProfileListItem
         header={thread.title}
         content={thread.content}
         date={thread.date}
       />
     ));
-    setListItems(dislikedListItems);
+    setListItems(commentListItems);
   };
 
   if (!user) return <div>Loading...........</div>;

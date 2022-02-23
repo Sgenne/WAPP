@@ -131,6 +131,13 @@ commentRouter.post(
   }
 );
 
+commentRouter.get("/author/:userId", async (req: Request, res: Response) => {
+  const userId = req.params.userId;
+
+
+
+})
+
 commentRouter.get("/:commentId", async (req: Request, res: Response) => {
   const commentId = req.params.commentId;
 

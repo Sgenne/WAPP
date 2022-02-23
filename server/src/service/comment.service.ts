@@ -1,6 +1,6 @@
 import { Comment } from "../model/comment.interface";
 import { User } from "../model/user.interface";
-import { users } from "./user.service";
+import { getUser, users } from "./user.service";
 import { newComment } from "./thread.service";
 
 export const comments: { [key: string]: Comment } = {};
@@ -23,6 +23,8 @@ interface CommentServiceResult {
    * The comment that was acted upon.
    */
   comment?: Comment;
+
+  comments?: Comment[];
 }
 
 /**
@@ -134,6 +136,28 @@ export const getComment = async (
     statusCode: 404,
     message: "Comment could not be found",
     comment: comment,
+  };
+};
+
+export const getCommentsByAuthor = async (
+  userId: number
+): Promise<CommentServiceResult> => {
+  const result = await getUser(userId);
+
+  const user = result.user;
+
+  if (!user) {
+    return result;
+  }
+
+  const createdComments = Object.values(comments).filter(
+    (comment) => comment.authour === userId
+  );
+
+  return {
+    statusCode: 200,
+    message: "The created comments were found and returned successfully.",
+    comments: createdComments,
   };
 };
 

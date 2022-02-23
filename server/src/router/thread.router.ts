@@ -10,6 +10,7 @@ import {
 } from "../utils/validation.util";
 import { isAuthenticated } from "../utils/auth.util";
 import { threadId } from "worker_threads";
+import { getUser } from "../service/user.service";
 
 export const threadRouter = Router();
 
@@ -167,6 +168,10 @@ threadRouter.get("/author/:userId", async (req: Request, res: Response) => {
   res.status(200).send({ message: result.message, threads: result.threads });
 });
 
+threadRouter.get(
+  "/likedThreads/:userId",
+  
+);
 threadRouter.delete(
   "/deleteThread",
   hasValidThreadId,
