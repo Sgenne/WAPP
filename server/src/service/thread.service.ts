@@ -188,7 +188,13 @@ export const getThreadsByAuthor = async (
     threads: authoredThreads,
   };
 };
-
+/**
+ * Get list of threads user has liked
+ *
+ * @param username - the user who liked the threads.
+ *
+ * @returns - A ThreadServiceResult object.
+ */
 export const getLikedThreads = async (
   userId: number
 ): Promise<ThreadServiceResult> => {
@@ -202,6 +208,12 @@ export const getLikedThreads = async (
       result.push(threads[threadId]);
     }
   });
+  
+  if (result.length == 0 ){
+    return {statusCode: 200, message: "The user has no liked threads", threads: []}
+  }
+  
+  console.log(result);
   return {
     statusCode: 200,
     message:
