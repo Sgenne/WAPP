@@ -15,7 +15,7 @@ export const comments: { [key: string]: Comment } = {
   },
   1: {
     content:
-      "Wow, what a question. The average cock-of-the-rock is about 12 inches.",
+      "Wow, what a question. The average Guianan rooster is roughly 24-32 inches.",
     date: new Date(),
     author: 1,
     replies: [],

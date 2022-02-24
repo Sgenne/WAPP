@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { formatDate } from "../../utils/formatUtils";
 import ProfileListItem from "./ProfileListItem";
 import { Thread } from "../../../../server/src/model/thread.interface";
@@ -18,6 +18,7 @@ const ProfilePage = () => {
   const [likedComments, setLikedComments] = useState<Comment[]>([]);
   const [listItems, setListItems] = useState<JSX.Element[]>([]);
   const [showSettings, setShowSettings] = useState(false);
+  const [error, setError] = useState<Error>();
 
   const authContext = useContext(AuthContext);
   const params = useParams();
@@ -29,11 +30,11 @@ const ProfilePage = () => {
   const userId = +params.userId;
 
   useEffect(() => {
-    fetchUser(+userId);
-    fetchCreatedThreads(+userId);
-    fetchCreatedComments(+userId);
-    fetchLikedThreads(+userId);
-    fetchLikedComments(+userId);
+    fetchUser(userId);
+    fetchCreatedThreads(userId);
+    fetchCreatedComments(userId);
+    fetchLikedThreads(userId);
+    fetchLikedComments(userId);
   }, [userId]);
 
   const fetchUser = async (userId: Number) => {
@@ -44,7 +45,7 @@ const ProfilePage = () => {
         `http://localhost:8080/user/${userId}`
       );
     } catch (error) {
-      console.log(error); // TODO: Show error
+      setError(new Error("No user with the given id was found."));
       return;
     }
     setUser(response.data.user);
@@ -176,6 +177,7 @@ const ProfilePage = () => {
     setShowSettings(false);
   };
 
+  if (error) return <div>{error.message}</div>;
   if (!user) return <div>Loading...........</div>;
 
   const isOwner = authContext.userId && authContext.userId === userId;

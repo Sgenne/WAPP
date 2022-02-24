@@ -46,8 +46,8 @@ export const threads: { [threadId: string]: Thread } = {
   },
   4: {
     author: 2,
-    content: "How large is a Cock-of-the-rock",
-    title: "A question about Cocks-of-the-rocks",
+    content: "How large is a Guianan rooster?",
+    title: "A question about roosters",
     date: new Date(),
     threadId: 3,
     likes: 0,
@@ -74,8 +74,8 @@ categories[1] = {
 };
 
 categories[2] = {
-  title: "Guianan Cock-of-the-rock",
-  description: "something random which is what the f is this",
+  title: "Guianan roosters",
+  description: "What does the Guianan rooster say?",
   CategoryId: 2,
 };
 

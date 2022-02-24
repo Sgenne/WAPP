@@ -1,11 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import multer from "multer";
-import path from "path";
 
 /**
  * The path to the folder used to store images.
  */
-export const imageFolderPath = path.join(__dirname, "../../images");
+export const imageFolderPath = "images";
 
 export const handleUploadedImage = [
   multer().single("image"),
@@ -28,6 +27,5 @@ export const handleUploadedImage = [
     }
 
     next();
-
   },
 ];

@@ -21,6 +21,7 @@ export const images: { [imageId: string]: Image } = {
       "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/ToastedWhiteBread.jpg/800px-ToastedWhiteBread.jpg",
     filename: "ToastedWhiteBread.jpg",
     imageId: 1,
+    isDefault: true,
   },
 };
 

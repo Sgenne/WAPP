@@ -108,6 +108,15 @@ header {
   border-radius: 0 5px 5px 0;
 }
 
+.header__profile-link {
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.header__profile-link:hover {
+  text-decoration: underline;
+}
+
 .header__account {
   display: flex;
   justify-content: space-evenly;
@@ -283,17 +292,18 @@ header {
 }
 
 .profile-page__image {
-  min-width: 15%;
-  max-width: 230px;
+  width: 230px;
+  height: 230px;
+  object-fit: cover;
   border-radius: 100%;
 }
 
 .profile-page__settings-button {
   border: none;
   border-radius: 150px;
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
+  bottom: 0;
+  right: 0;
+  position: fixed;
   background-color: inherit;
 }
 

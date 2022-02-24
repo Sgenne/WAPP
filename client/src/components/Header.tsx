@@ -2,6 +2,7 @@ import { GiCapybara } from "react-icons/gi";
 import { FaSearch } from "react-icons/fa";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { NavLink } from "react-router-dom";
 
 const Header = () => {
   const authContext = useContext(AuthContext);
@@ -22,8 +23,8 @@ const Header = () => {
             <GiCapybara className="header__logo-icon" />
           </a>
           <a href="/">
-          <h1 className="d-none d-md-inline">WAPP</h1>
-          </a >
+            <h1 className="d-none d-md-inline">WAPP</h1>
+          </a>
         </div>
         <div className="header__search col-lg-8 col-md-6 col-6">
           <input type="text" placeholder="what are you looking for?" />
@@ -33,7 +34,11 @@ const Header = () => {
         </div>
         <div className="header__account col-lg-2 col-md-3 col-4 d-sm-flex d-inline">
           {authContext.isSignedIn ? (
-            <span>Hello, {authContext.username}!</span>
+            <span className="header__profile-link">
+              <NavLink to={`/profile/${authContext.userId}`}>
+                Hello, {authContext.username}!
+              </NavLink>
+            </span>
           ) : (
             <>
               <button onClick={signInClickHandler}>Sign-in</button>

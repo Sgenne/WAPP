@@ -8,8 +8,9 @@ const Modal = (props: {
   // Hide scrollbar while modal is shown.
   useEffect(() => {
     document.body.style.overflowY = "hidden";
+    window.scrollY = 0;
     return () => {
-      document.body.style.overflowY = "default";
+      document.body.style.overflowY = "";
     };
   }, []);
 
