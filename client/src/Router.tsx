@@ -1,17 +1,18 @@
 import { Route, Routes } from "react-router-dom";
+import CategoryPage from "./components/CategoryPage";
+import CreateThread from "./components/CreateThread";
+import Home from "./components/Home";
 import ProfilePage from "./components/profile/ProfilePage";
 import ThreadPage from "./components/ThreadPage";
 
 const Router = () => {
   return (
     <Routes>
-      <Route path="/" element={<div>Hello! This is the front page!</div>} />
+      <Route path="/" element={<Home />} />
       <Route path="/thread" element={<ThreadPage />} />
-      <Route
-        path="/create-thread"
-        element={<div>Hello! This is the page for creating a thread!</div>}
-      />
-      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/create-thread/:category" element={<CreateThread />} />
+      <Route path="/profile/:userId" element={<ProfilePage />} />
+      <Route path="/category/:category" element={<CategoryPage />} />
       <Route path="*" element={<div>Uh oh... No page was found 😿</div>} />
     </Routes>
   );

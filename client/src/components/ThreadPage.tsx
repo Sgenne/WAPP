@@ -4,7 +4,7 @@ import ThreadComment from "./ThreadComment";
 const ThreadPage = () => {
   const list = [];
   for (var i = 0; i < 8; i++) {
-    list[i] = <ThreadComment />;
+    list[i] = <ThreadComment threadId={i}/>;
   }
   const title:string = "Title - A new hope";
   const context:string = "Luke Skywalker joins forces with a Jedi Knight, a cocky pilot, a Wookiee and two droids to save the galaxy from the Empire's world-destroying battle station, while also attempting to rescue Princess Leia from the mysterious Darth Vader."

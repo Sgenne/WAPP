@@ -65,7 +65,7 @@ const Register = () => {
     const userId: string = result.data.userId;
 
     authContext.setIsSignedIn(true);
-    authContext.setUserId(userId);
+    authContext.setUserId(+userId);
     authContext.setUsername(username);
     authContext.setPassword(password);
     authContext.setShowRegister(false);

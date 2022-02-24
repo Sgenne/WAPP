@@ -134,7 +134,7 @@ export const hasValidThreadTitle = body("title")
 /**
  * Verifies that the request body has a non-empty category field.
  */
-export const hasCategory = body("category")
+export const hasCategory = body("categoryId")
   .notEmpty()
   .withMessage("No category was provided.");
 

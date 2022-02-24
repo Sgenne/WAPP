@@ -26,7 +26,7 @@ export interface Thread {
   /**
    * The category the thread resides in
    */
-  category: string;
+  category: number;
   /**
    * All comments in id who have commented on the thread
    */

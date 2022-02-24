@@ -121,13 +121,13 @@ threadRouter.post(
   isAuthenticated,
   async (req: Request, res: Response) => {
     const userId = req.body.userId;
-    const category = req.body.category;
+    const categoryId = req.body.categoryId;
     const title = req.body.title;
     const content = req.body.content;
 
     const result = await threadServices.postThread(
       userId,
-      category,
+      categoryId,
       title,
       content
     );
@@ -140,6 +140,35 @@ threadRouter.post(
       message: "Thread posted successfully.",
       thread: result.thread,
     });
+  }
+);
+
+threadRouter.get("/categories", async (req: Request, res: Response) => {
+  const result = await threadServices.getCategories();
+
+  if (result.statusCode !== 200) {
+    return res.status(result.statusCode).send({ message: result.message });
+  }
+
+  res
+    .status(200)
+    .send({ message: result.message, categories: result.category });
+});
+
+threadRouter.get(
+  "/sampleThreads/:categoryId",
+  async (req: Request, res: Response) => {
+    const result = await threadServices.getSampleThreads(
+      +req.params.categoryId
+    );
+
+    if (result.statusCode !== 200) {
+      return res.status(result.statusCode).send({ message: result.message });
+    }
+
+    res
+      .status(200)
+      .send({ message: result.message, categories: result.threads });
   }
 );
 
@@ -182,7 +211,6 @@ threadRouter.get(
     return;
    }
    
-   console.log(result.threads);
    res.status(200).send({message: result.message, threads: result.threads});
    
  }

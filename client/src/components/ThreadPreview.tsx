@@ -1,17 +1,17 @@
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
-import ThreadComment from "./ThreadComment";
+import { Thread } from "../../../server/src/model/thread.interface";
 
-const ThreadPreview = () => {
+const ThreadPreview = (props: { thread: Thread }) => {
   const title: string = "Title - A new hope";
   const context: string =
-    "Luke Skywalker joins forces with a Jedi Knight, a cocky pilot, a Wookiee and two droids to save the galaxy from the Empire's world-destroying battle station, while also attempting to rescue Princess Leia from the mysterious Darth Vader.";
+    "Luke Skywalker joins forces with a Jedi Knight, a cocky pilot, a Wire's world-destroying battle station, while also attempting to rescue Princess Leia from the mysterious Darth Vader.";
   const author: string = "Luke";
   const discrod = require("./../resources/img/discrod.png");
   const likes: number = 1336;
   const dislikes: number = 419;
   return (
     <li>
-      <div className="category-box container-fluid px-4">
+      <div className="category-thread container-fluid px-4">
         <div className="row">
           <img src={discrod} className="row__avatar" />
           <div className="col row">

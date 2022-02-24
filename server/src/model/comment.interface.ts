@@ -6,7 +6,7 @@ export interface Comment {
   /**
    * The userID of the commentor
    */
-  authour: number;
+  author: number;
   /**
    * The date when the comment was posted
    */

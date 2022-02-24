@@ -28,6 +28,12 @@ const SignIn = () => {
     setPassword(event.target.value);
   };
 
+  const handleKeyDown = (event: { key: string; }) => {
+    if (event.key === 'Enter') {
+      submitClickHandler();
+    }
+  }
+
   const submitClickHandler = async () => {
     let signInResult: AxiosResponse;
     try {
@@ -73,6 +79,7 @@ const SignIn = () => {
             className="sign-in__username-input"
             placeholder="Enter a username"
             onChange={usernameChangeHandler}
+            onKeyDown={handleKeyDown}
           />
         </div>
         <div className="sign-in__input-container">
@@ -83,6 +90,7 @@ const SignIn = () => {
             className="sign-in__password-input"
             placeholder="Enter a password"
             onChange={passwordChangeHandler}
+            onKeyDown={handleKeyDown}
           />
         </div>
         <div className="sign-in__buttons">

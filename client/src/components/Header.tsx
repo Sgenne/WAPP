@@ -18,8 +18,12 @@ const Header = () => {
     <div className="container-fluid">
       <header className="row">
         <div className="header__logo col-lg-2 col-md-3 col-2">
-          <GiCapybara className="header__logo-icon" />
+          <a href="/">
+            <GiCapybara className="header__logo-icon" />
+          </a>
+          <a href="/">
           <h1 className="d-none d-md-inline">WAPP</h1>
+          </a >
         </div>
         <div className="header__search col-lg-8 col-md-6 col-6">
           <input type="text" placeholder="what are you looking for?" />

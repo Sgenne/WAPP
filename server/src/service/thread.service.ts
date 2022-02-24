@@ -1,14 +1,14 @@
 import { Comment } from "../model/comment.interface";
 import { Thread } from "../model/thread.interface";
-import { User } from "../model/user.interface";
 import { users } from "./user.service";
 import { comments } from "./comment.service";
+import { Category } from "../model/category.interface";
 
 /**
  * Temporary in-memory store of all threads.
  */
 export const threads: { [threadId: string]: Thread } = {
-  [1]: {
+  1: {
     author: 1,
     content:
       "Toast is bread that has been browned by radiant heat. The browning is the result of a Maillard reaction, altering the flavor of the bread and making it firmer so that it is easier to spread toppings on it. Toasting is a common method of making stale bread more palatable. Bread is often toasted using a toaster, but toaster ovens are also used. Pre-sliced bread is most commonly used.",
@@ -17,10 +17,10 @@ export const threads: { [threadId: string]: Thread } = {
     threadId: 1,
     likes: 10,
     dislikes: 3,
-    category: "bread",
+    category: 0,
     replies: [],
   },
-  [2]: {
+  2: {
     author: 1,
     content:
       "Toast is a common breakfast food. Bagels and English muffins are also toasted.",
@@ -29,10 +29,10 @@ export const threads: { [threadId: string]: Thread } = {
     threadId: 2,
     likes: 20,
     dislikes: 11,
-    category: "bread",
+    category: 1,
     replies: [],
   },
-  [3]: {
+  3: {
     author: 1,
     content:
       "A more recent cultural phenomenon is the popularity of avocado toast, which is toast spread with mashed avocado. It is associated with the Millennial generation in particular as a stereotypical food consumed by that group.",
@@ -41,19 +41,44 @@ export const threads: { [threadId: string]: Thread } = {
     threadId: 3,
     likes: 3,
     dislikes: 11,
-    category: "bread",
+    category: 2,
     replies: [],
+  },
+  4: {
+    author: 2,
+    content: "How large is a Cock-of-the-rock",
+    title: "A question about Cocks-of-the-rocks",
+    date: new Date(),
+    threadId: 3,
+    likes: 0,
+    dislikes: 0,
+    category: 2,
+    replies: [0],
   },
 };
 /**
  * Temporary in-memory store of all categories.
  */
-export const categories: string[] = [
-  "dogs",
-  "cats",
-  "Guianan Cock-of-the-rock",
-  "bread",
-];
+export const categories: { [key: string]: Category } = {};
+
+categories[0] = {
+  title: "dogs",
+  description: "dogs says wuuf",
+  CategoryId: 0,
+};
+
+categories[1] = {
+  title: "cats",
+  description: "cats say mjau",
+  CategoryId: 1,
+};
+
+categories[2] = {
+  title: "Guianan Cock-of-the-rock",
+  description: "something random which is what the f is this",
+  CategoryId: 2,
+};
+
 /**
  * Global variable to know what id to assign next thread.
  */
@@ -91,6 +116,26 @@ interface ThreadServiceResult {
    * The threads that were acted upon if the service was successfull.
    */
   threads?: Thread[];
+}
+
+/**
+ * The result of a thread service.
+ */
+interface CategoryServiceResult {
+  /**
+   * An HTTP status code describing the result of the attempted operation.
+   */
+  statusCode: number;
+
+  /**
+   * A message describing the result of the attempted operation.
+   */
+  message: string;
+
+  /**
+   * The thread that was acted upon.
+   */
+  category?: Category[];
 }
 
 /**
@@ -313,7 +358,7 @@ export const commentThread = async (
   content: string
 ): Promise<ThreadServiceResult> => {
   const thread: Thread = threads[threadId];
-  const authour: number = userId;
+  const author: number = userId;
   const date: Date = new Date();
   const replies: number[] = [];
   const likes: number = 0;
@@ -321,7 +366,7 @@ export const commentThread = async (
   const commentId: number = commentID++;
   const newComment: Comment = {
     content,
-    authour,
+    author,
     date,
     replies,
     likes,
@@ -392,11 +437,11 @@ const removeReplies = (reply: Comment): void => {
  */
 export const postThread = async (
   userId: number,
-  category: string,
+  category: number,
   title: string,
   content: string
 ): Promise<ThreadServiceResult> => {
-  if (!categories.includes(category)) {
+  if (!categories[category]) {
     return { statusCode: 400, message: "The given category was invalid." };
   }
 
@@ -424,5 +469,58 @@ export const postThread = async (
     statusCode: 200,
     message: "Thread posted successfully.",
     thread: newThread,
+  };
+};
+
+/**
+ *
+ * @returns A list of all categories
+ */
+export const getCategories = async (): Promise<CategoryServiceResult> => {
+  const category: Category[] = [];
+
+  for (const key in categories) {
+    category.push(categories[key]);
+  }
+
+  if (category.length > 0) {
+    return {
+      statusCode: 200,
+      message: "Categories has successfully been recived.",
+      category: category,
+    };
+  }
+  return {
+    statusCode: 404,
+    message: "Categories could not be found",
+    category: undefined,
+  };
+};
+
+/**
+ *
+ * @returns A list of three threads
+ */
+export const getSampleThreads = async (
+  cat: number
+): Promise<ThreadServiceResult> => {
+  const threadArr: Thread[] = [];
+
+  for (const key in threads) {
+    if (threads[key].category === cat) threadArr.push(threads[key]);
+    if (threadArr.length === 3) break;
+  }
+
+  if (threadArr.length <= 3) {
+    return {
+      statusCode: 200,
+      message: "Threads has successfully been recived.",
+      threads: threadArr,
+    };
+  }
+  return {
+    statusCode: 404,
+    message: "Threads could not be found",
+    thread: undefined,
   };
 };
