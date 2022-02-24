@@ -39,7 +39,7 @@ const EditProfilePopup = (props: {
     }
 
 
-    navigate(`/profile/${authContext.userId}`);
+    navigate(`/profile/${authContext.username}`);
     props.onClose();
   };
 

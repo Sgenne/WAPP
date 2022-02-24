@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { formatDate } from "../../utils/formatUtils";
 import ProfileListItem from "./ProfileListItem";
 import { Thread } from "../../../../server/src/model/thread.interface";
@@ -11,7 +11,7 @@ import { FaCog } from "react-icons/fa";
 import EditProfilePopup from "./EditProfilePopup";
 
 const ProfilePage = () => {
-  const [user, setUser] = useState<User>();
+  const [owner, setOwner] = useState<User>();
   const [createdThreads, setCreatedThreads] = useState<Thread[]>([]);
   const [createdComments, setCreatedComments] = useState<Comment[]>([]);
   const [likedThreads, setLikedThreads] = useState<Thread[]>([]);
@@ -23,35 +23,42 @@ const ProfilePage = () => {
   const authContext = useContext(AuthContext);
   const params = useParams();
 
-  if (!params.userId) {
-    throw new Error("Invalid user-id");
+  if (!params.username) {
+    throw new Error("Invalid username");
   }
 
-  const userId = +params.userId;
+  const ownerName = params.username;
 
   useEffect(() => {
-    fetchUser(userId);
-    fetchCreatedThreads(userId);
-    fetchCreatedComments(userId);
-    fetchLikedThreads(userId);
-    fetchLikedComments(userId);
-  }, [userId]);
+    if (!ownerName) return;
+    fetchUser(ownerName);
+  }, [ownerName]);
 
-  const fetchUser = async (userId: Number) => {
+  useEffect(() => {
+    if (!owner) return;
+
+    const ownerId = owner.userId;
+    fetchCreatedThreads(ownerId);
+    fetchCreatedComments(ownerId);
+    fetchLikedThreads(ownerId);
+    fetchLikedComments(ownerId);
+  }, [owner]);
+
+  const fetchUser = async (username: string) => {
     let response: AxiosResponse;
 
     try {
       response = await axios.get<{ user: User }>(
-        `http://localhost:8080/user/${userId}`
+        `http://localhost:8080/user/username/${username}`
       );
     } catch (error) {
-      setError(new Error("No user with the given id was found."));
+      setError(new Error("No user with the given username was found."));
       return;
     }
-    setUser(response.data.user);
+    setOwner(response.data.user);
   };
 
-  const fetchCreatedThreads = async (userId: Number): Promise<void> => {
+  const fetchCreatedThreads = async (userId: number): Promise<void> => {
     let response: AxiosResponse;
 
     try {
@@ -65,15 +72,6 @@ const ProfilePage = () => {
     const fetchedThreads: Thread[] = response.data.threads;
 
     setCreatedThreads(fetchedThreads);
-    setListItems(
-      fetchedThreads.map((thread) => (
-        <ProfileListItem
-          header={thread.title}
-          content={thread.content}
-          date={formatDate(new Date(thread.date))}
-        />
-      ))
-    );
   };
 
   const fetchCreatedComments = async (userId: number) => {
@@ -84,7 +82,7 @@ const ProfilePage = () => {
         `http://localhost:8080/comment/author/${userId}`
       );
     } catch (error) {
-      console.log(error); // TODO: Show error
+      setError(new Error("Created comments could not be fetched."));
       return;
     }
 
@@ -96,10 +94,10 @@ const ProfilePage = () => {
 
     try {
       response = await axios.get<{ threads: Thread[] }>(
-        `http://localhost:8080/thread/likedThreads/${userId}`
+        `http://localhost:8080/thread/liked/${userId}`
       );
     } catch (error) {
-      console.log(error); // TODO: Show error
+      setError(new Error("Liked threads could not be fetched."));
       return;
     }
 
@@ -114,56 +112,55 @@ const ProfilePage = () => {
         `http://localhost:8080/comment/likedComments/${userId}`
       );
     } catch (error) {
-      console.log(error); // TODO: Show error
+      setError(new Error("Liked comments could not be fetched."));
       return;
     }
 
     setLikedComments(response.data.comments);
   };
 
-  const threadClickHandler = () => {
-    // send GET to /thread/author/:userId
+  const showCreatedThreads = useCallback(() => {
     const threadListItems = createdThreads.map((thread) => (
       <ProfileListItem
         header={thread.title}
         content={thread.content}
-        date={formatDate(new Date(thread.date))}
+        info={`Posted at: ${formatDate(new Date(thread.date))}`}
       />
     ));
     setListItems(threadListItems);
-  };
+  }, [createdThreads]);
 
-  const commentClickHandler = () => {
-    // send GET to /comment/author/:userId
+  // Show created threads when page is loaded.
+  useEffect(() => {
+    showCreatedThreads();
+  }, [showCreatedThreads]);
+
+  const showCreatedComments = () => {
     const commentListItems = createdComments.map((comment) => (
       <ProfileListItem
-        header={""}
         content={comment.content}
-        date={formatDate(new Date(comment.date))}
+        info={`Posted at: ${formatDate(new Date(comment.date))}`}
       />
     ));
     setListItems(commentListItems);
   };
 
-  // send GET to /thread/liked-by/:userId
-  const likedThreadsClickHandler = () => {
+  const showLikedThreads = () => {
     const threadListItems = likedThreads.map((thread) => (
       <ProfileListItem
         header={thread.title}
         content={thread.content}
-        date={formatDate(new Date(thread.date))}
+        info={`Posted at: ${formatDate(new Date(thread.date))}`}
       />
     ));
     setListItems(threadListItems);
   };
 
-  // send GET to /comment/liked-by/:userId
-  const likedCommentsClickHandler = () => {
+  const showLikedComments = () => {
     const commentListItems = likedComments.map((comment) => (
       <ProfileListItem
-        header={""}
         content={comment.content}
-        date={formatDate(new Date(comment.date))}
+        info={`Posted at: ${formatDate(new Date(comment.date))}`}
       />
     ));
     setListItems(commentListItems);
@@ -178,23 +175,23 @@ const ProfilePage = () => {
   };
 
   if (error) return <div>{error.message}</div>;
-  if (!user) return <div>Loading...........</div>;
+  if (!owner) return <div>Loading...........</div>;
 
-  const isOwner = authContext.userId && authContext.userId === userId;
+  const isOwner = authContext.userId && authContext.userId === owner.userId;
 
   return (
     <div className="profile-page">
       {showSettings && (
-        <EditProfilePopup currentUser={user} onClose={hideSettingsHandler} />
+        <EditProfilePopup currentUser={owner} onClose={hideSettingsHandler} />
       )}
       <div className="profile-page__userInfo">
         <img
           className="profile-page__image"
-          src={user.image.imageUrl}
+          src={owner.image.imageUrl}
           alt="profile"
         />
-        <h1 className="profile-page__username"> {user.username}</h1>
-        <p className="profile-page__bio"> {user.bio}</p>
+        <h1 className="profile-page__username"> {owner.username}</h1>
+        <p className="profile-page__bio"> {owner.bio}</p>
         {isOwner && (
           <button
             className="profile-page__settings-button"
@@ -205,10 +202,10 @@ const ProfilePage = () => {
         )}
       </div>
       <div className="profile-page__thread-buttons">
-        <button onClick={threadClickHandler}>Threads</button>
-        <button onClick={commentClickHandler}>Comments</button>
-        <button onClick={likedThreadsClickHandler}>Liked Threads</button>
-        <button onClick={likedCommentsClickHandler}>Liked Comments</button>
+        <button onClick={showCreatedThreads}>Threads</button>
+        <button onClick={showCreatedComments}>Comments</button>
+        <button onClick={showLikedThreads}>Liked Threads</button>
+        <button onClick={showLikedComments}>Liked Comments</button>
       </div>
       <ul className="profile-page__displayed-threads">{listItems}</ul>
     </div>

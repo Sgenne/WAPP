@@ -213,7 +213,7 @@ export const getLikedThreads = async (
     return {statusCode: 200, message: "The user has no liked threads", threads: []}
   }
   
-  console.log(result);
+  console.log("threads: ", result);
   return {
     statusCode: 200,
     message:

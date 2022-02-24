@@ -83,20 +83,6 @@ userRouter.delete(
   }
 );
 
-userRouter.get("/:userId", async (req: Request, res: Response) => {
-  const userId = req.params.userId;
-
-  const result = await userServices.getUser(+userId);
-
-  const user = result.user;
-
-  if (!user) {
-    return res.status(result.statusCode).send({ message: result.message });
-  }
-
-  res.status(200).send({ message: result.message, user: result.user });
-});
-
 userRouter.put(
   "/set-visible-properties",
   isAuthenticated,
@@ -175,3 +161,25 @@ userRouter.post(
     res.status(result.statusCode).send({ message: result.message });
   }
 );
+
+userRouter.get("/:userId", async (req: Request, res: Response) => {
+  const userId = req.params.userId;
+
+  const result = await userServices.getUser(+userId);
+
+  const user = result.user;
+
+  res
+    .status(result.statusCode)
+    .send({ message: result.message, user: result.user });
+});
+
+userRouter.get("/username/:username", async (req: Request, res: Response) => {
+  const username = req.params.username;
+
+  const result = await userServices.getUserByUsername(username);
+
+  res
+    .status(result.statusCode)
+    .send({ message: result.message, user: result.user });
+});

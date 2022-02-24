@@ -5,6 +5,7 @@ import { FaArrowDown } from "react-icons/fa";
 import { Category } from "../../../server/src/model/category.interface";
 import axios, { AxiosResponse } from "axios";
 import { Thread } from "../../../server/src/model/thread.interface";
+import { NavLink } from "react-router-dom";
 
 const CategoryPreview = (props: { category: Category }) => {
   const [threads, setThreads] = useState<Thread[]>([]);
@@ -45,7 +46,7 @@ const CategoryPreview = (props: { category: Category }) => {
     <li className="category-box container-fluid px-4">
       <div className="row">
         <h3 className="col-11">
-          <a href={link}> {props.category.title} </a>
+          <NavLink to={link}>{props.category.title}</NavLink>
         </h3>
 
         <Button

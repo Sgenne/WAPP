@@ -8,8 +8,11 @@ export const formatDate = (date: Date) => {
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
 
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
+  let hours = date.getHours().toString();
+  let minutes = date.getMinutes().toString();
+
+  if (minutes.length === 1) minutes = "0" + minutes;
+  if (hours.length === 1) hours = "0" + hours;
 
   return `${dayOfTheMonth}/${month}-${year} ${hours}:${minutes}`;
 };
