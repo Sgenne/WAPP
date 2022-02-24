@@ -38,7 +38,6 @@ const EditProfilePopup = (props: {
       return;
     }
 
-
     navigate(`/profile/${authContext.username}`);
     props.onClose();
   };
@@ -55,10 +54,11 @@ const EditProfilePopup = (props: {
     <Modal onBackgroundClick={props.onClose}>
       <div className="edit-profile">
         <div className="edit-profile__profile-picture">
-          <div className="edit-profile__profile-picture-preview">
-            <img src="" alt="" />
+          <div className="edit-profile__profile-picture-input">
+            <label>Update your profile picture</label>
+            <input type="file" onChange={profilePictureChangeHandler} />
           </div>
-          <input type="file" onChange={profilePictureChangeHandler} />
+
           <button onClick={submitProfilePictureHandler}>
             Submit profile picture
           </button>
@@ -66,8 +66,10 @@ const EditProfilePopup = (props: {
         <div className="edit-profile__user-info">
           <label>Edit bio:</label>
           <textarea>{props.currentUser.bio}</textarea>
-          <button>Submit changes</button>
-          <button>Cancel</button>
+          <div className="edit-profile__user-info-buttons">
+            <button>Submit changes</button>
+            <button onClick={props.onClose}>Cancel</button>
+          </div>
         </div>
       </div>
     </Modal>
