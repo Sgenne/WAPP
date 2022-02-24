@@ -39,7 +39,7 @@ export const users: { [userId: string]: User } = {
       "$2a$10$6cl/uWNIxhokhH8GR4BlQuTVMDlT1ptZm64vNoSPSdr5Ngeci2aEG",
     bio: "I'm burnt",
     image: images[1],
-    likedThreads: [],
+    likedThreads: [1,3],
     dislikedThreads: [],
     likedComments: [],
     dislikedComments: [],

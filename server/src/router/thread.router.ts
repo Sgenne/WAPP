@@ -169,8 +169,23 @@ threadRouter.get("/author/:userId", async (req: Request, res: Response) => {
 });
 
 threadRouter.get(
-  "/likedThreads/:userId",
+  "/liked/:userId",
+ async (req: Request, res: Response) => {
+  console.log("Begin");
   
+  const userId = req.params.userId;
+
+   const result = await threadServices.getLikedThreads(+userId);
+
+   if(!result.thread){
+    res.status(result.statusCode).send({message: result.message});
+    return;
+   }
+   
+   console.log(result.threads);
+   res.status(200).send({message: result.message, threads: result.threads});
+   
+ }
 );
 threadRouter.delete(
   "/deleteThread",
