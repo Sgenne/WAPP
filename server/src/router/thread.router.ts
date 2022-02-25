@@ -121,7 +121,7 @@ threadRouter.post(
   isAuthenticated,
   async (req: Request, res: Response) => {
     const userId = req.body.userId;
-    const categoryId = req.body.categoryId;
+    const categoryId = +req.body.categoryId;
     const title = req.body.title;
     const content = req.body.content;
 
@@ -166,23 +166,56 @@ threadRouter.get(
       return res.status(result.statusCode).send({ message: result.message });
     }
 
-    res
-      .status(200)
-      .send({ message: result.message, categories: result.threads });
+    res.status(200).send({ message: result.message, threads: result.threads });
   }
 );
 
-threadRouter.get("/:threadId", async (req: Request, res: Response) => {
-  const threadId = req.params.threadId;
+threadRouter.get(
+  "/categoryThreads/:categoryId",
+  async (req: Request, res: Response) => {
+    const result = await threadServices.getCategoryThreads(
+      +req.params.categoryId
+    );
 
-  const result = await threadServices.getThread(+threadId);
+    if (result.statusCode !== 200) {
+      return res.status(result.statusCode).send({ message: result.message });
+    }
 
-  if (result.statusCode !== 200) {
-    return res.status(result.statusCode).send({ message: result.message });
+    res.status(200).send({ message: result.message, threads: result.threads });
   }
+);
 
-  res.status(200).send({ message: result.message, user: result.thread });
-});
+threadRouter.get(
+  "/threadComments/:threadId",
+  async (req: Request, res: Response) => {
+    const result = await threadServices.getThreadComments(req.params.threadId);
+
+    if (result.statusCode !== 200) {
+      return res.status(result.statusCode).send({ message: result.message });
+    }
+
+    res
+      .status(200)
+      .send({ message: result.message, comments: result.comments });
+  }
+);
+
+threadRouter.get(
+  "/commentComments/:commentId",
+  async (req: Request, res: Response) => {
+    const result = await threadServices.getCommentComments(
+      req.params.commentId
+    );
+
+    if (result.statusCode !== 200) {
+      return res.status(result.statusCode).send({ message: result.message });
+    }
+
+    res
+      .status(200)
+      .send({ message: result.message, comments: result.comments });
+  }
+);
 
 threadRouter.get("/author/:userId", async (req: Request, res: Response) => {
   const userId = req.params.userId;
@@ -229,3 +262,14 @@ threadRouter.delete(
     });
   }
 );
+threadRouter.get("/:threadId", async (req: Request, res: Response) => {
+  const threadId = req.params.threadId;
+
+  const result = await threadServices.getThread(threadId);
+
+  if (result.statusCode !== 200) {
+    return res.status(result.statusCode).send({ message: result.message });
+  }
+
+  res.status(200).send({ message: result.message, thread: result.thread });
+});

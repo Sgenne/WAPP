@@ -31,6 +31,8 @@ const CreateThread = () => {
           content: value,
         }
       );
+
+      console.log(signInResult.data);
     } catch (error) {
       console.log(error);
       return;

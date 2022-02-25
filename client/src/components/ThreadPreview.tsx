@@ -1,14 +1,40 @@
+import axios, { AxiosResponse } from "axios";
+import { useState, useEffect } from "react";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import { Thread } from "../../../server/src/model/thread.interface";
+import { User } from "../../../server/src/model/user.interface";
 
 const ThreadPreview = (props: { thread: Thread }) => {
-  const title: string = "Title - A new hope";
-  const context: string =
-    "Luke Skywalker joins forces with a Jedi Knight, a cocky pilot, a Wire's world-destroying battle station, while also attempting to rescue Princess Leia from the mysterious Darth Vader.";
-  const author: string = "Luke";
+  const [user, setThreads] = useState<User>();
+
+  async function getUser() {
+    try {
+      threadResult = await axios.get<{
+        message: string;
+        threads?: Thread[];
+      }>("http://localhost:8080/user/" + props.thread.author, {});
+    } catch (error) {
+      console.log(error);
+    }
+    setThreads(threadResult.data.user);
+  }
+
+  let threadResult: AxiosResponse;
+
+  useEffect(() => {
+    getUser();
+  }, []);
+  let author;
+  if (user) {
+    author = user?.username;
+  }
+
+  const title: string = props.thread.title;
+  const context: string = props.thread.content;
   const discrod = require("./../resources/img/discrod.png");
-  const likes: number = 1336;
-  const dislikes: number = 419;
+  const likes: number = props.thread.likes;
+  const dislikes: number = props.thread.dislikes;
+  const id: string = "/thread/" + props.thread.threadId;
   return (
     <li>
       <div className="category-thread container-fluid px-4">
@@ -16,7 +42,7 @@ const ThreadPreview = (props: { thread: Thread }) => {
           <img src={discrod} className="row__avatar" />
           <div className="col row">
             <h3 className="thread-title col-12">
-              <a href="thread.html" className="link">
+              <a href={id} className="link">
                 {title}
               </a>
             </h3>

@@ -9,7 +9,7 @@ const Router = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/thread" element={<ThreadPage />} />
+      <Route path="/thread/:threadId" element={<ThreadPage />} />
       <Route path="/create-thread/:category" element={<CreateThread />} />
       <Route path="/profile/:username" element={<ProfilePage />} />
       <Route path="/category/:category" element={<CategoryPage />} />

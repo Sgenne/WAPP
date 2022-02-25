@@ -49,11 +49,11 @@ export const threads: { [threadId: string]: Thread } = {
     content: "How large is a Guianan rooster?",
     title: "A question about roosters",
     date: new Date(),
-    threadId: 3,
+    threadId: 4,
     likes: 0,
     dislikes: 0,
     category: 2,
-    replies: [0],
+    replies: [0, 1],
   },
 };
 /**
@@ -82,7 +82,7 @@ categories[2] = {
 /**
  * Global variable to know what id to assign next thread.
  */
-let id: number = 0;
+let id: number = 4;
 
 /**
  * Global variable to know what id to assign next comment.
@@ -116,6 +116,8 @@ interface ThreadServiceResult {
    * The threads that were acted upon if the service was successfull.
    */
   threads?: Thread[];
+
+  comments?: Comment[];
 }
 
 /**
@@ -144,7 +146,7 @@ interface CategoryServiceResult {
  * @returns a thread with the specified id
  */
 export const getThread = async (
-  threadId: number
+  threadId: string
 ): Promise<ThreadServiceResult> => {
   const thread = threads[threadId];
   if (thread) {
@@ -208,12 +210,16 @@ export const getLikedThreads = async (
       result.push(threads[threadId]);
     }
   });
-  
-  if (result.length == 0 ){
-    return {statusCode: 200, message: "The user has no liked threads", threads: []}
+
+  if (result.length == 0) {
+    return {
+      statusCode: 200,
+      message: "The user has no liked threads",
+      threads: [],
+    };
   }
-  
-  console.log("threads: ", result);
+
+  console.log(result);
   return {
     statusCode: 200,
     message:
@@ -465,6 +471,7 @@ export const postThread = async (
   };
 
   threads[threadId] = newThread;
+
   return {
     statusCode: 200,
     message: "Thread posted successfully.",
@@ -521,6 +528,84 @@ export const getSampleThreads = async (
   return {
     statusCode: 404,
     message: "Threads could not be found",
+    thread: undefined,
+  };
+};
+
+export const getCategoryThreads = async (
+  cat: number
+): Promise<ThreadServiceResult> => {
+  const threadArr: Thread[] = [];
+
+  for (const key in threads) {
+    if (threads[key].category === cat) threadArr.push(threads[key]);
+  }
+
+  if (threadArr) {
+    return {
+      statusCode: 200,
+      message: "Threads has successfully been recived.",
+      threads: threadArr,
+    };
+  }
+  return {
+    statusCode: 404,
+    message: "Threads could not be found",
+    thread: undefined,
+  };
+};
+
+export const getThreadComments = async (
+  threadId: string
+): Promise<ThreadServiceResult> => {
+  const commentArr: Comment[] = [];
+  const thread = threads[threadId];
+
+  if (!thread) {
+    return {
+      statusCode: 404,
+      message: "There are no comments",
+      thread: undefined,
+    };
+  }
+  for (const commentId in thread.replies) {
+    commentArr.push(comments[commentId]);
+  }
+
+  if (commentArr) {
+    return {
+      statusCode: 200,
+      message: "Comments has successfully been recived.",
+      comments: commentArr,
+    };
+  }
+  return {
+    statusCode: 404,
+    message: "Bad thread or no comments",
+    thread: undefined,
+  };
+};
+
+export const getCommentComments = async (
+  rootId: string
+): Promise<ThreadServiceResult> => {
+  const commentArr: Comment[] = [];
+  const comment = comments[rootId];
+
+  for (const commentId in comment.replies) {
+    commentArr.push(comments[commentId]);
+  }
+
+  if (commentArr) {
+    return {
+      statusCode: 200,
+      message: "Comments has successfully been recived.",
+      comments: commentArr,
+    };
+  }
+  return {
+    statusCode: 404,
+    message: "Bad comment or no comments",
     thread: undefined,
   };
 };

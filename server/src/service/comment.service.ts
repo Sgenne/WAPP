@@ -18,7 +18,7 @@ export const comments: { [key: string]: Comment } = {
       "Wow, what a question. The average Guianan rooster is roughly 24-32 inches.",
     date: new Date(),
     author: 1,
-    replies: [],
+    replies: [0],
     likes: 0,
     dislikes: 0,
     commentId: 1,
