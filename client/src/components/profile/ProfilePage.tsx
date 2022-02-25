@@ -174,6 +174,10 @@ const ProfilePage = () => {
     setShowSettings(false);
   };
 
+  const updateOwnerHandler = (updatedOwner: User) => {
+    setOwner(updatedOwner)
+  }
+
   if (error) return <div>{error.message}</div>;
   if (!owner) return <div>Loading...........</div>;
 
@@ -182,7 +186,7 @@ const ProfilePage = () => {
   return (
     <div className="profile-page">
       {showSettings && (
-        <EditProfilePopup currentUser={owner} onClose={hideSettingsHandler} />
+        <EditProfilePopup owner={owner} onClose={hideSettingsHandler} onUpdateOwner={updateOwnerHandler} />
       )}
       <div className="profile-page__userInfo">
         <img

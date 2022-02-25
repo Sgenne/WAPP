@@ -1,22 +1,25 @@
 import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { User } from "../../../../server/src/model/user.interface";
 import Modal from "../Modal";
 import { AuthContext } from "../../context/AuthContext";
 import FormData from "form-data";
+import { Image } from "../../../../server/src/model/image.interface";
 
 const EditProfilePopup = (props: {
   onClose: () => void;
-  currentUser: User;
+  owner: User;
+  onUpdateOwner: (updatedOwner: User) => void;
 }) => {
   const [newProfilePicture, setNewProfilePicture] = useState<File>();
+  const [bio, setBio] = useState(props.owner.bio);
   const authContext = useContext(AuthContext);
-  const navigate = useNavigate();
 
   const submitProfilePictureHandler = async () => {
     if (!(newProfilePicture && authContext.userId && authContext.password))
       return;
+
+    let response: AxiosResponse;
 
     const formData = new FormData();
     formData.append("userId", authContext.userId.toString());
@@ -28,7 +31,7 @@ const EditProfilePopup = (props: {
     };
 
     try {
-      await axios.post(
+      response = await axios.post<{ message: string; profilePicture: Image }>(
         "http://localhost:8080/user/upload-profile-picture",
         formData,
         config
@@ -38,7 +41,33 @@ const EditProfilePopup = (props: {
       return;
     }
 
-    navigate(`/profile/${authContext.username}`);
+    const updatedOwner = {
+      ...props.owner,
+      image: response.data.profilePicture,
+    };
+
+    props.onUpdateOwner(updatedOwner);
+    props.onClose();
+  };
+
+  const submitUserInfoChanges = async () => {
+    try {
+      await axios.put("http://localhost:8080/user/update-user", {
+        userId: authContext.userId,
+        password: authContext.password,
+        bio: bio,
+      });
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+
+    const updatedOwner = {
+      ...props.owner,
+      bio: bio,
+    };
+
+    props.onUpdateOwner(updatedOwner);
     props.onClose();
   };
 
@@ -48,6 +77,10 @@ const EditProfilePopup = (props: {
     if (!event.target.files) return;
 
     setNewProfilePicture(event.target.files[0]);
+  };
+
+  const bioChangeHandler = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setBio(event.target.value);
   };
 
   return (
@@ -65,9 +98,9 @@ const EditProfilePopup = (props: {
         </div>
         <div className="edit-profile__user-info">
           <label>Edit bio:</label>
-          <textarea>{props.currentUser.bio}</textarea>
+          <textarea onChange={bioChangeHandler} defaultValue={bio}></textarea>
           <div className="edit-profile__user-info-buttons">
-            <button>Submit changes</button>
+            <button onClick={submitUserInfoChanges}>Submit changes</button>
             <button onClick={props.onClose}>Cancel</button>
           </div>
         </div>

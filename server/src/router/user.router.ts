@@ -59,7 +59,6 @@ userRouter.put(
     const update = {
       birthDate: req.body.birthDate,
       bio: req.body.bio,
-      image: req.body.image,
       password: req.body.newPassword,
     };
 
@@ -158,7 +157,16 @@ userRouter.post(
       filename: image.originalname,
     });
 
-    res.status(result.statusCode).send({ message: result.message });
+    const user = result.user;
+
+    if (!user) {
+      res.status(result.statusCode).send({ message: result.message });
+      return;
+    }
+
+    res
+      .status(result.statusCode)
+      .send({ message: result.message, profilePicture: user.image });
   }
 );
 
