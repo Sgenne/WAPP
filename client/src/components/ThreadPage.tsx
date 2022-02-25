@@ -94,7 +94,7 @@ const ThreadPage = () => {
 
   const title = threadObject.title;
   const context = threadObject.content;
-  const discrod = require("./../resources/img/discrod.png");
+  const discrod = user.image.imageUrl;
   const likes = threadObject.likes;
   const dislikes = threadObject.dislikes;
   return (

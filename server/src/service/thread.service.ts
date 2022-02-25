@@ -42,7 +42,7 @@ export const threads: { [threadId: string]: Thread } = {
     likes: 3,
     dislikes: 11,
     category: 2,
-    replies: [],
+    replies: [0, 1],
   },
   4: {
     author: 2,

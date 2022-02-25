@@ -20,6 +20,7 @@ const ThreadPreview = (props: { thread: Thread }) => {
   }
 
   let threadResult: AxiosResponse;
+  let discrod;
 
   useEffect(() => {
     getUser();
@@ -27,11 +28,11 @@ const ThreadPreview = (props: { thread: Thread }) => {
   let author;
   if (user) {
     author = user?.username;
+    discrod = user.image.imageUrl;
   }
 
   const title: string = props.thread.title;
   const context: string = props.thread.content;
-  const discrod = require("./../resources/img/discrod.png");
   const likes: number = props.thread.likes;
   const dislikes: number = props.thread.dislikes;
   const id: string = "/thread/" + props.thread.threadId;
