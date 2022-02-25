@@ -38,7 +38,7 @@ threadRouter.put(
 );
 
 threadRouter.put(
-  "/disLikeThread",
+  "/dislikeThread",
   hasValidThreadId,
   handleValidationResult,
   isAuthenticated,

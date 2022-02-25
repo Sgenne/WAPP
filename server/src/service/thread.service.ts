@@ -473,7 +473,7 @@ export const postThread = async (
   threads[threadId] = newThread;
 
   return {
-    statusCode: 200,
+    statusCode: 201,
     message: "Thread posted successfully.",
     thread: newThread,
   };

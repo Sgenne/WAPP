@@ -1,11 +1,12 @@
 import axios, { AxiosResponse } from "axios";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import { useParams } from "react-router";
 import { Thread } from "../../../server/src/model/thread.interface";
 import { User } from "../../../server/src/model/user.interface";
 import { Comment } from "../../../server/src/model/comment.interface";
 import ThreadComment from "./ThreadComment";
+import { AuthContext } from "../context/AuthContext";
 
 const ThreadPage = () => {
   const param = useParams();
@@ -14,6 +15,8 @@ const ThreadPage = () => {
   const [user, setuser] = useState<User>();
   const [threadObject, setThreadObject] = useState<Thread>();
   const [comments, setComments] = useState<Comment[]>();
+
+  const authContext = useContext(AuthContext);
 
   async function getThread() {
     try {
@@ -92,11 +95,51 @@ const ThreadPage = () => {
     }
   }
 
+  const likeClickHandler = async () => {
+    let likeResult: AxiosResponse;
+    try {
+      likeResult = await axios.put<{ message: string; thread?: Thread }>(
+        "http://localhost:8080/thread/likeThread/",
+        {
+          userId: authContext.userId,
+          password: authContext.password,
+          threadId: threadObject.threadId,
+          username: authContext.userId,
+        }
+      );
+      console.log(likeResult.data);
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  };
+
+  const dislikeClickHandler = async () => {
+    let dislikeResult: AxiosResponse;
+    try {
+      dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
+        "http://localhost:8080/thread/dislikeThread/",
+        {
+          userId: authContext.userId,
+          password: authContext.password,
+          threadId: threadObject.threadId,
+          username: authContext.userId,
+        }
+      );
+
+      console.log(dislikeResult.data);
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  };
+
   const title = threadObject.title;
   const context = threadObject.content;
   const discrod = user.image.imageUrl;
   const likes = threadObject.likes;
   const dislikes = threadObject.dislikes;
+  const date = threadObject.date;
   return (
     <div className="wholePage">
       <ul>
@@ -105,20 +148,16 @@ const ThreadPage = () => {
             <div className="row">
               <img src={discrod} className="row__avatar" />
               <div className="col row">
-                <h3 className="thread-title col-12">
-                  <a href="thread.html" className="link">
-                    {title}
-                  </a>
-                </h3>
+                <h3 className="thread-title col-12">{title}</h3>
                 <p className="row__thread-title col-3">
-                  <a href="thread.html" className="link">
+                  <a href="/profile" className="link">
                     {author}
                   </a>
                 </p>
-                <p className="row__thread-title col-3">
-                  <a href="thread.html" className="link">
-                    /*TODO Date*
-                  </a>
+                <p className="row__thread-title col-4">
+                  {new Date(date).toLocaleDateString() +
+                    " " +
+                    new Date(date).toLocaleTimeString()}
                 </p>
               </div>
             </div>
@@ -126,15 +165,15 @@ const ThreadPage = () => {
               <p>{context}</p>
             </div>
             <div className="row">
-              <div className="col-2">
+              <button className="col-2" onClick={likeClickHandler}>
                 <FaThumbsUp />
                 <p className="threadLikes">{likes}</p>
-              </div>
-              <div className="col-2">
+              </button>
+              <button className="col-2" onClick={dislikeClickHandler}>
                 <FaThumbsDown />
                 <p className="threadLikes">{dislikes}</p>
-              </div>
-              <div className="col-2">Reply</div>
+              </button>
+              <button className="col-2">Reply</button>
             </div>
           </div>
         </li>
