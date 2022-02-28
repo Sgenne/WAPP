@@ -1,12 +1,16 @@
 import axios, { AxiosResponse } from "axios";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import { Comment } from "../../../server/src/model/comment.interface";
 import { Thread } from "../../../server/src/model/thread.interface";
 import { User } from "../../../server/src/model/user.interface";
+import { AuthContext } from "../context/AuthContext";
 
 const ThreadComment = (props: { root: Comment }) => {
   const [user, setThreads] = useState<User>();
   const [comments, setComments] = useState<Comment[]>();
+  const authContext = useContext(AuthContext);
 
   async function getComments() {
     let commentResult: AxiosResponse;
@@ -56,24 +60,86 @@ const ThreadComment = (props: { root: Comment }) => {
     }
   }
 
+  const likeClickHandler = async () => {
+    let likeResult: AxiosResponse;
+    try {
+      likeResult = await axios.put<{ message: string; thread?: Thread }>(
+        "http://localhost:8080/comment/likeComment/",
+        {
+          userId: authContext.userId,
+          password: authContext.password,
+          commentID: props.root.commentId,
+          username: authContext.userId,
+        }
+      );
+      console.log(likeResult.data);
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  };
+
+  const dislikeClickHandler = async () => {
+    let dislikeResult: AxiosResponse;
+    try {
+      dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
+        "http://localhost:8080/comment/dislikeComment/",
+        {
+          userId: authContext.userId,
+          password: authContext.password,
+          commentID: props.root.commentId,
+          username: authContext.userId,
+        }
+      );
+
+      console.log(dislikeResult.data);
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  };
+
+  const navigate = useNavigate();
+  const replyClickHandler = async () => {
+    navigate(`/create-comment/comment/${props.root.commentId}`);
+  };
+
   const context: string = props.root.content;
+  const likes = props.root.likes;
+  const dislikes = props.root.dislikes;
+  const date = props.root.date;
+  const path = "/profile/" + user?.username;
+
   return (
-    <li>
+    <li style={{ marginLeft: "30px" }}>
       <div className="category-box container-fluid px-4">
         <div className="row">
           <p className="category-box__row__thread-title col-3">
-            <a href="thread.html" className="link">
+            <a href={path} className="link">
               {author}
             </a>
           </p>
           <p className="category-box__row__thread-title col-3">
-            <a href="thread.html" className="link">
-              Thread 1 Title
-            </a>
+            {new Date(date).toLocaleDateString() +
+              " " +
+              new Date(date).toLocaleTimeString()}
           </p>
         </div>
         <div className="category-box__thread-desc">
           <p>{context}</p>
+        </div>
+        <div className="row">
+          <button className="col-2" onClick={likeClickHandler}>
+            <FaThumbsUp />
+            <p className="threadLikes">{likes}</p>
+          </button>
+          <button className="col-2" onClick={dislikeClickHandler}>
+            <FaThumbsDown />
+            <p className="threadLikes">{dislikes}</p>
+          </button>
+          <button className="col-2" onClick={replyClickHandler}>
+            Reply
+          </button>
         </div>
       </div>
       <ul>{list}</ul>

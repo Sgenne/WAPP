@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import CategoryPage from "./components/CategoryPage";
+import CreateComment from "./components/CreateComment";
 import CreateThread from "./components/CreateThread";
 import Home from "./components/Home";
 import ProfilePage from "./components/profile/ProfilePage";
@@ -14,6 +15,7 @@ const Router = () => {
       <Route path="/profile/:username" element={<ProfilePage />} />
       <Route path="/category/:category" element={<CategoryPage />} />
       <Route path="*" element={<div>Uh oh... No page was found 😿</div>} />
+      <Route path="/create-comment/:type/:id" element={<CreateComment />} />
     </Routes>
   );
 };

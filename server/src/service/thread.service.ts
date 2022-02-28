@@ -87,7 +87,7 @@ let id: number = 4;
 /**
  * Global variable to know what id to assign next comment.
  */
-let commentID: number = 0;
+let commentID: number = 5;
 
 export const newComment = (): number => {
   return commentID++;
@@ -360,7 +360,7 @@ export const editThread = async (
  */
 export const commentThread = async (
   userId: number,
-  threadId: number,
+  threadId: string,
   content: string
 ): Promise<ThreadServiceResult> => {
   const thread: Thread = threads[threadId];

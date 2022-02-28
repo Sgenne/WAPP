@@ -142,7 +142,7 @@ export const hasCategory = body("categoryId")
  * Verifies that the request body has a valid comment-id.
  * A valid comment-id has to be numeric.
  */
-export const hasValidCommentId = body("commentId")
+export const hasValidCommentId = body("commentID")
   .notEmpty()
   .withMessage("No comment-id was provided.")
   .isNumeric()

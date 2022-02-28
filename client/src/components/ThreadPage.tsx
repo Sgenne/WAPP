@@ -7,8 +7,10 @@ import { User } from "../../../server/src/model/user.interface";
 import { Comment } from "../../../server/src/model/comment.interface";
 import ThreadComment from "./ThreadComment";
 import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const ThreadPage = () => {
+  const navigate = useNavigate();
   const param = useParams();
   const id = param.threadId;
   const [threads, setThreads] = useState<Thread>();
@@ -87,6 +89,7 @@ const ThreadPage = () => {
   if (!user) return <div>An error has occured.</div>;
 
   author = user.username;
+  const path = "/profile/" + user.username;
 
   const list: JSX.Element[] = [];
   if (comments) {
@@ -134,6 +137,10 @@ const ThreadPage = () => {
     }
   };
 
+  const replyClickHandler = async () => {
+    navigate(`/create-comment/thread/${threadObject.threadId}`);
+  };
+
   const title = threadObject.title;
   const context = threadObject.content;
   const discrod = user.image.imageUrl;
@@ -150,7 +157,7 @@ const ThreadPage = () => {
               <div className="col row">
                 <h3 className="thread-title col-12">{title}</h3>
                 <p className="row__thread-title col-3">
-                  <a href="/profile" className="link">
+                  <a href={path} className="link">
                     {author}
                   </a>
                 </p>
@@ -173,7 +180,9 @@ const ThreadPage = () => {
                 <FaThumbsDown />
                 <p className="threadLikes">{dislikes}</p>
               </button>
-              <button className="col-2">Reply</button>
+              <button className="col-2" onClick={replyClickHandler}>
+                Reply
+              </button>
             </div>
           </div>
         </li>

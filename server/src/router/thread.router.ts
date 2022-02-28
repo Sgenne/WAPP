@@ -85,21 +85,16 @@ threadRouter.put(
 );
 
 threadRouter.post(
-  "/commentThread",
-  hasValidThreadId,
+  "/reply",
   hasContent,
   handleValidationResult,
   isAuthenticated,
   async (req: Request, res: Response) => {
-    const threadID = req.body.threadId;
+    const id = req.body.threadId;
     const content = req.body.content;
     const userId = req.body.userId;
 
-    const result = await threadServices.commentThread(
-      userId,
-      threadID,
-      content
-    );
+    const result = await threadServices.commentThread(userId, id, content);
 
     if (result.statusCode !== 201) {
       return res.status(result.statusCode).send({ message: result.message });
