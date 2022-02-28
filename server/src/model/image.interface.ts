@@ -10,11 +10,6 @@ export interface Image {
   filename: string;
 
   /**
-   * The id of the image.
-   */
-  imageId: number;
-
-  /**
    * Indicates if the image is a default image. Default images cannot be deleted.
    */
   isDefault?: boolean;

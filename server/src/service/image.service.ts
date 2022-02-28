@@ -4,25 +4,11 @@ import { HOST, PORT } from "../utils/app.util";
 import { Image } from "../model/image.interface";
 import { imageFolderPath } from "../utils/image.util";
 
-export const DEFAULT_IMAGE_ID = 0;
-
-const defaultImage: Image = {
+export const DEFAULT_IMAGE: Image = {
   imageUrl:
     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png",
   filename: "blank-profile-picture-973460_640.png",
-  imageId: DEFAULT_IMAGE_ID,
   isDefault: true,
-};
-
-export const images: { [imageId: string]: Image } = {
-  [0]: defaultImage,
-  [1]: {
-    imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/ToastedWhiteBread.jpg/800px-ToastedWhiteBread.jpg",
-    filename: "ToastedWhiteBread.jpg",
-    imageId: 1,
-    isDefault: true,
-  },
 };
 
 /**
@@ -67,12 +53,9 @@ export const storeImage = async (image: {
 
   const imageUrl: string = `${HOST}:${PORT}/${imagePath}`;
   const storedImage: Image = {
-    imageId: imageId,
     imageUrl: imageUrl,
     filename: newName,
   };
-
-  images[imageId] = storedImage;
 
   return {
     statusCode: 201,
@@ -93,8 +76,6 @@ export const deleteImage = async (
       message: "The image could not be deleted from the file system.",
     };
   }
-
-  delete images[image.imageId];
 
   return {
     statusCode: 200,
