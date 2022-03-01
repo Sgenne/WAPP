@@ -6,7 +6,7 @@ import { userModel } from "../db/user.db";
 /**
  * The result of a user service.
  */
-interface UserServiceResult {
+export interface UserServiceResult {
   /**
    * An HTTP status code describing the result of the attempted operation.
    */

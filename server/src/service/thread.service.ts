@@ -1,97 +1,16 @@
 import { Comment } from "../model/comment.interface";
 import { Thread } from "../model/thread.interface";
-import { users } from "./user.service";
-import { comments } from "./comment.service";
 import { Category } from "../model/category.interface";
+import { threadModel } from "../db/thread.db";
+import { getUser, UserServiceResult } from "./user.service";
+import { userModel } from "../db/user.db";
+import { commentModel } from "../db/comment.db";
+import { categoryModel } from "../db/category.db";
 
-/**
- * Temporary in-memory store of all threads.
- */
-export const threads: { [threadId: string]: Thread } = {
-  1: {
-    author: 1,
-    content:
-      "Toast is bread that has been browned by radiant heat. The browning is the result of a Maillard reaction, altering the flavor of the bread and making it firmer so that it is easier to spread toppings on it. Toasting is a common method of making stale bread more palatable. Bread is often toasted using a toaster, but toaster ovens are also used. Pre-sliced bread is most commonly used.",
-    title: "About me",
-    date: new Date(),
-    threadId: 1,
-    likes: 10,
-    dislikes: 3,
-    category: 0,
-    replies: [],
-  },
-  2: {
-    author: 1,
-    content:
-      "Toast is a common breakfast food. Bagels and English muffins are also toasted.",
-    title: "Breakfast",
-    date: new Date(),
-    threadId: 2,
-    likes: 20,
-    dislikes: 11,
-    category: 1,
-    replies: [],
-  },
-  3: {
-    author: 1,
-    content:
-      "A more recent cultural phenomenon is the popularity of avocado toast, which is toast spread with mashed avocado. It is associated with the Millennial generation in particular as a stereotypical food consumed by that group.",
-    title: "A modern version",
-    date: new Date(),
-    threadId: 3,
-    likes: 3,
-    dislikes: 11,
-    category: 2,
-    replies: [],
-  },
-  4: {
-    author: 2,
-    content: "How large is a Guianan rooster?",
-    title: "A question about roosters",
-    date: new Date(),
-    threadId: 3,
-    likes: 0,
-    dislikes: 0,
-    category: 2,
-    replies: [0],
-  },
-};
-/**
- * Temporary in-memory store of all categories.
- */
-export const categories: { [key: string]: Category } = {};
-
-categories[0] = {
-  title: "dogs",
-  description: "dogs says wuuf",
-  CategoryId: 0,
-};
-
-categories[1] = {
-  title: "cats",
-  description: "cats say mjau",
-  CategoryId: 1,
-};
-
-categories[2] = {
-  title: "Guianan roosters",
-  description: "What does the Guianan rooster say?",
-  CategoryId: 2,
-};
-
-/**
- * Global variable to know what id to assign next thread.
- */
-let id: number = 0;
-
-/**
- * Global variable to know what id to assign next comment.
- */
-let commentID: number = 0;
-
-export const newComment = (): number => {
-  return commentID++;
-};
+// /**
+//  * Temporary in-memory store of all categories.
+//  */
+// export const categories: { [key: string]: Category } = {};
 
 /**
  * The result of a thread service.
@@ -135,7 +54,7 @@ interface CategoryServiceResult {
   /**
    * The thread that was acted upon.
    */
-  category?: Category[];
+  categories?: Category[];
 }
 
 /**
@@ -146,18 +65,19 @@ interface CategoryServiceResult {
 export const getThread = async (
   threadId: number
 ): Promise<ThreadServiceResult> => {
-  const thread = threads[threadId];
-  if (thread) {
+  const thread: Thread | null = await threadModel.findOne({
+    threadId: threadId,
+  });
+  if (!thread) {
     return {
-      statusCode: 200,
-      message: "Thread has successfully been recived.",
-      thread: thread,
+      statusCode: 404,
+      message: "Thread could not be found",
     };
   }
   return {
-    statusCode: 404,
-    message: "Thread could not be found",
-    thread: undefined,
+    statusCode: 200,
+    message: "Thread has successfully been recived.",
+    thread: thread,
   };
 };
 
@@ -171,15 +91,15 @@ export const getThread = async (
 export const getThreadsByAuthor = async (
   userId: number
 ): Promise<ThreadServiceResult> => {
-  const user = users[userId];
+  const userResult: UserServiceResult = await getUser(userId);
+
+  const user = userResult.user;
 
   if (!user) {
     return { statusCode: 404, message: "No user with the given id exists." };
   }
 
-  const authoredThreads = Object.values(threads).filter(
-    (thread) => thread.author === userId
-  );
+  const authoredThreads: Thread[] = await threadModel.find({ author: userId });
 
   return {
     statusCode: 200,
@@ -198,27 +118,20 @@ export const getThreadsByAuthor = async (
 export const getLikedThreads = async (
   userId: number
 ): Promise<ThreadServiceResult> => {
-  const user = users[userId];
+  const userResult: UserServiceResult = await getUser(userId);
+  const user = userResult.user;
+
   if (!user) {
-    return { statusCode: 404, message: "No user with the given id exists." };
+    return userResult;
   }
-  const result: Thread[] = [];
-  Object.keys(threads).forEach((threadId) => {
-    if (user.likedThreads.includes(+threadId)) {
-      result.push(threads[threadId]);
-    }
-  });
-  
-  if (result.length == 0 ){
-    return {statusCode: 200, message: "The user has no liked threads", threads: []}
-  }
-  
-  console.log("threads: ", result);
+
+  const likedThreads: Thread[] = await threadModel.find({ author: userId });
+
   return {
     statusCode: 200,
     message:
       "The threads liked by the user were found and returned successfully.",
-    threads: result,
+    threads: likedThreads,
   };
 };
 
@@ -235,8 +148,19 @@ export const likeThread = async (
   threadId: number,
   userId: number
 ): Promise<ThreadServiceResult> => {
-  const thread = threads[threadId];
-  const user = users[userId];
+  const threadResult: ThreadServiceResult = await getThread(threadId);
+  const userResult: UserServiceResult = await getUser(userId);
+
+  const user = userResult.user;
+  const thread = threadResult.thread;
+
+  if (!user) {
+    return userResult;
+  }
+
+  if (!thread) {
+    return threadResult;
+  }
 
   if (user.dislikedThreads.includes(threadId)) {
     user.dislikedThreads = user.dislikedThreads.filter(
@@ -252,6 +176,10 @@ export const likeThread = async (
     user.likedThreads = user.likedThreads.filter((elem) => elem !== threadId);
     thread.likes--;
   }
+
+  await userModel.updateOne({ userId: userId }, user);
+  await threadModel.updateOne({ threadId: threadId }, thread);
+
   return {
     statusCode: 200,
     message: "Thread like status changed successfully.",
@@ -272,8 +200,19 @@ export const disLikeThread = async (
   threadId: number,
   userId: number
 ): Promise<ThreadServiceResult> => {
-  const thread = threads[threadId];
-  const user = users[userId];
+  const threadResult: ThreadServiceResult = await getThread(threadId);
+  const userResult: UserServiceResult = await getUser(userId);
+
+  const thread = threadResult.thread;
+  const user = userResult.user;
+
+  if (!thread) {
+    return threadResult;
+  }
+
+  if (!user) {
+    return userResult;
+  }
 
   if (user.likedThreads.includes(threadId)) {
     user.likedThreads = user.likedThreads.filter((elem) => elem !== threadId);
@@ -289,6 +228,9 @@ export const disLikeThread = async (
     );
     thread.dislikes--;
   }
+
+  await userModel.updateOne({ userId: userId }, user);
+  await threadModel.updateOne({ threadId: threadId }, thread);
 
   return {
     statusCode: 200,
@@ -313,13 +255,11 @@ export const editThread = async (
   content: string,
   title: string
 ): Promise<ThreadServiceResult> => {
-  const thread: Thread = threads[threadId];
+  const threadResult: ThreadServiceResult = await getThread(threadId);
+  const thread = threadResult.thread;
 
   if (!thread) {
-    return {
-      statusCode: 404,
-      message: "Thread does not exist.",
-    };
+    return threadResult;
   }
 
   const today: Date = new Date();
@@ -333,6 +273,8 @@ export const editThread = async (
   content += date;
   thread.content = content;
   thread.title = title;
+
+  await threadModel.updateOne({ threadId: threadId }, thread);
 
   return {
     statusCode: 200,
@@ -357,13 +299,19 @@ export const commentThread = async (
   threadId: number,
   content: string
 ): Promise<ThreadServiceResult> => {
-  const thread: Thread = threads[threadId];
+  const threadResult: ThreadServiceResult = await getThread(threadId);
+  const thread: Thread | undefined = threadResult.thread;
+
+  if (!thread) {
+    return threadResult;
+  }
+
   const author: number = userId;
   const date: Date = new Date();
   const replies: number[] = [];
   const likes: number = 0;
   const dislikes: number = 0;
-  const commentId: number = commentID++;
+  const commentId: number = new Date().getTime();
   const newComment: Comment = {
     content,
     author,
@@ -372,10 +320,15 @@ export const commentThread = async (
     likes,
     dislikes,
     commentId,
+    isDeleted: false,
+    thread: threadId,
   };
 
   thread.replies.push(commentId);
-  comments[newComment.commentId] = newComment;
+
+  commentModel.create(newComment);
+  threadModel.updateOne({ threadId: threadId }, thread);
+
   return {
     statusCode: 201,
     message: "Thread posted successfully.",
@@ -394,32 +347,33 @@ export const deleteThread = async (
   threadId: number,
   userId: number
 ): Promise<ThreadServiceResult> => {
-  const thread: Thread = threads[threadId];
+  const threadResult: ThreadServiceResult = await getThread(threadId);
+  const userResult: UserServiceResult = await getUser(userId);
 
-  if (userId !== userId) {
+  const user = userResult.user;
+  const thread = threadResult.thread;
+
+  if (!user) {
+    return userResult;
+  }
+
+  if (!thread) {
+    return threadResult;
+  }
+
+  if (userId !== thread.author) {
     return {
       statusCode: 403,
       message: "The user does not have permission to delete this thread.",
     };
   }
 
-  thread.replies.forEach((element: number, index: number): void => {
-    removeReplies(comments[element]);
-    delete thread.replies[index];
-  });
-  delete threads[threadId];
+  commentModel.deleteMany({ thread: threadId });
 
   return {
     statusCode: 200,
     message: "Thread deleted successfully.",
   };
-};
-
-const removeReplies = (reply: Comment): void => {
-  reply.replies.forEach((element: number, index: number): void => {
-    removeReplies(comments[element]);
-    delete reply.replies[index];
-  });
 };
 
 /**
@@ -441,12 +395,23 @@ export const postThread = async (
   title: string,
   content: string
 ): Promise<ThreadServiceResult> => {
-  if (!categories[category]) {
+  const userResult: UserServiceResult = await getUser(userId);
+  const user = userResult.user;
+
+  if (!user) {
+    return userResult;
+  }
+
+  const existingCategory: Category | null = await categoryModel.findOne({
+    CategoryId: category,
+  });
+
+  if (!existingCategory) {
     return { statusCode: 400, message: "The given category was invalid." };
   }
 
   const author: number = userId;
-  const threadId: number = id++;
+  const threadId: number = new Date().getTime();
   const date: Date = new Date();
   const replies: number[] = [];
   const likes: number = 0;
@@ -464,7 +429,8 @@ export const postThread = async (
     threadId,
   };
 
-  threads[threadId] = newThread;
+  threadModel.create(newThread);
+
   return {
     statusCode: 200,
     message: "Thread posted successfully.",
@@ -477,23 +443,12 @@ export const postThread = async (
  * @returns A list of all categories
  */
 export const getCategories = async (): Promise<CategoryServiceResult> => {
-  const category: Category[] = [];
+  const categories: Category[] = await categoryModel.find();
 
-  for (const key in categories) {
-    category.push(categories[key]);
-  }
-
-  if (category.length > 0) {
-    return {
-      statusCode: 200,
-      message: "Categories has successfully been recived.",
-      category: category,
-    };
-  }
   return {
-    statusCode: 404,
-    message: "Categories could not be found",
-    category: undefined,
+    statusCode: 200,
+    message: "The existing categories were found and returned successfully.",
+    categories: categories,
   };
 };
 
@@ -502,25 +457,27 @@ export const getCategories = async (): Promise<CategoryServiceResult> => {
  * @returns A list of three threads
  */
 export const getSampleThreads = async (
-  cat: number
+  categoryId: number
 ): Promise<ThreadServiceResult> => {
-  const threadArr: Thread[] = [];
+  const allCategories = await categoryModel.find();
+  const category: Category | null = await categoryModel.findOne({
+    categoryId: categoryId,
+  });
 
-  for (const key in threads) {
-    if (threads[key].category === cat) threadArr.push(threads[key]);
-    if (threadArr.length === 3) break;
-  }
-
-  if (threadArr.length <= 3) {
+  if (!category) {
     return {
-      statusCode: 200,
-      message: "Threads has successfully been recived.",
-      threads: threadArr,
+      statusCode: 404,
+      message: "No category with the given category id was found.",
     };
   }
+
+  const sampleThreads = await threadModel
+    .find({ category: categoryId })
+    .limit(3);
+
   return {
-    statusCode: 404,
-    message: "Threads could not be found",
-    thread: undefined,
+    statusCode: 200,
+    message: "Threads has successfully been recived.",
+    threads: sampleThreads,
   };
 };

@@ -1,6 +1,5 @@
-import { Schema } from "mongoose";
+import { Schema, model } from "mongoose";
 import { User } from "../model/user.interface";
-import { db } from "./connection";
 
 const userSchema: Schema = new Schema({
   userId: {
@@ -60,4 +59,4 @@ const userSchema: Schema = new Schema({
   },
 });
 
-export const userModel = db.model<User>("User", userSchema);
+export const userModel = model<User>("User", userSchema);

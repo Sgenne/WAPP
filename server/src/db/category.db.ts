@@ -1,6 +1,5 @@
-import { Schema } from "mongoose";
+import { Schema, model } from "mongoose";
 import { Category } from "../model/category.interface";
-import { db } from "./connection";
 
 const categorySchema = new Schema({
   title: {
@@ -13,10 +12,10 @@ const categorySchema = new Schema({
     required: true,
   },
   categoryId: {
-    type: String,
+    type: Number,
     required: true,
     unique: true,
   },
 });
 
-export const categoryModel = db.model<Category>("Category", categorySchema);
+export const categoryModel = model<Category>("Category", categorySchema);

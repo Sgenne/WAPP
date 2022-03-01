@@ -1,6 +1,5 @@
-import { Schema } from "mongoose";
+import { Schema, model } from "mongoose";
 import { Comment } from "../model/comment.interface";
-import { db } from "./connection";
 
 const commentSchema = new Schema({
   content: {
@@ -32,6 +31,10 @@ const commentSchema = new Schema({
     required: true,
     unique: true,
   },
+  isDeleted: {
+    type: Boolean,
+    required: true,
+  },
 });
 
-export const commentModel = db.model<Comment>("Comment", commentSchema);
+export const commentModel = model<Comment>("Comment", commentSchema);

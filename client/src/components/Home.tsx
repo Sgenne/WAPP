@@ -16,8 +16,6 @@ const Home = () => {
       console.log(error);
     }
 
-    console.log("fetched categories: ", categoryResult.data.categories);
-
     setCategetories(categoryResult.data.categories);
   }
 
@@ -27,11 +25,13 @@ const Home = () => {
     getCat();
   }, []);
 
-  const categoryPreviewComponents = categories.map((cat) => (
-    <span key={cat.CategoryId}>
-      <CategoryPreview category={cat} />
-    </span>
-  ));
+  const categoryPreviewComponents = categories.map((cat) => {
+    return (
+      <span key={cat.categoryId}>
+        <CategoryPreview category={cat} />
+      </span>
+    );
+  });
 
   return (
     <div className="wholePage">

@@ -27,4 +27,6 @@ export interface Comment {
    * The unique id of the comment
    */
   commentId: number;
+  isDeleted: boolean;
+  thread: number;
 }

@@ -1,6 +1,5 @@
-import { Schema } from "mongoose";
+import { Schema, model } from "mongoose";
 import { Thread } from "../model/thread.interface";
-import { db } from "./connection";
 
 const threadSchema = new Schema({
   likes: {
@@ -39,7 +38,7 @@ const threadSchema = new Schema({
     type: Number,
     required: true,
     unique: true,
-  },
+  }
 });
 
-export const threadModel = db.model<Thread>("Thread", threadSchema);
+export const threadModel = model<Thread>("Thread", threadSchema);

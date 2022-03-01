@@ -17,7 +17,7 @@ const CategoryPreview = (props: { category: Category }) => {
         threads?: Thread[];
       }>(
         "http://localhost:8080/thread/sampleThreads/" +
-          props.category.CategoryId,
+          props.category.categoryId,
         {}
       );
     } catch (error) {
@@ -41,7 +41,7 @@ const CategoryPreview = (props: { category: Category }) => {
   }
 
   const [open, setOpen] = useState(false);
-  const link = `/category/${props.category.CategoryId}`;
+  const link = `/category/${props.category.categoryId}`;
   return (
     <li className="category-box container-fluid px-4">
       <div className="row">

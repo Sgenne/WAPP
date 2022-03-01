@@ -1,34 +1,14 @@
 import { Comment } from "../model/comment.interface";
 import { User } from "../model/user.interface";
-import { getUser, users } from "./user.service";
-import { newComment } from "./thread.service";
+import { getUser, UserServiceResult } from "./user.service";
+import { commentModel } from "../db/comment.db";
+import { userModel } from "../db/user.db";
 
-export const comments: { [key: string]: Comment } = {
-  0: {
-    content: "Asking for a friend",
-    date: new Date(),
-    author: 2,
-    replies: [],
-    likes: 1,
-    dislikes: 0,
-    commentId: 0,
-  },
-  1: {
-    content:
-      "Wow, what a question. The average Guianan rooster is roughly 24-32 inches.",
-    date: new Date(),
-    author: 1,
-    replies: [],
-    likes: 0,
-    dislikes: 0,
-    commentId: 1,
-  },
-};
 
 /**
  * The result of a comment service.
  */
-interface CommentServiceResult {
+export interface CommentServiceResult {
   /**
    * An HTTP status code describing the result of the attempted operation.
    */
@@ -57,32 +37,57 @@ export const likeComment = async (
   commentId: number,
   userId: number
 ): Promise<CommentServiceResult> => {
-  const comment: Comment = comments[commentId];
-  const user: User = users[userId];
+  const commentResult: CommentServiceResult = await getComment(commentId);
+  const userResult: UserServiceResult = await getUser(userId);
 
-  if (users[comment.author].username === "Deleted") {
+  const comment = commentResult.comment;
+  const user = userResult.user;
+
+  if (!comment) {
+    return commentResult;
+  }
+
+  if (!user) {
+    return userResult;
+  }
+
+  if (comment.isDeleted) {
     return {
       statusCode: 400,
       message: "The specified comment is deleted.",
     };
   }
 
+  let updatedLikes = comment.likes;
+  let updatedLikedComments = user.likedComments;
+  let updatedDislikedComments = user.dislikedComments;
+
   if (user.dislikedComments.includes(commentId)) {
-    user.dislikedComments = user.dislikedComments.filter(
+    updatedDislikedComments = user.dislikedComments.filter(
       (elem) => elem !== commentId
     );
-    comment.dislikes--;
+
+    if (!user.likedComments.includes(commentId)) {
+      updatedLikedComments = [...user.likedComments, commentId];
+      updatedLikes++;
+    } else {
+      updatedLikedComments = user.likedComments.filter(
+        (elem) => elem !== commentId
+      );
+      updatedLikes--;
+    }
   }
 
-  if (!user.likedComments.includes(commentId)) {
-    user.likedComments.push(commentId);
-    comment.likes++;
-  } else {
-    user.likedComments = user.likedComments.filter(
-      (elem) => elem !== commentId
-    );
-    comment.likes--;
-  }
+  userModel.updateOne(
+    { userId: userId },
+    {
+      dislikedComments: updatedDislikedComments,
+      likedComments: updatedLikedComments,
+    }
+  );
+  commentModel.updateOne({ commentId: commentId }, { likes: updatedLikes });
+
+  comment.likes = updatedLikes;
 
   return {
     statusCode: 200,
@@ -101,32 +106,61 @@ export const disLikeComment = async (
   commentId: number,
   userId: number
 ): Promise<CommentServiceResult> => {
-  const comment: Comment = comments[commentId];
-  const user: User = users[userId];
+  const commentResult: CommentServiceResult = await getComment(commentId);
+  const userResult: UserServiceResult = await getUser(userId);
 
-  if (users[comment.author].username === "Deleted") {
+  const comment = commentResult.comment;
+  const user = userResult.user;
+
+  if (!comment) {
+    return commentResult;
+  }
+
+  if (!user) {
+    return userResult;
+  }
+
+  if (comment.isDeleted) {
     return {
       statusCode: 400,
       message: "The specified comment is deleted.",
     };
   }
 
+  let updatedDislikes = comment.dislikes;
+  let updatedLikedComments = user.likedComments;
+  let updatedDislikedComments = user.dislikedComments;
+
   if (user.likedComments.includes(commentId)) {
-    user.likedComments = user.likedComments.filter(
+    updatedLikedComments = user.likedComments.filter(
       (elem) => elem !== commentId
     );
-    comment.dislikes--;
+    updatedDislikes--;
   }
 
   if (!user.dislikedComments.includes(commentId)) {
-    user.dislikedComments.push(commentId);
-    comment.dislikes++;
+    updatedDislikedComments = [...user.dislikedComments, commentId];
+    updatedDislikes++;
   } else {
-    user.dislikedComments = user.dislikedComments.filter(
+    updatedDislikedComments = user.dislikedComments.filter(
       (elem) => elem !== commentId
     );
-    comment.dislikes--;
+    updatedDislikes--;
   }
+
+  userModel.updateOne(
+    { userId: userId },
+    {
+      dislikedComments: updatedDislikedComments,
+      likedComments: updatedLikedComments,
+    }
+  );
+  commentModel.updateOne(
+    { commentId: commentId },
+    { dislikes: updatedDislikes }
+  );
+
+  comment.dislikes = updatedDislikes;
 
   return {
     statusCode: 200,
@@ -144,17 +178,20 @@ export const disLikeComment = async (
 export const getComment = async (
   commentId: number
 ): Promise<CommentServiceResult> => {
-  const comment = comments[commentId];
-  if (comment) {
+  const comment: Comment | null = await commentModel.findOne({
+    commentId: commentId,
+  });
+
+  if (!comment) {
     return {
-      statusCode: 200,
-      message: "Comment has successfully been recived.",
-      comment: comment,
+      statusCode: 404,
+      message: "Comment could not be found",
     };
   }
+
   return {
-    statusCode: 404,
-    message: "Comment could not be found",
+    statusCode: 200,
+    message: "Comment has successfully been recived.",
     comment: comment,
   };
 };
@@ -167,7 +204,7 @@ export const getComment = async (
 export const getCommentsByAuthor = async (
   userId: number
 ): Promise<CommentServiceResult> => {
-  const result = await getUser(userId);
+  const result: UserServiceResult = await getUser(userId);
 
   const user = result.user;
 
@@ -175,9 +212,9 @@ export const getCommentsByAuthor = async (
     return result;
   }
 
-  const createdComments = Object.values(comments).filter(
-    (comment) => comment.author === userId
-  );
+  const createdComments: Comment[] = await commentModel.find({
+    author: userId,
+  });
 
   return {
     statusCode: 200,
@@ -186,19 +223,23 @@ export const getCommentsByAuthor = async (
   };
 };
 
+/**
+ * Returns the comments liked by a specified user.
+ *
+ * @param userId - The id of the user.
+ */
 export const getLikedComments = async (userId: number) => {
-  const { user, statusCode, message } = await getUser(userId);
+  const userResult: UserServiceResult = await getUser(userId);
+
+  const user = userResult.user;
 
   if (!user) {
-    return {
-      statusCode: statusCode,
-      message: message,
-    };
+    return userResult;
   }
 
-  const likedComments = Object.values(comments).filter((comment) =>
-    user.likedComments.includes(comment.commentId)
-  );
+  const likedComments = await commentModel.find({
+    commentId: { $in: user.likedComments },
+  });
 
   return {
     statusCode: 200,
@@ -219,7 +260,12 @@ export const editComment = async (
   content: string,
   userId: number
 ): Promise<CommentServiceResult> => {
-  const comment: Comment = comments[commentId];
+  const commentResult: CommentServiceResult = await getComment(commentId);
+  const comment = commentResult.comment;
+
+  if (!comment) {
+    return commentResult;
+  }
 
   if (comment.author !== userId) {
     return {
@@ -228,9 +274,10 @@ export const editComment = async (
     };
   }
 
-  if (users[comment.author].username !== "Deleted") {
+  if (!comment.isDeleted) {
     comment.content = content + "\nedited";
   }
+
   return {
     statusCode: 200,
     message: "Comment edited successfully.",
@@ -247,7 +294,13 @@ export const deleteComment = async (
   commentId: number,
   userId: number
 ): Promise<CommentServiceResult> => {
-  const comment: Comment = comments[commentId];
+  const commentResult: CommentServiceResult = await getComment(commentId);
+
+  const comment = commentResult.comment;
+
+  if (!comment) {
+    return commentResult;
+  }
 
   if (comment.author !== userId) {
     return {
@@ -256,7 +309,7 @@ export const deleteComment = async (
     };
   }
 
-  if (users[comment.author].username === "Deleted") {
+  if (comment.isDeleted) {
     return {
       statusCode: 403,
       message: "The comment is already deleted.",
@@ -267,6 +320,9 @@ export const deleteComment = async (
   comment.content = "";
   comment.dislikes = 0;
   comment.likes = 0;
+  comment.isDeleted = true;
+
+  commentModel.updateOne({ commentId: commentId }, comment);
 
   return {
     statusCode: 200,
@@ -286,13 +342,31 @@ export const postReply = async (
   content: string,
   userId: number
 ): Promise<CommentServiceResult> => {
-  let root: Comment = comments[commentIdRoot];
-  let author: number = userId;
-  let date: Date = new Date();
-  let replies: number[] = [];
-  let likes: number = 0;
-  let dislikes: number = 0;
-  let commentId: number = getCommentID();
+  const userResult: UserServiceResult = await getUser(userId);
+  const rootCommentResult: CommentServiceResult = await getComment(
+    commentIdRoot
+  );
+  const root: Comment | undefined = rootCommentResult.comment;
+  const user: User | undefined = userResult.user;
+
+  if (!user) {
+    return userResult;
+  }
+
+  if (!root) {
+    return {
+      statusCode: 404,
+      message: "No comment with the given root comment id exists.",
+    };
+  }
+
+  const author: number = userId;
+  const date: Date = new Date();
+  const replies: number[] = [];
+  const likes: number = 0;
+  const dislikes: number = 0;
+  const commentId: number = new Date().getTime();
+  const thread: number = root.thread;
   const newComment: Comment = {
     content,
     author,
@@ -301,15 +375,17 @@ export const postReply = async (
     likes,
     dislikes,
     commentId,
+    thread,
+    isDeleted: false,
   };
   root.replies.push(commentId);
+
+  commentModel.create(newComment);
+  commentModel.updateOne({ commentId: commentIdRoot }, root);
+
   return {
     statusCode: 201,
     message: "Reply posted successfully",
     comment: newComment,
   };
 };
-
-function getCommentID(): number {
-  return newComment();
-}

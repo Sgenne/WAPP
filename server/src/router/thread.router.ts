@@ -9,8 +9,6 @@ import {
   hasValidThreadTitle,
 } from "../utils/validation.util";
 import { isAuthenticated } from "../utils/auth.util";
-import { threadId } from "worker_threads";
-import { getUser } from "../service/user.service";
 
 export const threadRouter = Router();
 
@@ -152,7 +150,7 @@ threadRouter.get("/categories", async (req: Request, res: Response) => {
 
   res
     .status(200)
-    .send({ message: result.message, categories: result.category });
+    .send({ message: result.message, categories: result.categories });
 });
 
 threadRouter.get(
@@ -166,9 +164,7 @@ threadRouter.get(
       return res.status(result.statusCode).send({ message: result.message });
     }
 
-    res
-      .status(200)
-      .send({ message: result.message, categories: result.threads });
+    res.status(200).send({ message: result.message, threads: result.threads });
   }
 );
 
