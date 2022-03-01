@@ -1,36 +1,9 @@
 import { Comment } from "../model/comment.interface";
 import { User } from "../model/user.interface";
-<<<<<<< HEAD
 import { getUser, UserServiceResult } from "./user.service";
 import { commentModel } from "../db/comment.db";
 import { userModel } from "../db/user.db";
 
-=======
-import { getUser, users } from "./user.service";
-import { newComment } from "./thread.service";
-
-export const comments: { [key: string]: Comment } = {
-  0: {
-    content: "Asking for a friend",
-    date: new Date(),
-    author: 2,
-    replies: [],
-    likes: 1,
-    dislikes: 0,
-    commentId: 0,
-  },
-  1: {
-    content:
-      "Wow, what a question. The average Guianan rooster is roughly 24-32 inches.",
-    date: new Date(),
-    author: 1,
-    replies: [0],
-    likes: 0,
-    dislikes: 0,
-    commentId: 1,
-  },
-};
->>>>>>> main
 
 /**
  * The result of a comment service.
