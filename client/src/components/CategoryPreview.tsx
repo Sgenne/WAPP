@@ -10,7 +10,7 @@ import { NavLink } from "react-router-dom";
 const CategoryPreview = (props: { category: Category }) => {
   const [threads, setThreads] = useState<Thread[]>([]);
 
-  async function getCat() {
+  async function getThreads() {
     try {
       threadResult = await axios.get<{
         message: string;
@@ -29,7 +29,7 @@ const CategoryPreview = (props: { category: Category }) => {
   let threadResult: AxiosResponse;
 
   useEffect(() => {
-    getCat();
+    getThreads();
   }, []);
   let ThreadPreviewContent;
   if (threads) {

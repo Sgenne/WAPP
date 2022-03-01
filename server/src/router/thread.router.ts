@@ -36,7 +36,7 @@ threadRouter.put(
 );
 
 threadRouter.put(
-  "/disLikeThread",
+  "/dislikeThread",
   hasValidThreadId,
   handleValidationResult,
   isAuthenticated,
@@ -83,21 +83,16 @@ threadRouter.put(
 );
 
 threadRouter.post(
-  "/commentThread",
-  hasValidThreadId,
+  "/reply",
   hasContent,
   handleValidationResult,
   isAuthenticated,
   async (req: Request, res: Response) => {
-    const threadID = req.body.threadId;
+    const id = req.body.threadId;
     const content = req.body.content;
     const userId = req.body.userId;
 
-    const result = await threadServices.commentThread(
-      userId,
-      threadID,
-      content
-    );
+    const result = await threadServices.commentThread(userId, id, content);
 
     if (result.statusCode !== 201) {
       return res.status(result.statusCode).send({ message: result.message });
@@ -119,7 +114,7 @@ threadRouter.post(
   isAuthenticated,
   async (req: Request, res: Response) => {
     const userId = req.body.userId;
-    const categoryId = req.body.categoryId;
+    const categoryId = +req.body.categoryId;
     const title = req.body.title;
     const content = req.body.content;
 
@@ -168,17 +163,22 @@ threadRouter.get(
   }
 );
 
-threadRouter.get("/:threadId", async (req: Request, res: Response) => {
-  const threadId = req.params.threadId;
+threadRouter.get(
+  "/commentComments/:commentId",
+  async (req: Request, res: Response) => {
+    const result = await threadServices.getCommentComments(
+      +req.params.commentId
+    );
 
-  const result = await threadServices.getThread(+threadId);
+    if (result.statusCode !== 200) {
+      return res.status(result.statusCode).send({ message: result.message });
+    }
 
-  if (result.statusCode !== 200) {
-    return res.status(result.statusCode).send({ message: result.message });
+    res
+      .status(200)
+      .send({ message: result.message, comments: result.comments });
   }
-
-  res.status(200).send({ message: result.message, user: result.thread });
-});
+);
 
 threadRouter.get("/author/:userId", async (req: Request, res: Response) => {
   const userId = req.params.userId;
@@ -225,3 +225,14 @@ threadRouter.delete(
     });
   }
 );
+threadRouter.get("/:threadId", async (req: Request, res: Response) => {
+  const threadId = +req.params.threadId;
+
+  const result = await threadServices.getThread(threadId);
+
+  if (result.statusCode !== 200) {
+    return res.status(result.statusCode).send({ message: result.message });
+  }
+
+  res.status(200).send({ message: result.message, thread: result.thread });
+});

@@ -6,7 +6,8 @@ import { useParams } from "react-router-dom";
 import { Thread } from "../../../server/src/model/thread.interface";
 import { AuthContext } from "../context/AuthContext";
 
-const CreateThread = () => {
+const CreateComment = () => {
+  const authContext = useContext(AuthContext);
   const params = useParams();
   const category = params.category;
   const [value, setValue] = useState("");
@@ -16,18 +17,20 @@ const CreateThread = () => {
   ) => {
     setValue2(event.target.value);
   };
-  const authContext = useContext(AuthContext);
+  if (params.type != "thread" && params.type != "comment") {
+    return <div>Invald type</div>;
+  }
 
   const submitClickHandler = async () => {
     let signInResult: AxiosResponse;
     try {
       signInResult = await axios.post<{ message: string; thread?: Thread }>(
-        "http://localhost:8080/thread/postThread/",
+        "http://localhost:8080/" + params.type + "/reply/",
         {
           userId: authContext.userId,
           password: authContext.password,
           categoryId: category,
-          title: value2,
+          id: params.id,
           content: value,
         }
       );
@@ -59,12 +62,6 @@ const CreateThread = () => {
         </li>
         <li>
           <div id="postthread">
-            <input
-              id="threadinput"
-              placeholder="Thread title"
-              onChange={createThreadChangeHandler}
-            />
-
             <ReactQuill
               id="quill"
               theme="snow"
@@ -88,4 +85,4 @@ const CreateThread = () => {
   );
 };
 
-export default CreateThread;
+export default CreateComment;

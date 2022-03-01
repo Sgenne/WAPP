@@ -103,22 +103,21 @@ commentRouter.put(
 );
 
 commentRouter.post(
-  "/replyComment",
-  hasValidCommentId,
+  "/reply",
   hasContent,
   hasUsername,
   handleValidationResult,
   isAuthenticated,
   async (req: Request, res: Response) => {
-    const commentID = req.body.commentID;
+    const id = req.body.commentID;
     const content = req.body.content;
     const username = req.body.username;
 
-    if (!(content && commentID && username)) {
+    if (!(content && id && username)) {
       return res.status(400).send({ message: "Invalid input." });
     }
 
-    const result = await commentService.postReply(commentID, content, username);
+    const result = await commentService.postReply(id, content, username);
 
     if (result.statusCode !== 200) {
       return res.status(result.statusCode).send({ message: result.message });

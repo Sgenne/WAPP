@@ -7,11 +7,6 @@ import { userModel } from "../db/user.db";
 import { commentModel } from "../db/comment.db";
 import { categoryModel } from "../db/category.db";
 
-// /**
-//  * Temporary in-memory store of all categories.
-//  */
-// export const categories: { [key: string]: Category } = {};
-
 /**
  * The result of a thread service.
  */
@@ -35,6 +30,8 @@ interface ThreadServiceResult {
    * The threads that were acted upon if the service was successfull.
    */
   threads?: Thread[];
+
+  comments?: Comment[];
 }
 
 /**
@@ -432,7 +429,7 @@ export const postThread = async (
   threadModel.create(newThread);
 
   return {
-    statusCode: 200,
+    statusCode: 201,
     message: "Thread posted successfully.",
     thread: newThread,
   };
@@ -479,5 +476,68 @@ export const getSampleThreads = async (
     statusCode: 200,
     message: "Threads has successfully been recived.",
     threads: sampleThreads,
+  };
+};
+
+export const getCategoryThreads = async (
+  cat: number
+): Promise<ThreadServiceResult> => {
+  const threadArr: Thread[] = await threadModel.find({ category: cat });
+
+  return {
+    statusCode: 200,
+    message: "Threads has successfully been recived.",
+    threads: threadArr,
+  };
+};
+
+export const getThreadComments = async (
+  threadId: number
+): Promise<ThreadServiceResult> => {
+  const thread: Thread | null = await threadModel.findOne({
+    threadId: threadId,
+  });
+
+  if (!thread) {
+    return {
+      statusCode: 404,
+      message: "There are no comments",
+      thread: undefined,
+    };
+  }
+
+  const commentArr = await commentModel.find({
+    commentId: { $in: thread.replies },
+  });
+
+  return {
+    statusCode: 200,
+    message: "Comments has successfully been recived.",
+    comments: commentArr,
+  };
+};
+
+export const getCommentComments = async (
+  rootId: number
+): Promise<ThreadServiceResult> => {
+  const comment: Comment | null = await commentModel.findOne({
+    commentId: rootId,
+  });
+
+  if (!comment) {
+    return {
+      statusCode: 404,
+      message: "No comment with the given root comment id exists.",
+    };
+  }
+
+  const commentArr: Comment[] = await commentModel.find({
+    commentId: { $in: comment.replies },
+  });
+
+  return {
+    statusCode: 200,
+    message: "Comments has successfully been recived.",
+    comments: commentArr,
   };
 };
