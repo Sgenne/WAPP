@@ -98,7 +98,7 @@ threadRouter.post(
       return res.status(result.statusCode).send({ message: result.message });
     }
 
-    res.status(200).send({
+    res.status(201).send({
       message: "Comment posted successfully.",
       thread: result.thread,
     });

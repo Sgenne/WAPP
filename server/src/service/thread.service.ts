@@ -322,13 +322,14 @@ export const commentThread = async (
   };
 
   thread.replies.push(commentId);
-
-  commentModel.create(newComment);
-  threadModel.updateOne({ threadId: threadId }, thread);
+  //const updatedReplies = [...thread.replies, commentId];
+  //console.log(updatedReplies);
+  await commentModel.create(newComment);
+  await threadModel.updateOne({ threadId: threadId }, {replies: thread.replies});
 
   return {
     statusCode: 201,
-    message: "Thread posted successfully.",
+    message: "Comment posted successfully.",
     thread: thread,
   };
 };

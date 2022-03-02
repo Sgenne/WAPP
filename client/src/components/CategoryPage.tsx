@@ -9,7 +9,7 @@ const CategoryPage = () => {
   const category = param.category;
   const [threads, setThreads] = useState<Thread[]>([]);
 
-  async function getCat() {
+  async function getCategory() {
     try {
       threadResult = await axios.get<{
         message: string;
@@ -24,7 +24,7 @@ const CategoryPage = () => {
   let threadResult: AxiosResponse;
 
   useEffect(() => {
-    getCat();
+    getCategory();
   }, []);
   let ThreadPreviewContent;
   if (threads) {

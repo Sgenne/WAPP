@@ -86,9 +86,10 @@ const ThreadPreview = (props: { thread: Thread }) => {
           <img src={discrod} className="row__avatar" />
           <div className="col row">
             <h3 className="thread-title col-12">
-              <a href={id} className="link">
+            <NavLink to={id} className="link">
                 {title}
-              </a>
+              </NavLink>
+             
             </h3>
             <p className="row__thread-title col-3">
               <NavLink to={`/profile/${author}`} className="link">

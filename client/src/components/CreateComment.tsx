@@ -30,7 +30,8 @@ const CreateComment = () => {
           userId: authContext.userId,
           password: authContext.password,
           categoryId: category,
-          id: params.id,
+          threadId: params.id,
+          commentID: params.id,
           content: value,
         }
       );
