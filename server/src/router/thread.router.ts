@@ -7,6 +7,7 @@ import {
   hasUsername,
   hasValidThreadId,
   hasValidThreadTitle,
+  hasValidUserId,
 } from "../utils/validation.util";
 import { isAuthenticated } from "../utils/auth.util";
 
@@ -14,15 +15,15 @@ export const threadRouter = Router();
 
 threadRouter.put(
   "/likeThread",
+  hasValidUserId,
   hasValidThreadId,
-  hasUsername,
   handleValidationResult,
   isAuthenticated,
   async (req: Request, res: Response) => {
     const threadID = req.body.threadId;
-    const username = req.body.username;
+    const userId = req.body.userId;
 
-    const result = await threadServices.likeThread(threadID, username);
+    const result = await threadServices.likeThread(threadID, userId);
 
     if (result.statusCode !== 200) {
       return res.status(result.statusCode).send({ message: result.message });
@@ -37,6 +38,7 @@ threadRouter.put(
 
 threadRouter.put(
   "/dislikeThread",
+  hasValidUserId,
   hasValidThreadId,
   handleValidationResult,
   isAuthenticated,

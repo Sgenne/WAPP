@@ -5,12 +5,15 @@ import "react-quill/dist/quill.snow.css";
 import { useParams } from "react-router-dom";
 import { Thread } from "../../../server/src/model/thread.interface";
 import { AuthContext } from "../context/AuthContext";
+import ErrorMessage from "./ErrorMessage";
 
 const CreateThread = () => {
+  const gg = "<p><b>hej<b></p>";
   const params = useParams();
   const category = params.category;
   const [value, setValue] = useState("");
   const [value2, setValue2] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const createThreadChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -31,9 +34,15 @@ const CreateThread = () => {
           content: value,
         }
       );
-
+      setErrorMessage("");
       console.log(signInResult.data);
     } catch (error) {
+      if (!(axios.isAxiosError(error) && error.response)) {
+        setErrorMessage("Something went wrong while signing in.");
+        return;
+      }
+
+      setErrorMessage(error.response.data.message);
       console.log(error);
       return;
     }
@@ -50,27 +59,20 @@ const CreateThread = () => {
               </h3>
             </div>
             <div className="thread-desc">
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-                malesuada odio at magna faucibus, eget mollis erat tempor.
-              </p>
+              <p>Edit in the future</p>
             </div>
           </div>
         </li>
         <li>
           <div id="postthread">
             <input
+              maxLength={54}
               id="threadinput"
               placeholder="Thread title"
               onChange={createThreadChangeHandler}
             />
 
-            <ReactQuill
-              id="quill"
-              theme="snow"
-              value={value}
-              onChange={setValue}
-            />
+            <ReactQuill value={value} onChange={setValue} />
 
             <div id="submitbut">
               <button
@@ -80,6 +82,9 @@ const CreateThread = () => {
               >
                 Submit Thread
               </button>
+            </div>
+            <div>
+              <ErrorMessage>{errorMessage}</ErrorMessage>
             </div>
           </div>
         </li>

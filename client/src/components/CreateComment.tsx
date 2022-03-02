@@ -5,18 +5,15 @@ import "react-quill/dist/quill.snow.css";
 import { useParams } from "react-router-dom";
 import { Thread } from "../../../server/src/model/thread.interface";
 import { AuthContext } from "../context/AuthContext";
+import ErrorMessage from "./ErrorMessage";
 
 const CreateComment = () => {
   const authContext = useContext(AuthContext);
   const params = useParams();
   const category = params.category;
   const [value, setValue] = useState("");
-  const [value2, setValue2] = useState("");
-  const createThreadChangeHandler = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setValue2(event.target.value);
-  };
+  const [errorMessage, setErrorMessage] = useState("");
+
   if (params.type != "thread" && params.type != "comment") {
     return <div>Invald type</div>;
   }
@@ -38,6 +35,12 @@ const CreateComment = () => {
 
       console.log(signInResult.data);
     } catch (error) {
+      if (!(axios.isAxiosError(error) && error.response)) {
+        setErrorMessage("Something went wrong while signing in.");
+        return;
+      }
+
+      setErrorMessage(error.response.data.message);
       console.log(error);
       return;
     }
@@ -50,7 +53,7 @@ const CreateComment = () => {
           <div className="category-box container-fluid px-4">
             <div className="row1">
               <h3 className="thread-title">
-                You are about to create a thread under category {category}
+                You are about to create a comment for {params.type} {params.id}
               </h3>
             </div>
             <div className="thread-desc">
@@ -78,6 +81,9 @@ const CreateComment = () => {
               >
                 Submit Thread
               </button>
+            </div>
+            <div>
+              <ErrorMessage>{errorMessage}</ErrorMessage>
             </div>
           </div>
         </li>

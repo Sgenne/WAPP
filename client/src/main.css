@@ -221,7 +221,7 @@ header {
   margin-left: 5px;
 }
 
-.threadPrevCont {
+#threadPrevCont {
   text-overflow: ellipsis;
   overflow: hidden;
   display: -webkit-box;
@@ -274,11 +274,7 @@ header {
   justify-content: flex-end;
 }
 
-#quill {
-  background-color: #ffffff;
-}
-
-.ql-container {
+.ql-editor {
   background-color: #ffffff;
   min-height: 200px;
 }
@@ -402,4 +398,6 @@ header {
   flex-direction: column;
 }
 
-
+.ql-toolbar {
+  display: none;
+}
