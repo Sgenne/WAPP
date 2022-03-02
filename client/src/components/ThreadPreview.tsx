@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import { useState, useEffect, useContext } from "react";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
+import { NavLink } from "react-router-dom";
 import { Thread } from "../../../server/src/model/thread.interface";
 import { User } from "../../../server/src/model/user.interface";
 import { AuthContext } from "../context/AuthContext";
@@ -90,11 +91,15 @@ const ThreadPreview = (props: { thread: Thread }) => {
               </a>
             </h3>
             <p className="row__thread-title col-3">
-              <a href="thread.html" className="link">
+              <NavLink to={`/profile/${author}`} className="link">
                 {author}
-              </a>
+              </NavLink>
             </p>
-            <p className="row__thread-title col-4">{new Date(date).toLocaleDateString() + " " + new Date(date).toLocaleTimeString()}</p>
+            <p className="row__thread-title col-4">
+              {new Date(date).toLocaleDateString() +
+                " " +
+                new Date(date).toLocaleTimeString()}
+            </p>
           </div>
         </div>
         <div className="category-box__thread-desc">
