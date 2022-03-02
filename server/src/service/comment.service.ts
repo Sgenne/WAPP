@@ -228,7 +228,7 @@ export const getCommentsByAuthor = async (
  *
  * @param userId - The id of the user.
  */
-export const getLikedComments = async (userId: number) => {
+export const getLikedComments = async (userId: number): Promise<CommentServiceResult> => {
   const userResult: UserServiceResult = await getUser(userId);
 
   const user = userResult.user;

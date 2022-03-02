@@ -149,6 +149,21 @@ threadRouter.get("/categories", async (req: Request, res: Response) => {
 });
 
 threadRouter.get(
+  "/categoryThreads/:categoryId",
+  async (req: Request, res: Response) => {
+    const result = await threadServices.getCategoryThreads(
+      +req.params.categoryId
+    );
+
+    if (result.statusCode !== 200) {
+      return res.status(result.statusCode).send({ message: result.message });
+    }
+
+    res.status(200).send({ message: result.message, threads: result.threads });
+  }
+);
+
+threadRouter.get(
   "/sampleThreads/:categoryId",
   async (req: Request, res: Response) => {
     const result = await threadServices.getSampleThreads(
