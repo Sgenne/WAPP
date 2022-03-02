@@ -322,8 +322,6 @@ export const commentThread = async (
   };
 
   thread.replies.push(commentId);
-  //const updatedReplies = [...thread.replies, commentId];
-  //console.log(updatedReplies);
   await commentModel.create(newComment);
   await threadModel.updateOne({ threadId: threadId }, {replies: thread.replies});
 

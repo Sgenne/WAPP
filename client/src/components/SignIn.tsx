@@ -74,6 +74,7 @@ const SignIn = () => {
         <div className="sign-in__input-container">
           <label>Username: </label>
           <input
+            autoFocus
             type="text"
             name="username"
             className="sign-in__username-input"

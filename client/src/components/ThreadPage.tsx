@@ -8,6 +8,9 @@ import { Comment } from "../../../server/src/model/comment.interface";
 import ThreadComment from "./ThreadComment";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import ReactQuill from "react-quill";
+import ErrorMessage from "./ErrorMessage";
+import { formatDate } from "../utils/formatUtils";
 
 const ThreadPage = () => {
   const navigate = useNavigate();
@@ -17,6 +20,7 @@ const ThreadPage = () => {
   const [user, setuser] = useState<User>();
   const [threadObject, setThreadObject] = useState<Thread>();
   const [comments, setComments] = useState<Comment[]>();
+  const [errorMessage, setErrorMessage] = useState("");
 
   const authContext = useContext(AuthContext);
 
@@ -110,8 +114,15 @@ const ThreadPage = () => {
           username: authContext.userId,
         }
       );
+      setErrorMessage("");
       console.log(likeResult.data);
     } catch (error) {
+      if (!(axios.isAxiosError(error) && error.response)) {
+        setErrorMessage("Something went wrong while trying to like the thread.");
+        return;
+      }
+
+      setErrorMessage(error.response.data.message);
       console.log(error);
       return;
     }
@@ -129,9 +140,15 @@ const ThreadPage = () => {
           username: authContext.userId,
         }
       );
-
+      setErrorMessage("");
       console.log(dislikeResult.data);
     } catch (error) {
+      if (!(axios.isAxiosError(error) && error.response)) {
+        setErrorMessage("Something went wrong while trying to dislike the thread.");
+        return;
+      }
+
+      setErrorMessage(error.response.data.message);
       console.log(error);
       return;
     }
@@ -143,7 +160,7 @@ const ThreadPage = () => {
 
   const title = threadObject.title;
   const context = threadObject.content;
-  const discrod = user.image.imageUrl;
+  const userImage = user.image.imageUrl;
   const likes = threadObject.likes;
   const dislikes = threadObject.dislikes;
   const date = threadObject.date;
@@ -153,7 +170,7 @@ const ThreadPage = () => {
         <li>
           <div className="category-box container-fluid px-4">
             <div className="row">
-              <img src={discrod} className="row__avatar" />
+              <img src={userImage} className="row__avatar" />
               <div className="col row">
                 <h3 className="thread-title col-12">{title}</h3>
                 <p className="row__thread-title col-3">
@@ -162,14 +179,16 @@ const ThreadPage = () => {
                   </a>
                 </p>
                 <p className="row__thread-title col-4">
-                  {new Date(date).toLocaleDateString() +
-                    " " +
-                    new Date(date).toLocaleTimeString()}
+                  {formatDate(new Date(date))}
                 </p>
               </div>
             </div>
             <div className="category-box__thread-desc">
-              <p>{context}</p>
+            <ReactQuill
+              readOnly
+              value={context}
+            />
+              {/* <p>{context}</p> */}
             </div>
             <div className="row">
               <button className="col-2" onClick={likeClickHandler}>
@@ -183,6 +202,9 @@ const ThreadPage = () => {
               <button className="col-2" onClick={replyClickHandler}>
                 Reply
               </button>
+            </div>
+            <div>
+              <ErrorMessage>{errorMessage}</ErrorMessage>
             </div>
           </div>
         </li>
