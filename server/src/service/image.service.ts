@@ -1,8 +1,7 @@
-import { unlink, writeFile } from "fs/promises";
 import path from "path";
-import { HOST, PORT } from "../utils/app.util";
 import { Image } from "../model/image.interface";
 import { imageFolderPath } from "../utils/image.util";
+import { imageStorage } from "../imageStorage/image.storage";
 
 export const DEFAULT_IMAGE: Image = {
   imageUrl:
@@ -41,21 +40,17 @@ export const storeImage = async (image: {
   imageBuffer: Buffer;
   filename: string;
 }): Promise<ImageServiceResult> => {
-  const imageId: number = new Date().getTime();
-  const newName: string = imageId + image.filename;
-  const imagePath: string = getImagePath(newName);
+  const filenamePrefix: number = new Date().getTime();
+  const newName: string = filenamePrefix + image.filename;
+  let storedImage: Image;
 
   try {
-    await writeFile(imagePath, image.imageBuffer);
+    storedImage = await imageStorage.storeImage(image.imageBuffer, newName);
   } catch (error) {
-    return { statusCode: 500, message: "The image could not be stored." };
+    const message =
+      error instanceof Error ? error.message : "The image could not be stored.";
+    return { statusCode: 500, message: message };
   }
-
-  const imageUrl: string = `${HOST}:${PORT}/${imagePath}`;
-  const storedImage: Image = {
-    imageUrl: imageUrl,
-    filename: newName,
-  };
 
   return {
     statusCode: 201,
@@ -67,14 +62,12 @@ export const storeImage = async (image: {
 export const deleteImage = async (
   image: Image
 ): Promise<ImageServiceResult> => {
-  const imagePath = getImagePath(image.filename);
   try {
-    await unlink(imagePath);
+    await imageStorage.deleteImage(image);
   } catch (error) {
-    return {
-      statusCode: 500,
-      message: "The image could not be deleted from the file system.",
-    };
+    const message =
+      error instanceof Error ? error.message : "The image could not be stored.";
+    return { statusCode: 500, message: message };
   }
 
   return {
