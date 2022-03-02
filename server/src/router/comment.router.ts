@@ -109,7 +109,7 @@ commentRouter.post(
   handleValidationResult,
   isAuthenticated,
   async (req: Request, res: Response) => {
-    const id = req.body.commentID;
+    const id = req.body.id;
     const content = req.body.content;
     const username = req.body.username;
 
@@ -162,5 +162,5 @@ commentRouter.get("/:commentId", async (req: Request, res: Response) => {
     return res.status(result.statusCode).send({ message: result.message });
   }
 
-  res.status(200).send({ message: result.message, user: result.comment });
+  res.status(200).send({ message: result.message, comment: result.comment });
 });

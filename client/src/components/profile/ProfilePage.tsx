@@ -125,6 +125,7 @@ const ProfilePage = () => {
         header={thread.title}
         content={thread.content}
         info={`Posted at: ${formatDate(new Date(thread.date))}`}
+        link={`/thread/${thread.threadId}`}
       />
     ));
     setListItems(threadListItems);
@@ -140,6 +141,7 @@ const ProfilePage = () => {
       <ProfileListItem
         content={comment.content}
         info={`Posted at: ${formatDate(new Date(comment.date))}`}
+        link={`/thread/${comment.rootThread}`}
       />
     ));
     setListItems(commentListItems);
@@ -151,6 +153,7 @@ const ProfilePage = () => {
         header={thread.title}
         content={thread.content}
         info={`Posted at: ${formatDate(new Date(thread.date))}`}
+        link={`/thread/${thread.threadId}`}
       />
     ));
     setListItems(threadListItems);
@@ -161,6 +164,7 @@ const ProfilePage = () => {
       <ProfileListItem
         content={comment.content}
         info={`Posted at: ${formatDate(new Date(comment.date))}`}
+        //link={`/thread/${comment.thread}`}
       />
     ));
     setListItems(commentListItems);
@@ -175,8 +179,8 @@ const ProfilePage = () => {
   };
 
   const updateOwnerHandler = (updatedOwner: User) => {
-    setOwner(updatedOwner)
-  }
+    setOwner(updatedOwner);
+  };
 
   if (error) return <div>{error.message}</div>;
   if (!owner) return <div>Loading...........</div>;
@@ -186,7 +190,11 @@ const ProfilePage = () => {
   return (
     <div className="profile-page">
       {showSettings && (
-        <EditProfilePopup owner={owner} onClose={hideSettingsHandler} onUpdateOwner={updateOwnerHandler} />
+        <EditProfilePopup
+          owner={owner}
+          onClose={hideSettingsHandler}
+          onUpdateOwner={updateOwnerHandler}
+        />
       )}
       <div className="profile-page__userInfo">
         <img

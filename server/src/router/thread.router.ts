@@ -88,9 +88,10 @@ threadRouter.post(
   handleValidationResult,
   isAuthenticated,
   async (req: Request, res: Response) => {
-    const id = req.body.threadId;
+    const id = req.body.id;
     const content = req.body.content;
     const userId = req.body.userId;
+    console.log(id);
 
     const result = await threadServices.commentThread(userId, id, content);
 

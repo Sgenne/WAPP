@@ -320,8 +320,6 @@ header {
   flex-direction: column;
 }
 
-
-
 .profile-page__thread-buttons {
   display: flex;
   justify-content: center;
@@ -401,5 +399,3 @@ header {
   align-items: flex-start;
   flex-direction: column;
 }
-
-

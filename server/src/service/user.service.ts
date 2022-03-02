@@ -221,7 +221,9 @@ export const getUser = async (userId: number): Promise<UserServiceResult> => {
 export const getUserByUsername = async (
   username: string
 ): Promise<UserServiceResult> => {
-  const existingUser = await userModel.findOne({ username: username });
+  const existingUser = await userModel.findOne({
+    username: { $regex: new RegExp("^" + username.toLowerCase(), "i") },
+  });
 
   if (!existingUser)
     return {

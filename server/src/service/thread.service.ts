@@ -318,7 +318,7 @@ export const commentThread = async (
     dislikes,
     commentId,
     isDeleted: false,
-    thread: threadId,
+    rootThread: threadId,
   };
 
   thread.replies.push(commentId);

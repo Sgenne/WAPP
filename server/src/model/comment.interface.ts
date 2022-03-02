@@ -28,5 +28,5 @@ export interface Comment {
    */
   commentId: number;
   isDeleted: boolean;
-  thread: number;
+  rootThread: number;
 }

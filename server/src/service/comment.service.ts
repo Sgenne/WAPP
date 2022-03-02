@@ -4,7 +4,6 @@ import { getUser, UserServiceResult } from "./user.service";
 import { commentModel } from "../db/comment.db";
 import { userModel } from "../db/user.db";
 
-
 /**
  * The result of a comment service.
  */
@@ -228,7 +227,9 @@ export const getCommentsByAuthor = async (
  *
  * @param userId - The id of the user.
  */
-export const getLikedComments = async (userId: number) => {
+export const getLikedComments = async (
+  userId: number
+): Promise<CommentServiceResult> => {
   const userResult: UserServiceResult = await getUser(userId);
 
   const user = userResult.user;
@@ -346,17 +347,17 @@ export const postReply = async (
   const rootCommentResult: CommentServiceResult = await getComment(
     commentIdRoot
   );
-  const root: Comment | undefined = rootCommentResult.comment;
+  const parentComment: Comment | undefined = rootCommentResult.comment;
   const user: User | undefined = userResult.user;
 
   if (!user) {
     return userResult;
   }
 
-  if (!root) {
+  if (!parentComment) {
     return {
       statusCode: 404,
-      message: "No comment with the given root comment id exists.",
+      message: "No comment with the given parent comment id exists.",
     };
   }
 
@@ -366,7 +367,7 @@ export const postReply = async (
   const likes: number = 0;
   const dislikes: number = 0;
   const commentId: number = new Date().getTime();
-  const thread: number = root.thread;
+  const rootThread: number = parentComment.rootThread;
   const newComment: Comment = {
     content,
     author,
@@ -375,13 +376,13 @@ export const postReply = async (
     likes,
     dislikes,
     commentId,
-    thread,
+    rootThread,
     isDeleted: false,
   };
-  root.replies.push(commentId);
+  parentComment.replies.push(commentId);
 
   commentModel.create(newComment);
-  commentModel.updateOne({ commentId: commentIdRoot }, root);
+  commentModel.updateOne({ commentId: commentIdRoot }, parentComment);
 
   return {
     statusCode: 201,
