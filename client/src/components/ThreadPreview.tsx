@@ -1,12 +1,17 @@
 import axios, { AxiosResponse } from "axios";
 import { useState, useEffect, useContext } from "react";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
+import ReactQuill from "react-quill";
+import { NavLink } from "react-router-dom";
 import { Thread } from "../../../server/src/model/thread.interface";
 import { User } from "../../../server/src/model/user.interface";
 import { AuthContext } from "../context/AuthContext";
+import { formatDate } from "../utils/formatUtils";
+import ErrorMessage from "./ErrorMessage";
 
 const ThreadPreview = (props: { thread: Thread }) => {
   const [user, setThreads] = useState<User>();
+  const [errorMessage, setErrorMessage] = useState("");
 
   async function getUser() {
     try {
@@ -21,7 +26,7 @@ const ThreadPreview = (props: { thread: Thread }) => {
   }
 
   let threadResult: AxiosResponse;
-  let discrod;
+  let userImage;
 
   useEffect(() => {
     getUser();
@@ -29,7 +34,7 @@ const ThreadPreview = (props: { thread: Thread }) => {
   let author;
   if (user) {
     author = user?.username;
-    discrod = user.image.imageUrl;
+    userImage = user.image.imageUrl;
   }
   const authContext = useContext(AuthContext);
 
@@ -52,8 +57,15 @@ const ThreadPreview = (props: { thread: Thread }) => {
           username: authContext.userId,
         }
       );
+      setErrorMessage("");
       console.log(likeResult.data);
     } catch (error) {
+      if (!(axios.isAxiosError(error) && error.response)) {
+        setErrorMessage("Something went wrong while signing in.");
+        return;
+      }
+
+      setErrorMessage(error.response.data.message);
       console.log(error);
       return;
     }
@@ -82,23 +94,24 @@ const ThreadPreview = (props: { thread: Thread }) => {
     <li>
       <div className="category-thread container-fluid px-4">
         <div className="row">
-          <img src={discrod} className="row__avatar" />
+          <img src={userImage} className="row__avatar" />
           <div className="col row">
             <h3 className="thread-title col-12">
-              <a href={id} className="link">
+              <NavLink to={id} className="link">
                 {title}
-              </a>
+              </NavLink>
             </h3>
             <p className="row__thread-title col-3">
-              <a href="thread.html" className="link">
+              <NavLink to={`/profile/${author}`} className="link">
                 {author}
-              </a>
+              </NavLink>
             </p>
-            <p className="row__thread-title col-4">{new Date(date).toLocaleDateString() + " " + new Date(date).toLocaleTimeString()}</p>
+            <p className="row__thread-title col-4">{formatDate(new Date(date))}</p>
           </div>
         </div>
         <div className="category-box__thread-desc">
-          <p className="threadPrevCont">{context}</p>
+          <ReactQuill readOnly value={context} />
+          {/* <p className="threadPrevCont">{context}</p> */}
         </div>
         <div className="row">
           <button className="col-2" onClick={likeClickHandler}>
@@ -109,6 +122,9 @@ const ThreadPreview = (props: { thread: Thread }) => {
             <FaThumbsDown />
             <p className="threadLikes">{dislikes}</p>
           </button>
+        </div>
+        <div>
+          <ErrorMessage>{errorMessage}</ErrorMessage>
         </div>
       </div>
     </li>

@@ -119,7 +119,7 @@ commentRouter.post(
 
     const result = await commentService.postReply(id, content, username);
 
-    if (result.statusCode !== 200) {
+    if (result.statusCode !== 201) {
       return res.status(result.statusCode).send({ message: result.message });
     }
 

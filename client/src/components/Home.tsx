@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 const Home = () => {
   const [categories, setCategetories] = useState<Category[]>([]);
 
-  async function getCat() {
+  async function getCategory() {
     try {
       categoryResult = await axios.get<{
         message: string;
@@ -22,7 +22,7 @@ const Home = () => {
   let categoryResult: AxiosResponse;
 
   useEffect(() => {
-    getCat();
+    getCategory();
   }, []);
 
   const categoryPreviewComponents = categories.map((cat) => {

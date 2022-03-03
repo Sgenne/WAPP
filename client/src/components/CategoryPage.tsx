@@ -9,23 +9,23 @@ const CategoryPage = () => {
   const category = param.category;
   const [threads, setThreads] = useState<Thread[]>([]);
 
-  // async function getCat() {
-  //   try {
-  //     threadResult = await axios.get<{
-  //       message: string;
-  //       threads?: Thread[];
-  //     }>("http://localhost:8080/thread/categoryThreads/" + category, {});
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  //   setThreads(threadResult.data.threads);
-  // }
+  async function getCategory() {
+    try {
+      threadResult = await axios.get<{
+        message: string;
+        threads?: Thread[];
+      }>("http://localhost:8080/thread/categoryThreads/" + category, {});
+    } catch (error) {
+      console.log(error);
+    }
+    setThreads(threadResult.data.threads);
+  }
 
   let threadResult: AxiosResponse;
 
-  // useEffect(() => {
-  //   getCat();
-  // }, []);
+  useEffect(() => {
+    getCategory();
+  }, []);
   let ThreadPreviewContent;
   if (threads) {
     ThreadPreviewContent = threads.map((thr: Thread) => (
