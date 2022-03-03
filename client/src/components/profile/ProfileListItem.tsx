@@ -1,5 +1,4 @@
 import React from "react";
-import ReactQuill from "react-quill";
 import { NavLink } from "react-router-dom";
 import parse from "html-react-parser";
 

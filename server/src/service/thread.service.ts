@@ -165,7 +165,6 @@ export const likeThread = async (
     );
     thread.dislikes--;
   }
-
   if (!user.likedThreads.includes(threadId)) {
     user.likedThreads.push(threadId);
     thread.likes++;
@@ -203,12 +202,11 @@ export const disLikeThread = async (
   const thread = threadResult.thread;
   const user = userResult.user;
 
-  if (!thread) {
-    return threadResult;
-  }
-
   if (!user) {
     return userResult;
+  }
+  if (!thread) {
+    return threadResult;
   }
 
   if (user.likedThreads.includes(threadId)) {

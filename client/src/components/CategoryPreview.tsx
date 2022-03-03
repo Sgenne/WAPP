@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Collapse } from "react-bootstrap";
+import { Collapse } from "react-bootstrap";
 import ThreadPreview from "./ThreadPreview";
 import { FaArrowDown } from "react-icons/fa";
 import { Category } from "../../../server/src/model/category.interface";
@@ -44,19 +44,21 @@ const CategoryPreview = (props: { category: Category }) => {
   const link = `/category/${props.category.categoryId}`;
   return (
     <li className="category-box container-fluid px-4">
-      <div className="row">
-        <h3 className="col-11">
-          <NavLink to={link}>{props.category.title}</NavLink>
-        </h3>
+      <div className="flex">
+        <h2>
+          <NavLink to={link} className="fullHeight">
+            {props.category.title}
+          </NavLink>
+        </h2>
 
-        <Button
+        <button
           onClick={() => setOpen(!open)}
           aria-controls="example-collapse-text"
           aria-expanded={open}
-          className="button button--grey col-1"
+          className="generalButton mostRight"
         >
           <FaArrowDown />
-        </Button>
+        </button>
       </div>
       <Collapse in={open}>
         <div className="row mt-2 collapse" id="collapseCat">

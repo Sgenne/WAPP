@@ -2,7 +2,6 @@ import { useState, useContext } from "react";
 import axios, { AxiosResponse } from "axios";
 import Modal from "./Modal";
 import { AuthContext } from "../context/AuthContext";
-import { User } from "../../../server/src/model/user.interface";
 import ErrorMessage from "./ErrorMessage";
 
 const Register = () => {
@@ -87,7 +86,7 @@ const Register = () => {
           />
         </div>
         <div className="register__input-container">
-          <label>password: </label>
+          <label>Password: </label>
           <input
             name="password"
             type="password"

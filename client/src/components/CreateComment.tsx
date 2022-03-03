@@ -36,7 +36,7 @@ const CreateComment = () => {
       console.log(signInResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
-        setErrorMessage("Something went wrong while signing in.");
+        setErrorMessage("Could not create comment");
         return;
       }
 
@@ -66,12 +66,7 @@ const CreateComment = () => {
         </li>
         <li>
           <div id="postthread">
-            <ReactQuill
-              id="quill"
-              theme="snow"
-              value={value}
-              onChange={setValue}
-            />
+            <ReactQuill value={value} onChange={setValue} />
 
             <div id="submitbut">
               <button
@@ -79,7 +74,7 @@ const CreateComment = () => {
                 id="subThread"
                 onClick={submitClickHandler}
               >
-                Submit Thread
+                Create comment
               </button>
             </div>
             <div>

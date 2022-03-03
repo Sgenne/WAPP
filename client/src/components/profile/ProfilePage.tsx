@@ -9,7 +9,6 @@ import { AuthContext } from "../../context/AuthContext";
 import { useParams } from "react-router-dom";
 import { FaCog } from "react-icons/fa";
 import EditProfilePopup from "./EditProfilePopup";
-import { threadId } from "worker_threads";
 
 const ProfilePage = () => {
   const [owner, setOwner] = useState<User>();

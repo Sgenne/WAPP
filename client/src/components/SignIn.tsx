@@ -82,7 +82,7 @@ const SignIn = () => {
           />
         </div>
         <div className="sign-in__input-container">
-          <label>password: </label>
+          <label>Password:</label>
           <input
             name="password"
             type="password"

@@ -6,11 +6,14 @@ import { Comment } from "../../../server/src/model/comment.interface";
 import { Thread } from "../../../server/src/model/thread.interface";
 import { User } from "../../../server/src/model/user.interface";
 import { AuthContext } from "../context/AuthContext";
+import { formatDate } from "../utils/formatUtils";
+import ErrorMessage from "./ErrorMessage";
 
 const ThreadComment = (props: { root: Comment }) => {
   const [user, setThreads] = useState<User>();
   const [comments, setComments] = useState<Comment[]>();
   const authContext = useContext(AuthContext);
+  const [errorMessage, setErrorMessage] = useState("");
 
   async function getComments() {
     let commentResult: AxiosResponse;
@@ -74,8 +77,15 @@ const ThreadComment = (props: { root: Comment }) => {
           username: authContext.signedInUser.username,
         }
       );
+      setErrorMessage("");
       console.log(likeResult.data);
     } catch (error) {
+      if (!(axios.isAxiosError(error) && error.response)) {
+        setErrorMessage("Something went wrong when liking.");
+        return;
+      }
+
+      setErrorMessage(error.response.data.message);
       console.log(error);
       return;
     }
@@ -94,9 +104,16 @@ const ThreadComment = (props: { root: Comment }) => {
           username: authContext.signedInUser.username,
         }
       );
+      setErrorMessage("");
 
       console.log(dislikeResult.data);
     } catch (error) {
+      if (!(axios.isAxiosError(error) && error.response)) {
+        setErrorMessage("Something went wrong when disliking.");
+        return;
+      }
+
+      setErrorMessage(error.response.data.message);
       console.log(error);
       return;
     }
@@ -123,9 +140,7 @@ const ThreadComment = (props: { root: Comment }) => {
             </NavLink>
           </p>
           <p className="category-box__row__thread-title col-3">
-            {new Date(date).toLocaleDateString() +
-              " " +
-              new Date(date).toLocaleTimeString()}
+            {formatDate(new Date(date))}
           </p>
         </div>
         <div className="category-box__thread-desc">
@@ -143,6 +158,9 @@ const ThreadComment = (props: { root: Comment }) => {
           <button className="col-2" onClick={replyClickHandler}>
             Reply
           </button>
+        </div>
+        <div>
+          <ErrorMessage>{errorMessage}</ErrorMessage>
         </div>
       </div>
       <ul>{list}</ul>

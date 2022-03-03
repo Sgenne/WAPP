@@ -42,15 +42,12 @@ const CategoryPage = () => {
   return (
     <div className="wholePage">
       <ul>
-        <li className="row">
-          <div className="col-sm-5"></div>
-          <div className="col-sm-2">
-            <h1 id="catigory-title">{category}</h1>
-          </div>
-          <div className="col-sm-3"></div>
-          <div className="col-sm-2">
+        <li className="flex">
+          <h1 className="category-title">{category}</h1>
+
+          <div className="">
             <button
-              className="button button--grey newThreadButton"
+              className="button newThreadButton"
               onClick={submitClickHandler}
             >
               <svg

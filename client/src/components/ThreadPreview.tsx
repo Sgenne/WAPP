@@ -1,17 +1,19 @@
 import axios, { AxiosResponse } from "axios";
 import { useState, useEffect, useContext } from "react";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
-import ReactQuill from "react-quill";
 import { NavLink } from "react-router-dom";
 import { Thread } from "../../../server/src/model/thread.interface";
 import { User } from "../../../server/src/model/user.interface";
 import { AuthContext } from "../context/AuthContext";
 import { formatDate } from "../utils/formatUtils";
 import ErrorMessage from "./ErrorMessage";
+import parse from "html-react-parser";
 
 const ThreadPreview = (props: { thread: Thread }) => {
   const [user, setThreads] = useState<User>();
   const [errorMessage, setErrorMessage] = useState("");
+  const [likes, setLikes] = useState(props.thread.likes);
+  const [dislikes, setDislikes] = useState(props.thread.dislikes);
 
   async function getUser() {
     try {
@@ -40,8 +42,6 @@ const ThreadPreview = (props: { thread: Thread }) => {
 
   const title: string = props.thread.title;
   const context: string = props.thread.content;
-  const likes: number = props.thread.likes;
-  const dislikes: number = props.thread.dislikes;
   const id: string = "/thread/" + props.thread.threadId;
   const date = props.thread.date;
 
@@ -60,10 +60,13 @@ const ThreadPreview = (props: { thread: Thread }) => {
         }
       );
       setErrorMessage("");
+      setLikes(likeResult.data.thread.likes);
+      setDislikes(likeResult.data.thread.dislikes);
+
       console.log(likeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
-        setErrorMessage("Something went wrong while signing in.");
+        setErrorMessage("Something went wrong while liking.");
         return;
       }
 
@@ -84,12 +87,20 @@ const ThreadPreview = (props: { thread: Thread }) => {
           userId: authContext.signedInUser.userId,
           password: authContext.password,
           threadId: props.thread.threadId,
-          username: authContext.signedInUser.userId,
+          username: authContext.signedInUser.username,
         }
       );
-
+      setErrorMessage("");
+      setLikes(dislikeResult.data.thread.likes);
+      setDislikes(dislikeResult.data.thread.dislikes);
       console.log(dislikeResult.data);
     } catch (error) {
+      if (!(axios.isAxiosError(error) && error.response)) {
+        setErrorMessage("Something went wrong when disliking.");
+        return;
+      }
+
+      setErrorMessage(error.response.data.message);
       console.log(error);
       return;
     }
@@ -105,26 +116,25 @@ const ThreadPreview = (props: { thread: Thread }) => {
                 {title}
               </NavLink>
             </h3>
-            <p className="row__thread-title col-3">
+            <p className="row__thread-title col-sm-3">
               <NavLink to={`/profile/${author}`} className="link">
                 {author}
               </NavLink>
             </p>
-            <p className="row__thread-title col-4">
+            <p className="row__thread-title col-sm-4">
               {formatDate(new Date(date))}
             </p>
           </div>
         </div>
-        <div className="category-box__thread-desc">
-          <ReactQuill readOnly value={context} />
-          {/* <p className="threadPrevCont">{context}</p> */}
+        <div className="category-box__thread-desc threadPrevCont">
+          {parse(context)}
         </div>
-        <div className="row">
-          <button className="col-2" onClick={likeClickHandler}>
+        <div>
+          <button className="generalButton" onClick={likeClickHandler}>
             <FaThumbsUp />
             <p className="threadLikes">{likes}</p>
           </button>
-          <button className="col-2" onClick={dislikeClickHandler}>
+          <button className="generalButton" onClick={dislikeClickHandler}>
             <FaThumbsDown />
             <p className="threadLikes">{dislikes}</p>
           </button>

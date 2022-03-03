@@ -8,9 +8,9 @@ import { Comment } from "../../../server/src/model/comment.interface";
 import ThreadComment from "./ThreadComment";
 import { AuthContext } from "../context/AuthContext";
 import { NavLink, useNavigate } from "react-router-dom";
-import ReactQuill from "react-quill";
 import ErrorMessage from "./ErrorMessage";
 import { formatDate } from "../utils/formatUtils";
+import parse from "html-react-parser";
 
 const ThreadPage = () => {
   const navigate = useNavigate();
@@ -181,30 +181,27 @@ const ThreadPage = () => {
               <img src={userImage} className="row__avatar" />
               <div className="col row">
                 <h3 className="thread-title col-12">{title}</h3>
-                <p className="row__thread-title col-3">
+                <p className="row__thread-title col-sm-3">
                   <NavLink to={path} className="link">
                     {author}
                   </NavLink>
                 </p>
-                <p className="row__thread-title col-4">
+                <p className="row__thread-title col-sm-4">
                   {formatDate(new Date(date))}
                 </p>
               </div>
             </div>
-            <div className="category-box__thread-desc">
-              <ReactQuill readOnly value={context} />
-              {/* <p>{context}</p> */}
-            </div>
-            <div className="row">
-              <button className="col-2" onClick={likeClickHandler}>
+            <div className="category-box__thread-desc">{parse(context)}</div>
+            <div>
+              <button className="generalButton" onClick={likeClickHandler}>
                 <FaThumbsUp />
                 <p className="threadLikes">{likes}</p>
               </button>
-              <button className="col-2" onClick={dislikeClickHandler}>
+              <button className="generalButton" onClick={dislikeClickHandler}>
                 <FaThumbsDown />
                 <p className="threadLikes">{dislikes}</p>
               </button>
-              <button className="col-2" onClick={replyClickHandler}>
+              <button className="generalButton" onClick={replyClickHandler}>
                 Reply
               </button>
             </div>

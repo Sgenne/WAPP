@@ -8,7 +8,6 @@ import { AuthContext } from "../context/AuthContext";
 import ErrorMessage from "./ErrorMessage";
 
 const CreateThread = () => {
-  const gg = "<p><b>hej<b></p>";
   const params = useParams();
   const category = params.category;
   const [value, setValue] = useState("");
@@ -40,7 +39,7 @@ const CreateThread = () => {
       console.log(signInResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
-        setErrorMessage("Something went wrong while signing in.");
+        setErrorMessage("Could not create thread");
         return;
       }
 
