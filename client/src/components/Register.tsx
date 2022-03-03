@@ -62,11 +62,10 @@ const Register = () => {
       return;
     }
 
-    const userId: string = result.data.userId;
+    const signedInUser = result.data.user;
 
     authContext.setIsSignedIn(true);
-    authContext.setUserId(+userId);
-    authContext.setUsername(username);
+    authContext.setSignedInUser(signedInUser);
     authContext.setPassword(password);
     authContext.setShowRegister(false);
   };

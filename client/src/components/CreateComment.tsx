@@ -24,7 +24,7 @@ const CreateComment = () => {
       signInResult = await axios.post<{ message: string; thread?: Thread }>(
         "http://localhost:8080/" + params.type + "/reply/",
         {
-          userId: authContext.userId,
+          userId: authContext.signedInUser?.userId,
           password: authContext.password,
           categoryId: category,
           threadId: params.id,

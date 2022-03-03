@@ -90,7 +90,7 @@ threadRouter.post(
   handleValidationResult,
   isAuthenticated,
   async (req: Request, res: Response) => {
-    const id = req.body.id;
+    const id = req.body.threadId;
     const content = req.body.content;
     const userId = req.body.userId;
     console.log(id);

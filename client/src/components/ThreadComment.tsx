@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import { useState, useEffect, useContext } from "react";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Comment } from "../../../server/src/model/comment.interface";
 import { Thread } from "../../../server/src/model/thread.interface";
 import { User } from "../../../server/src/model/user.interface";
@@ -61,15 +61,17 @@ const ThreadComment = (props: { root: Comment }) => {
   }
 
   const likeClickHandler = async () => {
+    if (!authContext.signedInUser) return;
+
     let likeResult: AxiosResponse;
     try {
       likeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/comment/likeComment/",
         {
-          userId: authContext.userId,
+          userId: authContext.signedInUser.userId,
           password: authContext.password,
           commentID: props.root.commentId,
-          username: authContext.userId,
+          username: authContext.signedInUser.username,
         }
       );
       console.log(likeResult.data);
@@ -80,15 +82,16 @@ const ThreadComment = (props: { root: Comment }) => {
   };
 
   const dislikeClickHandler = async () => {
+    if (!authContext.signedInUser) return;
     let dislikeResult: AxiosResponse;
     try {
       dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/comment/dislikeComment/",
         {
-          userId: authContext.userId,
+          userId: authContext.signedInUser.userId,
           password: authContext.password,
           commentID: props.root.commentId,
-          username: authContext.userId,
+          username: authContext.signedInUser.username,
         }
       );
 
@@ -115,9 +118,9 @@ const ThreadComment = (props: { root: Comment }) => {
       <div className="category-box container-fluid px-4">
         <div className="row">
           <p className="category-box__row__thread-title col-3">
-            <a href={path} className="link">
+            <NavLink to={path} className="link">
               {author}
-            </a>
+            </NavLink>
           </p>
           <p className="category-box__row__thread-title col-3">
             {new Date(date).toLocaleDateString() +

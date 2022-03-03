@@ -46,15 +46,17 @@ const ThreadPreview = (props: { thread: Thread }) => {
   const date = props.thread.date;
 
   const likeClickHandler = async () => {
+    if (!authContext.signedInUser) return;
+
     let likeResult: AxiosResponse;
     try {
       likeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/likeThread/",
         {
-          userId: authContext.userId,
+          userId: authContext.signedInUser.userId,
           password: authContext.password,
           threadId: props.thread.threadId,
-          username: authContext.userId,
+          username: authContext.signedInUser.username,
         }
       );
       setErrorMessage("");
@@ -72,15 +74,17 @@ const ThreadPreview = (props: { thread: Thread }) => {
   };
 
   const dislikeClickHandler = async () => {
+    if (!authContext.signedInUser) return;
+
     let dislikeResult: AxiosResponse;
     try {
       dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/dislikeThread/",
         {
-          userId: authContext.userId,
+          userId: authContext.signedInUser.userId,
           password: authContext.password,
           threadId: props.thread.threadId,
-          username: authContext.userId,
+          username: authContext.signedInUser.userId,
         }
       );
 
@@ -106,7 +110,9 @@ const ThreadPreview = (props: { thread: Thread }) => {
                 {author}
               </NavLink>
             </p>
-            <p className="row__thread-title col-4">{formatDate(new Date(date))}</p>
+            <p className="row__thread-title col-4">
+              {formatDate(new Date(date))}
+            </p>
           </div>
         </div>
         <div className="category-box__thread-desc">

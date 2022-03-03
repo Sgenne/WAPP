@@ -35,6 +35,10 @@ const commentSchema = new Schema({
     type: Boolean,
     required: true,
   },
+  rootThread: {
+    type: Number,
+    required: true,
+  },
 });
 
 export const commentModel = model<Comment>("Comment", commentSchema);

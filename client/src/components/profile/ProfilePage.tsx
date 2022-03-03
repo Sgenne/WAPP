@@ -9,6 +9,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { useParams } from "react-router-dom";
 import { FaCog } from "react-icons/fa";
 import EditProfilePopup from "./EditProfilePopup";
+import { threadId } from "worker_threads";
 
 const ProfilePage = () => {
   const [owner, setOwner] = useState<User>();
@@ -121,12 +122,15 @@ const ProfilePage = () => {
 
   const showCreatedThreads = useCallback(() => {
     const threadListItems = createdThreads.map((thread) => (
-      <ProfileListItem
-        header={thread.title}
-        content={thread.content}
-        info={`Posted at: ${formatDate(new Date(thread.date))}`}
-        link={`/thread/${thread.threadId}`}
-      />
+      <div className="profile-page__list-item" key={thread.threadId}>
+        <ProfileListItem
+          header={thread.title}
+          content={thread.content}
+          info={`Posted at: ${formatDate(new Date(thread.date))}`}
+          link={`/thread/${thread.threadId}`}
+          key={thread.threadId}
+        />
+      </div>
     ));
     setListItems(threadListItems);
   }, [createdThreads]);
@@ -138,34 +142,40 @@ const ProfilePage = () => {
 
   const showCreatedComments = () => {
     const commentListItems = createdComments.map((comment) => (
-      <ProfileListItem
-        content={comment.content}
-        info={`Posted at: ${formatDate(new Date(comment.date))}`}
-        link={`/thread/${comment.rootThread}`}
-      />
+      <div className="profile-page__list-item" key={comment.commentId}>
+        <ProfileListItem
+          content={comment.content}
+          info={`Posted at: ${formatDate(new Date(comment.date))}`}
+          link={`/thread/${comment.rootThread}`}
+        />
+      </div>
     ));
     setListItems(commentListItems);
   };
 
   const showLikedThreads = () => {
     const threadListItems = likedThreads.map((thread) => (
-      <ProfileListItem
-        header={thread.title}
-        content={thread.content}
-        info={`Posted at: ${formatDate(new Date(thread.date))}`}
-        link={`/thread/${thread.threadId}`}
-      />
+      <div className="profile-page__list-item" key={thread.threadId}>
+        <ProfileListItem
+          header={thread.title}
+          content={thread.content}
+          info={`Posted at: ${formatDate(new Date(thread.date))}`}
+          link={`/thread/${thread.threadId}`}
+        />
+      </div>
     ));
     setListItems(threadListItems);
   };
 
   const showLikedComments = () => {
     const commentListItems = likedComments.map((comment) => (
-      <ProfileListItem
-        content={comment.content}
-        info={`Posted at: ${formatDate(new Date(comment.date))}`}
-        //link={`/thread/${comment.thread}`}
-      />
+      <div className="profile-page__list-item" key={comment.commentId}>
+        <ProfileListItem
+          content={comment.content}
+          info={`Posted at: ${formatDate(new Date(comment.date))}`}
+          //link={`/thread/${comment.thread}`}
+        />
+      </div>
     ));
     setListItems(commentListItems);
   };
@@ -185,7 +195,9 @@ const ProfilePage = () => {
   if (error) return <div>{error.message}</div>;
   if (!owner) return <div>Loading...........</div>;
 
-  const isOwner = authContext.userId && authContext.userId === owner.userId;
+  const isOwner =
+    authContext.signedInUser &&
+    authContext.signedInUser.userId === owner.userId;
 
   return (
     <div className="profile-page">

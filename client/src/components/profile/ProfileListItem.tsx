@@ -1,5 +1,7 @@
 import React from "react";
+import ReactQuill from "react-quill";
 import { NavLink } from "react-router-dom";
+import parse from "html-react-parser";
 
 const ProfileListItem = (props: {
   header?: string;
@@ -11,13 +13,13 @@ const ProfileListItem = (props: {
   if (content.length > 100) {
     content = content.substring(0, 100) + "...";
   }
-
+  if (props.link) console.log(props.link);
   const listItem = (
     <>
       {props.header && (
-        <h5 className="profile-list-item__header">{props.header}</h5>
+        <h4 className="profile-list-item__header">{props.header}</h4>
       )}
-      <div className="profile-list-item__content">{content}</div>
+      <div className="profile-list-item__content">{parse(content)}</div>
       {props.info && (
         <div className="profile-list-item__info">{props.info}</div>
       )}

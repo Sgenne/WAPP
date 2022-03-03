@@ -22,12 +22,14 @@ const CreateThread = () => {
   const authContext = useContext(AuthContext);
 
   const submitClickHandler = async () => {
+    if (!authContext.signedInUser) return;
+
     let signInResult: AxiosResponse;
     try {
       signInResult = await axios.post<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/postThread/",
         {
-          userId: authContext.userId,
+          userId: authContext.signedInUser.userId,
           password: authContext.password,
           categoryId: category,
           title: value2,

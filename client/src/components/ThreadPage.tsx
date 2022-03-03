@@ -7,7 +7,7 @@ import { User } from "../../../server/src/model/user.interface";
 import { Comment } from "../../../server/src/model/comment.interface";
 import ThreadComment from "./ThreadComment";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import ReactQuill from "react-quill";
 import ErrorMessage from "./ErrorMessage";
 import { formatDate } from "../utils/formatUtils";
@@ -103,22 +103,26 @@ const ThreadPage = () => {
   }
 
   const likeClickHandler = async () => {
+    if (!authContext.signedInUser) return;
+
     let likeResult: AxiosResponse;
     try {
       likeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/likeThread/",
         {
-          userId: authContext.userId,
+          userId: authContext.signedInUser.userId,
           password: authContext.password,
           threadId: threadObject.threadId,
-          username: authContext.userId,
+          username: authContext.signedInUser.username,
         }
       );
       setErrorMessage("");
       console.log(likeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
-        setErrorMessage("Something went wrong while trying to like the thread.");
+        setErrorMessage(
+          "Something went wrong while trying to like the thread."
+        );
         return;
       }
 
@@ -129,22 +133,26 @@ const ThreadPage = () => {
   };
 
   const dislikeClickHandler = async () => {
+    if (!authContext.signedInUser) return;
+
     let dislikeResult: AxiosResponse;
     try {
       dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/dislikeThread/",
         {
-          userId: authContext.userId,
+          userId: authContext.signedInUser.userId,
           password: authContext.password,
           threadId: threadObject.threadId,
-          username: authContext.userId,
+          username: authContext.signedInUser.username,
         }
       );
       setErrorMessage("");
       console.log(dislikeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
-        setErrorMessage("Something went wrong while trying to dislike the thread.");
+        setErrorMessage(
+          "Something went wrong while trying to dislike the thread."
+        );
         return;
       }
 
@@ -174,9 +182,9 @@ const ThreadPage = () => {
               <div className="col row">
                 <h3 className="thread-title col-12">{title}</h3>
                 <p className="row__thread-title col-3">
-                  <a href={path} className="link">
+                  <NavLink to={path} className="link">
                     {author}
-                  </a>
+                  </NavLink>
                 </p>
                 <p className="row__thread-title col-4">
                   {formatDate(new Date(date))}
@@ -184,10 +192,7 @@ const ThreadPage = () => {
               </div>
             </div>
             <div className="category-box__thread-desc">
-            <ReactQuill
-              readOnly
-              value={context}
-            />
+              <ReactQuill readOnly value={context} />
               {/* <p>{context}</p> */}
             </div>
             <div className="row">

@@ -1,4 +1,5 @@
 import { createContext, useState } from "react";
+import { User } from "../../../server/src/model/user.interface";
 
 export interface AuthContextState {
   /**
@@ -6,15 +7,17 @@ export interface AuthContextState {
    */
   isSignedIn: boolean;
 
-  /**
-   * The id of the user if they are signed in.
-   */
-  userId?: number;
+  signedInUser?: User;
+  setSignedInUser: React.Dispatch<React.SetStateAction<User | undefined>>;
+  // /**
+  //  * The id of the user if they are signed in.
+  //  */
+  // userId?: number;
 
-  /**
-   * The username of the user if they are signed in.
-   */
-  username?: string;
+  // /**
+  //  * The username of the user if they are signed in.
+  //  */
+  // username?: string;
 
   /**
    * The password of the user if they are signed in.
@@ -25,17 +28,6 @@ export interface AuthContextState {
    * Updates the stored isSignedIn value.
    */
   setIsSignedIn: React.Dispatch<React.SetStateAction<boolean>>;
-
-  /**
-   * Updates the stored id.
-   */
-  setUserId: React.Dispatch<React.SetStateAction<number | undefined>>;
-
-  /**
-   * Updates the stored username.
-   */
-  setUsername: React.Dispatch<React.SetStateAction<string | undefined>>;
-
   /**
    * Updates the stored password.
    */
@@ -70,8 +62,7 @@ export interface AuthContextState {
 const defaultState: AuthContextState = {
   isSignedIn: false,
   setIsSignedIn: () => {},
-  setUserId: () => {},
-  setUsername: () => {},
+  setSignedInUser: () => {},
   setPassword: () => {},
   showSignIn: false,
   setShowSignIn: () => {},
@@ -97,16 +88,15 @@ export const AuthContextProvider = (props: { children: JSX.Element }) => {
   const [password, setPassword] = useState<string>();
   const [showSignIn, setShowSignIn] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
+  const [signedInUser, setSignedInUser] = useState<User>();
 
   return (
     <AuthContext.Provider
       value={{
         isSignedIn,
         setIsSignedIn,
-        userId,
-        setUserId,
-        username,
-        setUsername,
+        signedInUser,
+        setSignedInUser,
         password,
         setPassword,
         showSignIn,

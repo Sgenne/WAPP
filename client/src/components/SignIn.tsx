@@ -28,11 +28,11 @@ const SignIn = () => {
     setPassword(event.target.value);
   };
 
-  const handleKeyDown = (event: { key: string; }) => {
-    if (event.key === 'Enter') {
+  const handleKeyDown = (event: { key: string }) => {
+    if (event.key === "Enter") {
       submitClickHandler();
     }
-  }
+  };
 
   const submitClickHandler = async () => {
     let signInResult: AxiosResponse;
@@ -54,11 +54,9 @@ const SignIn = () => {
       return;
     }
 
-    const userId = signInResult.data.userId;
-
+    const signedInUser = signInResult.data.user;
     authContext.setIsSignedIn(true);
-    authContext.setUserId(userId);
-    authContext.setUsername(username);
+    authContext.setSignedInUser(signedInUser);
     authContext.setPassword(password);
     authContext.setShowSignIn(false);
   };

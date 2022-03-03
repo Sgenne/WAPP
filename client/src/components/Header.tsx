@@ -15,6 +15,8 @@ const Header = () => {
     authContext.setShowRegister(true);
   };
 
+  const signedInUser = authContext.signedInUser;
+
   return (
     <div className="container-fluid">
       <header className="row">
@@ -31,10 +33,14 @@ const Header = () => {
           </button>
         </div>
         <div className="header__account col-lg-2 col-md-3 col-4 d-sm-flex d-inline">
-          {authContext.isSignedIn ? (
+          {signedInUser ? (
             <span className="header__profile-link">
-              <NavLink to={`/profile/${authContext.username}`}>
-                Hello, {authContext.username}!
+              <NavLink to={`/profile/${authContext.signedInUser?.username}`}>
+                <img
+                  className="header__profile-picture"
+                  src={signedInUser.image.imageUrl}
+                />{" "}
+                {authContext.signedInUser?.username}
               </NavLink>
             </span>
           ) : (

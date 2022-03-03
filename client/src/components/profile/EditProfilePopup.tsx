@@ -16,13 +16,15 @@ const EditProfilePopup = (props: {
   const authContext = useContext(AuthContext);
 
   const submitProfilePictureHandler = async () => {
-    if (!(newProfilePicture && authContext.userId && authContext.password))
+    if (
+      !(newProfilePicture && authContext.signedInUser && authContext.password)
+    )
       return;
 
     let response: AxiosResponse;
 
     const formData = new FormData();
-    formData.append("userId", authContext.userId.toString());
+    formData.append("userId", authContext.signedInUser.userId.toString());
     formData.append("password", authContext.password);
     formData.append("image", newProfilePicture);
 
@@ -51,9 +53,11 @@ const EditProfilePopup = (props: {
   };
 
   const submitUserInfoChanges = async () => {
+    if (!authContext.signedInUser) return;
+
     try {
       await axios.put("http://localhost:8080/user/update-user", {
-        userId: authContext.userId,
+        userId: authContext.signedInUser.userId,
         password: authContext.password,
         bio: bio,
       });

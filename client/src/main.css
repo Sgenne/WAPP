@@ -110,7 +110,7 @@ header {
 
 .header__profile-link {
   font-weight: 600;
-  font-size: 20px;
+  font-size: 26px;
 }
 
 .header__profile-link:hover {
@@ -349,10 +349,14 @@ header {
 
 .profile-list-item {
   border: 1px solid #c0c0c0;
-  width: 80%;
+  width: 100%;
   padding: 6px;
   margin: 4px;
   border-radius: 5px;
+}
+
+.profile-page__list-item {
+  width: 80%;
 }
 
 .profile-list-item:hover {
@@ -367,6 +371,11 @@ header {
 .profile-list-item__content {
   font-size: 18px;
   margin: 8px 0;
+  width: 100%;
+}
+
+.profile-list-item__content p {
+  width: 100%;
 }
 
 .profile-list-item__date {
@@ -398,4 +407,12 @@ header {
 
 .ql-toolbar {
   display: none;
+}
+
+.header__profile-picture {
+  height: 75px;
+  width: 75px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-right: 8px;
 }

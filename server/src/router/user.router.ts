@@ -136,9 +136,7 @@ userRouter.post(
       return;
     }
 
-    res
-      .status(200)
-      .send({ message: "The user was verified.", userId: user.userId });
+    res.status(200).send({ message: "The user was verified.", user: user });
   }
 );
 
