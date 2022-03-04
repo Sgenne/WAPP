@@ -66,6 +66,9 @@ button {
   background-color: white;
   transition: background-color 100ms ease-in-out;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  /* text-overflow: ellipsis; */
 }
 
 button:hover {
@@ -96,9 +99,10 @@ header {
 }
 
 .header__logo-icon {
-  height: 40%;
-  width: 40%;
-  min-width: 32px;
+  height: 30%;
+  width: 30%;
+  min-width: 64px;
+  min-height: 64px;
 }
 
 .header__logo h1 {
@@ -113,7 +117,7 @@ header {
 }
 
 .header__search input {
-  width: 80%;
+  width: 90%;
   border-radius: 5px 0 0 5px;
   border-right: none;
 }
@@ -124,8 +128,14 @@ header {
 }
 
 .header__profile-link {
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 600;
   font-size: 26px;
+  width: fit-content;
+  margin: auto;
 }
 
 .header__profile-link:hover {
@@ -134,17 +144,8 @@ header {
 
 .header__account {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
-  text-align: center;
-}
-
-.register,
-.sign-in {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
 }
 
 .wholePage {
@@ -285,7 +286,6 @@ header {
 }
 
 #submitbut {
-  /*border: 2px solid red;*/
   display: flex;
   justify-content: flex-end;
 }
@@ -300,7 +300,6 @@ header {
   border: 1px solid #ececec;
   border-radius: 5px;
   min-height: calc(100vh - 100px);
-  /* width: 90%; */
   margin: 0 auto;
 }
 

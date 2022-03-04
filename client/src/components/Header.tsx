@@ -20,36 +20,49 @@ const Header = () => {
   return (
     <div className="container-fluid">
       <header className="row">
-        <div className="header__logo col-2">
+        <div className="header__logo col-md-3 col-2">
           <NavLink to="/">
-            <div className="container-fluid d-flex align-items-center">
-              <GiCapybara className="col-lg-6 col-12 header__logo-icon" />
-              <h1 className=".col-lg-6 d-lg-inline d-none">WAPP</h1>
+            <div className="container-fluid d-flex align-items-center justify-content-center">
+              <GiCapybara className="col-md-6 col-12 header__logo-icon" />
+              <h1 className=".col-md-6 d-md-inline d-none">WAPP</h1>
             </div>
           </NavLink>
         </div>
-        <div className="header__search col-lg-8 col-md-6 col-6">
+        <div className="header__search col-6">
           <input type="text" placeholder="what are you looking for?" />
           <button className="header__search-button">
             <FaSearch />
           </button>
         </div>
-        <div className="header__account col-lg-2 col-md-3 col-4 d-sm-flex d-inline">
+        <div className="header__account  col-md-3 col-4">
           {signedInUser ? (
-            <span className="header__profile-link">
-              <NavLink to={`/profile/${authContext.signedInUser?.username}`}>
+            <NavLink to={`/profile/${signedInUser.username}`}>
+              <div className="header__profile-link">
                 <img
-                  className="header__profile-picture "
+                  className="header__profile-picture col-sm-12 col-6"
                   src={signedInUser.image.imageUrl}
-                />{" "}
-                {authContext.signedInUser?.username}
-              </NavLink>
-            </span>
+                  alt="signed in user"
+                />
+                <span className="d-sm-inline d-none col-6">
+                  {signedInUser.username}
+                </span>
+              </div>
+            </NavLink>
           ) : (
-            <>
-              <button onClick={signInClickHandler}>Sign-in</button>
-              <button onClick={registerClickHandler}>Register</button>
-            </>
+            <div className="col-12 d-flex d-sm-block flex-column align-items-center">
+              <button
+                className="col-sm-5  col-12 mx-sm-1"
+                onClick={signInClickHandler}
+              >
+                Sign-in
+              </button>
+              <button
+                className="col-sm-5 col-12 mx-sm-1"
+                onClick={registerClickHandler}
+              >
+                Register
+              </button>
+            </div>
           )}
         </div>
       </header>
