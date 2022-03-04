@@ -98,7 +98,9 @@ export const getLikedThreads = async (
     return userResult;
   }
 
-  const likedThreads: Thread[] = await threadModel.find({ author: userId });
+  const likedThreads: Thread[] = await threadModel.find({
+    threadId: { $in: user.likedThreads },
+  });
 
   return {
     statusCode: 200,

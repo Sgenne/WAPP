@@ -1,6 +1,18 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import parse from "html-react-parser";
+import parse, { HTMLReactParserOptions } from "html-react-parser";
+import { isTag, isText } from "domhandler";
+
+const options: HTMLReactParserOptions = {
+  replace: (domNode) => {
+    if (isTag(domNode) && domNode.name === "a" && domNode.firstChild) {
+      const child = domNode.firstChild;
+
+      return isText(child) ? <>{child.data}</> : child;
+    }
+    return domNode;
+  },
+};
 
 const ProfileListItem = (props: {
   header?: string;
@@ -12,13 +24,14 @@ const ProfileListItem = (props: {
   if (content.length > 100) {
     content = content.substring(0, 100) + "...";
   }
-  if (props.link) console.log(props.link);
   const listItem = (
     <>
       {props.header && (
         <h4 className="profile-list-item__header">{props.header}</h4>
       )}
-      <div className="profile-list-item__content">{parse(content)}</div>
+      <div className="profile-list-item__content">
+        {parse(content, options)}
+      </div>
       {props.info && (
         <div className="profile-list-item__info">{props.info}</div>
       )}

@@ -30,7 +30,7 @@ export const handleValidationResult = (
 export const hasValidUsername = body("username")
   .exists()
   .withMessage("No username was provided.")
-  .isLength({ min: 4, max: 16 })
+  .isLength({ min: 4, max: 16 }).withMessage("Usernames have to be within 4 and 16 characters long.")
   .isAlphanumeric()
   .withMessage("The given username was invalid.");
 

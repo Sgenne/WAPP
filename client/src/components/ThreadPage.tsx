@@ -40,8 +40,6 @@ const ThreadPage = ():JSX.Element => {
   async function getUser(): Promise<void> {
     if (!threadObject) return;
 
-    console.log("in getUser");
-
     try {
       userResult = await axios.get<{
         message: string;
@@ -120,7 +118,6 @@ const ThreadPage = ():JSX.Element => {
         }
       );
       setErrorMessage("");
-      console.log(likeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
         setErrorMessage(
@@ -153,7 +150,6 @@ const ThreadPage = ():JSX.Element => {
         }
       );
       setErrorMessage("");
-      console.log(dislikeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
         setErrorMessage(
