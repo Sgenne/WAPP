@@ -40,8 +40,6 @@ const ThreadPage = () => {
   async function getUser() {
     if (!threadObject) return;
 
-    console.log("in getUser");
-
     try {
       userResult = await axios.get<{
         message: string;
@@ -117,7 +115,6 @@ const ThreadPage = () => {
         }
       );
       setErrorMessage("");
-      console.log(likeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
         setErrorMessage(
@@ -147,7 +144,6 @@ const ThreadPage = () => {
         }
       );
       setErrorMessage("");
-      console.log(dislikeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
         setErrorMessage(

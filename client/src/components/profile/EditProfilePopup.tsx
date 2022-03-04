@@ -110,10 +110,10 @@ const EditProfilePopup = (props: {
               onChange={bioChangeHandler}
               defaultValue={bio}
             ></textarea>
-          </div>
-          <div className="edit-profile__user-info-buttons">
-            <button onClick={submitUserInfoChanges}>Submit bio</button>
-            <button onClick={props.onClose}>Cancel</button>
+            <div className="edit-profile__user-info-buttons">
+              <button onClick={submitUserInfoChanges}>Submit bio</button>
+              <button onClick={props.onClose}>Cancel</button>
+            </div>
           </div>
         </div>
       </div>

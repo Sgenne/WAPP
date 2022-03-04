@@ -7,7 +7,7 @@ import axios, { AxiosResponse } from "axios";
 import { User } from "../../../../server/src/model/user.interface";
 import { AuthContext } from "../../context/AuthContext";
 import { useParams } from "react-router-dom";
-import { FaEdit, FaPencilAlt } from "react-icons/fa";
+import { FaEdit } from "react-icons/fa";
 import EditProfilePopup from "./EditProfilePopup";
 
 const ProfilePage = () => {
@@ -172,7 +172,7 @@ const ProfilePage = () => {
         <ProfileListItem
           content={comment.content}
           info={`Posted at: ${formatDate(new Date(comment.date))}`}
-          //link={`/thread/${comment.thread}`}
+          link={`/thread/${comment.rootThread}`}
         />
       </div>
     ));
@@ -214,7 +214,6 @@ const ProfilePage = () => {
           alt="profile"
         />
         <h1 className="profile-page__username">
-          {" "}
           {owner.username}
           {isOwner && (
             <button
