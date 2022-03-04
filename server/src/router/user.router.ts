@@ -48,7 +48,7 @@ userRouter.post(
 
     res.status(201).send({
       message: "The new user was created successfully",
-      userId: user.userId,
+      user: user
     });
   }
 );
