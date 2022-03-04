@@ -8,56 +8,33 @@ import { commentModel } from "../db/comment.db";
 import { categoryModel } from "../db/category.db";
 
 /**
- * The result of a thread service.
+ * The result of a thread service. Contains a status code and message describing the
+ * result of the attempted service. If the service was successful, then the result
+ * will contain the relevant thread or threads.
  */
 interface ThreadServiceResult {
-  /**
-   * An HTTP status code describing the result of the attempted operation.
-   */
   statusCode: number;
-
-  /**
-   * A message describing the result of the attempted operation.
-   */
   message: string;
-
-  /**
-   * The thread that was acted upon if the service was successfull.
-   */
   thread?: Thread;
-
-  /**
-   * The threads that were acted upon if the service was successfull.
-   */
   threads?: Thread[];
-
   comments?: Comment[];
 }
 
 /**
- * The result of a thread service.
+ * The result of a category service. Contains a status code and message describing the
+ * result of the attempted service. If the service was successful, then the result
+ * will contain the relevant categories.
  */
 interface CategoryServiceResult {
-  /**
-   * An HTTP status code describing the result of the attempted operation.
-   */
   statusCode: number;
-
-  /**
-   * A message describing the result of the attempted operation.
-   */
   message: string;
-
-  /**
-   * The thread that was acted upon.
-   */
   categories?: Category[];
 }
 
 /**
+ * Returns the thread with the given id.
  *
- * @param threadId The id of the thread to get
- * @returns a thread with the specified id
+ * @param threadId The id of the thread to get.
  */
 export const getThread = async (
   threadId: number
@@ -82,8 +59,6 @@ export const getThread = async (
  * Returns the threads created by the user with the given id.
  *
  * @param userId - The id of the author of the threads to return.
- *
- * @returns A ThreadServiceResult object.
  */
 export const getThreadsByAuthor = async (
   userId: number
@@ -105,6 +80,7 @@ export const getThreadsByAuthor = async (
     threads: authoredThreads,
   };
 };
+
 /**
  * Get list of threads user has liked
  *
@@ -138,8 +114,6 @@ export const getLikedThreads = async (
  * @param threadId - id of the thread the user likes.
  *
  * @param username - the user who likes the thread.
- *
- * @returns - A ThreadServiceResult object.
  */
 export const likeThread = async (
   threadId: number,
@@ -189,8 +163,6 @@ export const likeThread = async (
  * @param threadId - id of the thread the user dislikes.
  *
  * @param username - the user who dislikes the thread.
- *
- * @returns - A ThreadServiceResult object.
  */
 export const disLikeThread = async (
   threadId: number,
@@ -242,8 +214,6 @@ export const disLikeThread = async (
  * @param content - The new content of the thread.
  *
  * @param title - The new title of the thread.
- *
- * @returns A ThreadServiceResult object.
  */
 export const editThread = async (
   threadId: number,
@@ -286,8 +256,6 @@ export const editThread = async (
  * @param threadId - The id of the thread to comment on.
  *
  * @param content - The content of the comment.
- *
- * @returns A ThreadServiceResult object.
  */
 export const commentThread = async (
   userId: number,
@@ -321,7 +289,10 @@ export const commentThread = async (
 
   thread.replies.push(commentId);
   await commentModel.create(newComment);
-  await threadModel.updateOne({ threadId: threadId }, {replies: thread.replies});
+  await threadModel.updateOne(
+    { threadId: threadId },
+    { replies: thread.replies }
+  );
 
   return {
     statusCode: 201,
@@ -334,8 +305,6 @@ export const commentThread = async (
  * Deletes a thread.
  *
  * @param threadId - The thread to delete.
- *
- * @returns A ThreadServiceResult object.
  */
 export const deleteThread = async (
   threadId: number,
@@ -380,8 +349,6 @@ export const deleteThread = async (
  * @param title - The title of the thread.
  *
  * @param content - The text of the comment.
- *
- * @returns A ThreadServiceResult object.
  */
 export const postThread = async (
   userId: number,
@@ -433,8 +400,7 @@ export const postThread = async (
 };
 
 /**
- *
- * @returns A list of all categories
+ * Returns a list of all categories.
  */
 export const getCategories = async (): Promise<CategoryServiceResult> => {
   const categories: Category[] = await categoryModel.find();
@@ -447,8 +413,7 @@ export const getCategories = async (): Promise<CategoryServiceResult> => {
 };
 
 /**
- *
- * @returns A list of three threads
+ * Returns three sample threads from a specified category.
  */
 export const getSampleThreads = async (
   categoryId: number
@@ -476,10 +441,15 @@ export const getSampleThreads = async (
   };
 };
 
+/**
+ * Returns all threads from a specified category.
+ *
+ * @param categoryId - The id of the category whose threads should be returned.
+ */
 export const getCategoryThreads = async (
-  cat: number
+  categoryId: number
 ): Promise<ThreadServiceResult> => {
-  const threadArr: Thread[] = await threadModel.find({ category: cat });
+  const threadArr: Thread[] = await threadModel.find({ category: categoryId });
 
   return {
     statusCode: 200,
@@ -488,6 +458,11 @@ export const getCategoryThreads = async (
   };
 };
 
+/**
+ * Returns all comments from a specified thread.
+ *
+ * @param threadId - The id of the thread whose comments should be returned.
+ */
 export const getThreadComments = async (
   threadId: number
 ): Promise<ThreadServiceResult> => {
@@ -514,6 +489,11 @@ export const getThreadComments = async (
   };
 };
 
+/**
+ * Returns all replies to a specific root comment.
+ *
+ * @param rootId - The id of the root comment.
+ */
 export const getCommentComments = async (
   rootId: number
 ): Promise<ThreadServiceResult> => {

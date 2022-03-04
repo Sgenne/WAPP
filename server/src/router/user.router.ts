@@ -15,6 +15,9 @@ import { handleUploadedImage } from "../utils/image.util";
 
 export const userRouter = Router();
 
+/**
+ * Creates a user.
+ */
 userRouter.post(
   "/register",
   hasValidEmail,
@@ -50,6 +53,9 @@ userRouter.post(
   }
 );
 
+/**
+ * Updates a user.
+ */
 userRouter.put(
   "/update-user",
   isAuthenticated,
@@ -70,6 +76,9 @@ userRouter.put(
   }
 );
 
+/**
+ * Deletes a user.
+ */
 userRouter.delete(
   "/delete-user",
   isAuthenticated,
@@ -82,6 +91,9 @@ userRouter.delete(
   }
 );
 
+/**
+ * Updates the visible properties of a user.
+ */
 userRouter.put(
   "/set-visible-properties",
   isAuthenticated,
@@ -107,6 +119,10 @@ userRouter.put(
   }
 );
 
+/**
+ * Verifies that the provided password is correct for the user with the given username.
+ * If verified, returns the full user object.
+ */
 userRouter.post(
   "/sign-in",
   hasUsername,
@@ -140,6 +156,9 @@ userRouter.post(
   }
 );
 
+/**
+ * Updates the profile picture of the user.
+ */
 userRouter.post(
   "/upload-profile-picture",
   handleUploadedImage,
@@ -168,6 +187,9 @@ userRouter.post(
   }
 );
 
+/**
+ * Returns the user object of the user with the given id.
+ */
 userRouter.get("/:userId", async (req: Request, res: Response) => {
   const userId = req.params.userId;
 
@@ -180,6 +202,9 @@ userRouter.get("/:userId", async (req: Request, res: Response) => {
     .send({ message: result.message, user: result.user });
 });
 
+/**
+ * Returns the user oject of the user with the given username.
+ */
 userRouter.get("/username/:username", async (req: Request, res: Response) => {
   const username = req.params.username;
 

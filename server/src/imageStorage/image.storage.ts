@@ -13,7 +13,16 @@ class ImageStorage {
     );
   }
 
-  storeImage = (file: Buffer, filename: string): Promise<Image> =>
+  /**
+   * Adds an image to persistant storage.
+   *
+   * @param image - Buffer object containing the image being uploaded.
+   *
+   * @param filename - The name of the image.
+   *
+   * @returns - The stored image.
+   */
+  storeImage = (image: Buffer, filename: string): Promise<Image> =>
     new Promise<Image>((resolve, reject) => {
       const storedObject = this.bucket.file(filename);
 
@@ -28,12 +37,20 @@ class ImageStorage {
             filename: filename,
           });
         })
-        .end(file);
+        .end(image);
     });
 
+  /**
+   * Deletes an image from persistant storage.
+   *
+   * @param image - The image to be deleted.
+   */
   deleteImage = async (image: Image): Promise<void> => {
     await this.bucket.file(image.filename).delete();
   };
 }
 
+/**
+ * Handles persistant storage of images.
+ */
 export const imageStorage = new ImageStorage();

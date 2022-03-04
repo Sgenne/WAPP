@@ -5,32 +5,23 @@ import { commentModel } from "../db/comment.db";
 import { userModel } from "../db/user.db";
 
 /**
- * The result of a comment service.
+ * The result of a comment service. Contains a status code and message describing the
+ * result of the attempted service. If the service was successful, then the result
+ * will contain the comment or comments that were acted upon.
  */
 export interface CommentServiceResult {
-  /**
-   * An HTTP status code describing the result of the attempted operation.
-   */
   statusCode: number;
-
-  /**
-   * A message describing the result of the attempted operation.
-   */
   message: string;
-
-  /**
-   * The comment that was acted upon.
-   */
   comment?: Comment;
-
   comments?: Comment[];
 }
 
 /**
- * user liking a comment
- * @param commentId - id of the comment the user tries to like
- * @param userId - id of the user trying to like
- * @returns - the liked comment
+ * User liking a comment.
+ *
+ * @param commentId - Id of the comment the user tries to like.
+ *
+ * @param userId - Id of the user trying to like.
  */
 export const likeComment = async (
   commentId: number,
@@ -96,10 +87,11 @@ export const likeComment = async (
 };
 
 /**
- * user disliking a comment
- * @param commentId - id of the comment the user tries to dislike
- * @param userId - id of the user trying to dislike
- * @returns - the disliked comment
+ * User disliking a comment.
+ *
+ * @param commentId - Id of the comment the user tries to dislike.
+ *
+ * @param userId - Id of the user trying to dislike
  */
 export const disLikeComment = async (
   commentId: number,
@@ -170,9 +162,7 @@ export const disLikeComment = async (
 
 /**
  *
- * @param commentId The id of the comment to get
- *
- * @returns a comment with the specified id
+ * @param commentId - The id of the comment to get.
  */
 export const getComment = async (
   commentId: number
@@ -198,7 +188,7 @@ export const getComment = async (
 /**
  * Returns the comments from a specified user.
  *
- * @param userId - The id of the author of the returned comments.
+ * @param userId The id of the author of the returned comments.
  */
 export const getCommentsByAuthor = async (
   userId: number
@@ -250,11 +240,13 @@ export const getLikedComments = async (
 };
 
 /**
- * user changes the content of a comment
- * @param commentId - id of the comment being changed
- * @param content - the new content for the comment
- * @param userId - id of the user trying to change the comment
- * @returns - the edited comment
+ * User changes the content of a comment.
+ *
+ * @param commentId - Id of the comment being changed.
+ *
+ * @param content - The new content for the comment.
+ *
+ * @param userId - Id of the user trying to change the comment.
  */
 export const editComment = async (
   commentId: number,
@@ -285,11 +277,13 @@ export const editComment = async (
     comment: comment,
   };
 };
+
 /**
- * user removes their comment from a thread
- * @param commentId - id of the comment being removed
- * @param userId - id of the user trying to remove the comment
- * @returns - the blank/delted comment
+ * User removes their comment from a thread.
+ *
+ * @param commentId - Id of the comment being removed.
+ *
+ * @param userId - Id of the user trying to remove the comment.
  */
 export const deleteComment = async (
   commentId: number,
@@ -331,12 +325,15 @@ export const deleteComment = async (
     comment: comment,
   };
 };
+
 /**
- * user posts a reply to a comment
- * @param commentIdRoot - id of the root comment that the user is replying to
- * @param content - the content of the comment
- * @param userId - userID of the user making the comment
- * @returns - the reply that was posted
+ * User posts a reply to a comment.
+ *
+ * @param commentIdRoot - Id of the root comment that the user is replying to.
+ *
+ * @param content - The content of the comment.
+ *
+ * @param userId - Id of the user making the comment.
  */
 export const postReply = async (
   commentIdRoot: number,

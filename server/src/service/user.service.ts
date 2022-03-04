@@ -4,23 +4,13 @@ import bcrypt from "bcryptjs";
 import { userModel } from "../db/user.db";
 
 /**
- * The result of a user service.
+ * The result of a user service. Contains a status code and message describing the
+ * result of the attempted service. If the service was successful, then the result
+ * will contain the relevant user.
  */
 export interface UserServiceResult {
-  /**
-   * An HTTP status code describing the result of the attempted operation.
-   */
   statusCode: number;
-
-  /**
-   * A message describing the result of the attempted operation.
-   */
   message: string;
-
-  /**
-   * The user that the attempted service acted upon, in the case that the operation was
-   * successfull.
-   */
   user?: User;
 }
 
@@ -31,8 +21,6 @@ export interface UserServiceResult {
  *
  * @param update - An object whose defined properties
  * will be used to update the user.
- *
- * @returns A UserServiceResult object.
  */
 export const updateUser = async (
   userId: number,
@@ -76,8 +64,6 @@ export const updateUser = async (
  * @param userId - The id of the user.
  *
  * @param password - The password to validate.
- *
- * @returns A UserServiceResult object.
  */
 export const validatePassword = async (
   userId: number,
@@ -121,8 +107,6 @@ export const validatePassword = async (
  * @param password - The password of the new user.
  *
  * @param birthDate - The date of birth of the new user.
- *
- * @returns A UserServiceResult object.
  */
 export const register = async (
   email: string,
@@ -179,14 +163,10 @@ export const register = async (
  * Attempts to delete a user.
  *
  * @param userId - The id of the user to delete.
- *
- * @returns A UserServiceResult object.
  */
 export const deleteUser = async (
   userId: number
 ): Promise<UserServiceResult> => {
-  // const existingUser: User = users[userId];
-
   const deletedUser = await userModel.deleteOne({ userId: userId });
 
   if (!deletedUser) {
@@ -216,7 +196,6 @@ export const getUser = async (userId: number): Promise<UserServiceResult> => {
 /**
  * Returns the user with the given username if one exists.
  * @param username - The username of the returned user.
- * @returns A UserServiceResult object.
  */
 export const getUserByUsername = async (
   username: string
@@ -244,8 +223,6 @@ export const getUserByUsername = async (
  * @param userId - The id of the user to update.
  *
  * @param options  - An object describing which of the users properties should be visible.
- *
- * @returns A UserServiceResult object.
  */
 export const setVisibleProperties = async (
   userId: number,
@@ -276,6 +253,13 @@ export const setVisibleProperties = async (
   };
 };
 
+/**
+ * Updates the profile picture of the specified user.
+ *
+ * @param userId - The id of the user to update.
+ *
+ * @param image - The new profile picture.
+ */
 export const updateProfilePicture = async (
   userId: number,
   image: { imageBuffer: Buffer; filename: string }

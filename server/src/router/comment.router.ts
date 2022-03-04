@@ -10,6 +10,9 @@ import { isAuthenticated } from "../utils/auth.util";
 
 export const commentRouter = Router();
 
+/**
+ * Adds a like by a specified user to a specified comment.
+ */
 commentRouter.put(
   "/likeComment",
   hasValidCommentId,
@@ -33,6 +36,9 @@ commentRouter.put(
   }
 );
 
+/**
+ * Adds a dislike by a specified user to a specified comment.
+ */
 commentRouter.put(
   "/disLikeComment",
   hasValidCommentId,
@@ -56,6 +62,9 @@ commentRouter.put(
   }
 );
 
+/**
+ * Allows the creator of a comment to edit that comment.
+ */
 commentRouter.put(
   "/editComment",
   hasValidCommentId,
@@ -80,6 +89,9 @@ commentRouter.put(
   }
 );
 
+/**
+ * Allows the creator of a comment to delete that comment.
+ */
 commentRouter.put(
   "/deleteComment",
   hasValidCommentId,
@@ -102,6 +114,9 @@ commentRouter.put(
   }
 );
 
+/**
+ * Adds a reply by a specified user to a specified comment.
+ */
 commentRouter.post(
   "/reply",
   hasContent,
@@ -130,6 +145,9 @@ commentRouter.post(
   }
 );
 
+/**
+ * Returns all comments that have been liked by a specified user.
+ */
 commentRouter.get(
   "/likedComments/:userId",
   async (req: Request, res: Response) => {
@@ -143,6 +161,9 @@ commentRouter.get(
   }
 );
 
+/**
+ * Returns all comments that have been created by a specified user.
+ */
 commentRouter.get("/author/:userId", async (req: Request, res: Response) => {
   const userId = req.params.userId;
 
@@ -153,6 +174,9 @@ commentRouter.get("/author/:userId", async (req: Request, res: Response) => {
     .send({ message: result.message, comments: result.comments });
 });
 
+/**
+ * Returns one comment specified by the given comment-id.
+ */
 commentRouter.get("/:commentId", async (req: Request, res: Response) => {
   const commentId = req.params.commentId;
 

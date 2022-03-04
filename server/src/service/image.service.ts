@@ -11,30 +11,20 @@ export const DEFAULT_IMAGE: Image = {
 };
 
 /**
- * The result of an image service.
+ * The result of an image service. Contains a status code and message describing the
+ * result of the attempted service. If the service was successful, then the result
+ * will contain the image that was acted upon.
  */
 interface ImageServiceResult {
-  /**
-   * An HTTP status code describing the result of the attempted operation.
-   */
   statusCode: number;
-
-  /**
-   * A message describing the result of the attempted operation.
-   */
   message: string;
-
-  /**
-   * The image that the attempted service acted upon, in the case that the operation was
-   * successfull.
-   */
   image?: Image;
 }
 
 /**
- * Stores a given image in the file system.
+ * Adds an image to persistant storage.
+ *
  * @param image - The image to store.
- * @returns An ImageServiceResult object.
  */
 export const storeImage = async (image: {
   imageBuffer: Buffer;
@@ -59,6 +49,11 @@ export const storeImage = async (image: {
   };
 };
 
+/**
+ * Removes an image from persistant storage.
+ *
+ * @param image - The image to delete.
+ */
 export const deleteImage = async (
   image: Image
 ): Promise<ImageServiceResult> => {
@@ -75,9 +70,3 @@ export const deleteImage = async (
     message: "The image was deleted successfully.",
   };
 };
-
-/**
- * Returns the path to an image in the file system with a given filename.
- * @param filename - The name of the image.
- */
-const getImagePath = (filename: string) => path.join(imageFolderPath, filename);

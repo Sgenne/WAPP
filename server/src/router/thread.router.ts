@@ -4,7 +4,6 @@ import {
   handleValidationResult,
   hasCategory,
   hasContent,
-  hasUsername,
   hasValidThreadId,
   hasValidThreadTitle,
   hasValidUserId,
@@ -13,6 +12,9 @@ import { isAuthenticated } from "../utils/auth.util";
 
 export const threadRouter = Router();
 
+/**
+ * Adds a like from a specified user to a specified thread.
+ */
 threadRouter.put(
   "/likeThread",
   hasValidUserId,
@@ -36,6 +38,9 @@ threadRouter.put(
   }
 );
 
+/**
+ * Adds a dislike by a specified user to a specified thread.
+ */
 threadRouter.put(
   "/dislikeThread",
   hasValidUserId,
@@ -59,6 +64,9 @@ threadRouter.put(
   }
 );
 
+/**
+ * Allows the creator of a thread to edit the thread's content and title.
+ */
 threadRouter.put(
   "/editThread",
   hasValidThreadId,
@@ -84,6 +92,9 @@ threadRouter.put(
   }
 );
 
+/**
+ * Adds a reply to a specified thread.
+ */
 threadRouter.post(
   "/reply",
   hasContent,
@@ -108,6 +119,9 @@ threadRouter.post(
   }
 );
 
+/**
+ * Creates a thread.
+ */
 threadRouter.post(
   "/postThread",
   hasCategory,
@@ -139,6 +153,9 @@ threadRouter.post(
   }
 );
 
+/**
+ * Returns all available categories.
+ */
 threadRouter.get("/categories", async (req: Request, res: Response) => {
   const result = await threadServices.getCategories();
 
@@ -151,6 +168,9 @@ threadRouter.get("/categories", async (req: Request, res: Response) => {
     .send({ message: result.message, categories: result.categories });
 });
 
+/**
+ * Returns all threads from a specified category.
+ */
 threadRouter.get(
   "/categoryThreads/:categoryId",
   async (req: Request, res: Response) => {
@@ -166,6 +186,9 @@ threadRouter.get(
   }
 );
 
+/**
+ * Returns three sample threads from the specified category.
+ */
 threadRouter.get(
   "/sampleThreads/:categoryId",
   async (req: Request, res: Response) => {
@@ -181,6 +204,9 @@ threadRouter.get(
   }
 );
 
+/**
+ * Returns all replies to a specific comment.
+ */
 threadRouter.get(
   "/commentComments/:commentId",
   async (req: Request, res: Response) => {
@@ -198,6 +224,9 @@ threadRouter.get(
   }
 );
 
+/**
+ * Returns all threads that have been created by a specified user.
+ */
 threadRouter.get("/author/:userId", async (req: Request, res: Response) => {
   const userId = req.params.userId;
 
@@ -211,6 +240,9 @@ threadRouter.get("/author/:userId", async (req: Request, res: Response) => {
   res.status(200).send({ message: result.message, threads: result.threads });
 });
 
+/**
+ * Returns all threads that have been liked by a specified user.
+ */
 threadRouter.get("/liked/:userId", async (req: Request, res: Response) => {
   const userId = req.params.userId;
 
@@ -223,6 +255,9 @@ threadRouter.get("/liked/:userId", async (req: Request, res: Response) => {
   res.status(200).send({ message: result.message, threads: result.threads });
 });
 
+/**
+ * Deletes a specified thread.
+ */
 threadRouter.delete(
   "/deleteThread",
   hasValidThreadId,
@@ -243,6 +278,10 @@ threadRouter.delete(
     });
   }
 );
+
+/**
+ * Returns the thread with the given thread-id.
+ */
 threadRouter.get("/:threadId", async (req: Request, res: Response) => {
   const threadId = +req.params.threadId;
 
