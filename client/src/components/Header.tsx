@@ -20,10 +20,12 @@ const Header = () => {
   return (
     <div className="container-fluid">
       <header className="row">
-        <div className="header__logo col-lg-2 col-md-3 col-2">
+        <div className="header__logo col-2">
           <NavLink to="/">
-            <GiCapybara className="header__logo-icon" />
-            <h1 className="d-none d-md-inline">WAPP</h1>
+            <div className="container-fluid d-flex align-items-center">
+              <GiCapybara className="col-lg-6 col-12 header__logo-icon" />
+              <h1 className=".col-lg-6 d-lg-inline d-none">WAPP</h1>
+            </div>
           </NavLink>
         </div>
         <div className="header__search col-lg-8 col-md-6 col-6">
@@ -37,7 +39,7 @@ const Header = () => {
             <span className="header__profile-link">
               <NavLink to={`/profile/${authContext.signedInUser?.username}`}>
                 <img
-                  className="header__profile-picture"
+                  className="header__profile-picture "
                   src={signedInUser.image.imageUrl}
                 />{" "}
                 {authContext.signedInUser?.username}

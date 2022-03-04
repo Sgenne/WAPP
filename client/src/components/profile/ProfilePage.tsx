@@ -7,7 +7,7 @@ import axios, { AxiosResponse } from "axios";
 import { User } from "../../../../server/src/model/user.interface";
 import { AuthContext } from "../../context/AuthContext";
 import { useParams } from "react-router-dom";
-import { FaCog } from "react-icons/fa";
+import { FaEdit, FaPencilAlt } from "react-icons/fa";
 import EditProfilePopup from "./EditProfilePopup";
 
 const ProfilePage = () => {
@@ -213,24 +213,41 @@ const ProfilePage = () => {
           src={owner.image.imageUrl}
           alt="profile"
         />
-        <h1 className="profile-page__username"> {owner.username}</h1>
+        <h1 className="profile-page__username">
+          {" "}
+          {owner.username}
+          {isOwner && (
+            <button
+              className="profile-page__settings-button"
+              onClick={showSettingsHandler}
+            >
+              <FaEdit className="profile-page__settings-icon" />
+            </button>
+          )}
+        </h1>
         <p className="profile-page__bio"> {owner.bio}</p>
-        {isOwner && (
-          <button
-            className="profile-page__settings-button"
-            onClick={showSettingsHandler}
-          >
-            <FaCog className="profile-page__settings-icon" />
+      </div>
+      <div className="profile-page__thread-buttons container-fluid">
+        <div className="row">
+          <button className="col-lg-3" onClick={showCreatedThreads}>
+            Threads
           </button>
-        )}
+          <button className="col-lg-3" onClick={showCreatedComments}>
+            Comments
+          </button>
+          <button className="col-lg-3" onClick={showLikedThreads}>
+            Liked Threads
+          </button>
+          <button className="col-lg-3" onClick={showLikedComments}>
+            Liked Comments
+          </button>
+        </div>
       </div>
-      <div className="profile-page__thread-buttons">
-        <button onClick={showCreatedThreads}>Threads</button>
-        <button onClick={showCreatedComments}>Comments</button>
-        <button onClick={showLikedThreads}>Liked Threads</button>
-        <button onClick={showLikedComments}>Liked Comments</button>
+      <div className="container-fluid d-flex  justify-content-center">
+        <ul className="profile-page__displayed-threads col-lg-5 col-12">
+          {listItems}
+        </ul>
       </div>
-      <ul className="profile-page__displayed-threads">{listItems}</ul>
     </div>
   );
 };

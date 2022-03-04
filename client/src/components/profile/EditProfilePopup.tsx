@@ -93,18 +93,26 @@ const EditProfilePopup = (props: {
         <div className="edit-profile__profile-picture">
           <div className="edit-profile__profile-picture-input">
             <label>Update your profile picture</label>
-            <input type="file" onChange={profilePictureChangeHandler} />
+            <input
+              className="edit-profile__profile-picture-input-square"
+              type="file"
+              onChange={profilePictureChangeHandler}
+            />
           </div>
 
-          <button onClick={submitProfilePictureHandler}>
-            Submit profile picture
-          </button>
+          <button onClick={submitProfilePictureHandler}>Submit picture</button>
         </div>
         <div className="edit-profile__user-info">
-          <label>Edit bio:</label>
-          <textarea onChange={bioChangeHandler} defaultValue={bio}></textarea>
+          <div className="edit-profile__bio">
+            <label>Edit bio:</label>
+            <textarea
+              className="edit-profile__bio-text-area"
+              onChange={bioChangeHandler}
+              defaultValue={bio}
+            ></textarea>
+          </div>
           <div className="edit-profile__user-info-buttons">
-            <button onClick={submitUserInfoChanges}>Submit changes</button>
+            <button onClick={submitUserInfoChanges}>Submit bio</button>
             <button onClick={props.onClose}>Cancel</button>
           </div>
         </div>
