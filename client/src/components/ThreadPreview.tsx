@@ -9,13 +9,13 @@ import { formatDate } from "../utils/formatUtils";
 import ErrorMessage from "./ErrorMessage";
 import parse from "html-react-parser";
 
-const ThreadPreview = (props: { thread: Thread }) => {
+const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
   const [user, setThreads] = useState<User>();
   const [errorMessage, setErrorMessage] = useState("");
   const [likes, setLikes] = useState(props.thread.likes);
   const [dislikes, setDislikes] = useState(props.thread.dislikes);
 
-  async function getUser() {
+  async function getUser(): Promise<void> {
     try {
       threadResult = await axios.get<{
         message: string;
@@ -30,7 +30,7 @@ const ThreadPreview = (props: { thread: Thread }) => {
   let threadResult: AxiosResponse;
   let userImage;
 
-  useEffect(() => {
+  useEffect((): void => {
     getUser();
   }, []);
   let author;
@@ -45,8 +45,11 @@ const ThreadPreview = (props: { thread: Thread }) => {
   const id: string = "/thread/" + props.thread.threadId;
   const date = props.thread.date;
 
-  const likeClickHandler = async () => {
-    if (!authContext.signedInUser) return;
+  const likeClickHandler = async (): Promise<void> => {
+    if (!authContext.signedInUser) {
+      setErrorMessage("You need to sign in to like");
+      return;
+    } 
 
     let likeResult: AxiosResponse;
     try {
@@ -76,8 +79,11 @@ const ThreadPreview = (props: { thread: Thread }) => {
     }
   };
 
-  const dislikeClickHandler = async () => {
-    if (!authContext.signedInUser) return;
+  const dislikeClickHandler = async (): Promise<void> => {
+    if (!authContext.signedInUser) {
+      setErrorMessage("You need to sign in to dislike");
+      return;
+    } 
 
     let dislikeResult: AxiosResponse;
     try {
@@ -109,19 +115,19 @@ const ThreadPreview = (props: { thread: Thread }) => {
     <li>
       <div className="category-thread container-fluid px-4">
         <div className="row">
-          <img src={userImage} className="row__avatar" />
+          <img src={userImage} className="row__avatar" alt="Profile" />
           <div className="col row">
             <h3 className="thread-title col-12">
               <NavLink to={id} className="link">
                 {title}
               </NavLink>
             </h3>
-            <p className="row__thread-title col-sm-3">
+            <p className="row__thread-title col-3">
               <NavLink to={`/profile/${author}`} className="link">
                 {author}
               </NavLink>
             </p>
-            <p className="row__thread-title col-sm-4">
+            <p className="row__thread-title col-7">
               {formatDate(new Date(date))}
             </p>
           </div>

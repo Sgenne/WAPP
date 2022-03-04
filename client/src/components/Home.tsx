@@ -3,10 +3,10 @@ import CategoryPreview from "./CategoryPreview";
 import { Category } from "../../../server/src/model/category.interface";
 import { useEffect, useState } from "react";
 
-const Home = () => {
+const Home = (): JSX.Element => {
   const [categories, setCategetories] = useState<Category[]>([]);
 
-  async function getCategory() {
+  async function getCategory(): Promise<void> {
     try {
       categoryResult = await axios.get<{
         message: string;
@@ -21,7 +21,7 @@ const Home = () => {
 
   let categoryResult: AxiosResponse;
 
-  useEffect(() => {
+  useEffect((): void => {
     getCategory();
   }, []);
 

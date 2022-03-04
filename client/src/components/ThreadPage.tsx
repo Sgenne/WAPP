@@ -12,7 +12,7 @@ import ErrorMessage from "./ErrorMessage";
 import { formatDate } from "../utils/formatUtils";
 import parse from "html-react-parser";
 
-const ThreadPage = () => {
+const ThreadPage = ():JSX.Element => {
   const navigate = useNavigate();
   const param = useParams();
   const id = param.threadId;
@@ -24,7 +24,7 @@ const ThreadPage = () => {
 
   const authContext = useContext(AuthContext);
 
-  async function getThread() {
+  async function getThread(): Promise<void> {
     try {
       threadResult = await axios.get<{
         message: string;
@@ -37,7 +37,7 @@ const ThreadPage = () => {
     setThreads(threadResult.data.thread);
   }
 
-  async function getUser() {
+  async function getUser(): Promise<void> {
     if (!threadObject) return;
 
     console.log("in getUser");
@@ -53,7 +53,7 @@ const ThreadPage = () => {
     setuser(userResult.data.user);
   }
 
-  async function getComments() {
+  async function getComments(): Promise<void> {
     let commentResult: AxiosResponse;
     if (!threadObject) return;
 
@@ -75,11 +75,11 @@ const ThreadPage = () => {
   let threadResult: AxiosResponse;
   let userResult: AxiosResponse;
 
-  useEffect(() => {
+  useEffect(():void => {
     getThread();
   }, []);
 
-  useEffect(() => {
+  useEffect(()=> {
     if (threads) {
       setThreadObject(threads);
       getUser();
@@ -102,8 +102,11 @@ const ThreadPage = () => {
     }
   }
 
-  const likeClickHandler = async () => {
-    if (!authContext.signedInUser) return;
+  const likeClickHandler = async (): Promise<void> => {
+    if (!authContext.signedInUser){
+      setErrorMessage("You need to sign in to like");
+      return;
+    } 
 
     let likeResult: AxiosResponse;
     try {
@@ -132,8 +135,11 @@ const ThreadPage = () => {
     }
   };
 
-  const dislikeClickHandler = async () => {
-    if (!authContext.signedInUser) return;
+  const dislikeClickHandler = async (): Promise<void> => {
+    if (!authContext.signedInUser) {
+      setErrorMessage("You need to sign in to dislike");
+      return;
+    } 
 
     let dislikeResult: AxiosResponse;
     try {
@@ -162,7 +168,7 @@ const ThreadPage = () => {
     }
   };
 
-  const replyClickHandler = async () => {
+  const replyClickHandler = async (): Promise<void> => {
     navigate(`/create-comment/thread/${threadObject.threadId}`);
   };
 
@@ -178,15 +184,15 @@ const ThreadPage = () => {
         <li>
           <div className="category-box container-fluid px-4">
             <div className="row">
-              <img src={userImage} className="row__avatar" />
+              <img src={userImage} className="row__avatar" alt="Profile"/>
               <div className="col row">
                 <h3 className="thread-title col-12">{title}</h3>
-                <p className="row__thread-title col-sm-3">
+                <p className="row__thread-title col-3">
                   <NavLink to={path} className="link">
                     {author}
                   </NavLink>
                 </p>
-                <p className="row__thread-title col-sm-4">
+                <p className="row__thread-title col-7">
                   {formatDate(new Date(date))}
                 </p>
               </div>

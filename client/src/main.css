@@ -421,10 +421,6 @@ header {
   flex-direction: column;
 }
 
-.ql-toolbar {
-  display: none;
-}
-
 .header__profile-picture {
   height: 75px;
   width: 75px;

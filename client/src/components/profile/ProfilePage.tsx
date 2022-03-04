@@ -10,7 +10,7 @@ import { useParams } from "react-router-dom";
 import { FaEdit, FaPencilAlt } from "react-icons/fa";
 import EditProfilePopup from "./EditProfilePopup";
 
-const ProfilePage = () => {
+const ProfilePage = (): JSX.Element => {
   const [owner, setOwner] = useState<User>();
   const [createdThreads, setCreatedThreads] = useState<Thread[]>([]);
   const [createdComments, setCreatedComments] = useState<Comment[]>([]);
@@ -29,12 +29,12 @@ const ProfilePage = () => {
 
   const ownerName = params.username;
 
-  useEffect(() => {
+  useEffect((): void => {
     if (!ownerName) return;
     fetchUser(ownerName);
   }, [ownerName]);
 
-  useEffect(() => {
+  useEffect((): void => {
     if (!owner) return;
 
     const ownerId = owner.userId;
@@ -44,7 +44,7 @@ const ProfilePage = () => {
     fetchLikedComments(ownerId);
   }, [owner]);
 
-  const fetchUser = async (username: string) => {
+  const fetchUser = async (username: string): Promise<void> => {
     let response: AxiosResponse;
 
     try {
@@ -74,7 +74,7 @@ const ProfilePage = () => {
     setCreatedThreads(fetchedThreads);
   };
 
-  const fetchCreatedComments = async (userId: number) => {
+  const fetchCreatedComments = async (userId: number): Promise<void> => {
     let response: AxiosResponse;
 
     try {
@@ -89,7 +89,7 @@ const ProfilePage = () => {
     setCreatedComments(response.data.comments);
   };
 
-  const fetchLikedThreads = async (userId: Number) => {
+  const fetchLikedThreads = async (userId: Number): Promise<void> => {
     let response: AxiosResponse;
 
     try {
@@ -104,7 +104,7 @@ const ProfilePage = () => {
     setLikedThreads(response.data.threads);
   };
 
-  const fetchLikedComments = async (userId: Number) => {
+  const fetchLikedComments = async (userId: Number): Promise<void> => {
     let response: AxiosResponse;
 
     try {
@@ -135,7 +135,7 @@ const ProfilePage = () => {
   }, [createdThreads]);
 
   // Show created threads when page is loaded.
-  useEffect(() => {
+  useEffect((): void => {
     showCreatedThreads();
   }, [showCreatedThreads]);
 
@@ -211,7 +211,7 @@ const ProfilePage = () => {
         <img
           className="profile-page__image"
           src={owner.image.imageUrl}
-          alt="profile"
+          alt="Profile"
         />
         <h1 className="profile-page__username">
           {" "}

@@ -7,7 +7,7 @@ const ProfileListItem = (props: {
   content: string;
   info?: string;
   link?: string;
-}) => {
+}): JSX.Element => {
   let content = props.content;
   if (content.length > 100) {
     content = content.substring(0, 100) + "...";

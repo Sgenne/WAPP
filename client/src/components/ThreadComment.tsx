@@ -9,13 +9,13 @@ import { AuthContext } from "../context/AuthContext";
 import { formatDate } from "../utils/formatUtils";
 import ErrorMessage from "./ErrorMessage";
 
-const ThreadComment = (props: { root: Comment }) => {
+const ThreadComment = (props: { root: Comment }): JSX.Element => {
   const [user, setThreads] = useState<User>();
   const [comments, setComments] = useState<Comment[]>();
   const authContext = useContext(AuthContext);
   const [errorMessage, setErrorMessage] = useState("");
 
-  async function getComments() {
+  async function getComments(): Promise<void> {
     let commentResult: AxiosResponse;
 
     try {
@@ -33,7 +33,7 @@ const ThreadComment = (props: { root: Comment }) => {
     setComments(commentResult.data.comments);
   }
 
-  async function getUser() {
+  async function getUser(): Promise<void> {
     try {
       threadResult = await axios.get<{
         message: string;
@@ -47,7 +47,7 @@ const ThreadComment = (props: { root: Comment }) => {
 
   let threadResult: AxiosResponse;
 
-  useEffect(() => {
+  useEffect((): void => {
     getUser();
     getComments();
   }, []);
@@ -63,7 +63,7 @@ const ThreadComment = (props: { root: Comment }) => {
     }
   }
 
-  const likeClickHandler = async () => {
+  const likeClickHandler = async (): Promise<void> => {
     if (!authContext.signedInUser) return;
 
     let likeResult: AxiosResponse;
@@ -91,7 +91,7 @@ const ThreadComment = (props: { root: Comment }) => {
     }
   };
 
-  const dislikeClickHandler = async () => {
+  const dislikeClickHandler = async (): Promise<void> => {
     if (!authContext.signedInUser) return;
     let dislikeResult: AxiosResponse;
     try {
@@ -120,7 +120,7 @@ const ThreadComment = (props: { root: Comment }) => {
   };
 
   const navigate = useNavigate();
-  const replyClickHandler = async () => {
+  const replyClickHandler = async (): Promise<void> => {
     navigate(`/create-comment/comment/${props.root.commentId}`);
   };
 

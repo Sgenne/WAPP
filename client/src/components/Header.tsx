@@ -4,14 +4,14 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { NavLink } from "react-router-dom";
 
-const Header = () => {
+const Header = (): JSX.Element => {
   const authContext = useContext(AuthContext);
 
-  const signInClickHandler = () => {
+  const signInClickHandler = (): void => {
     authContext.setShowSignIn(true);
   };
 
-  const registerClickHandler = () => {
+  const registerClickHandler = (): void => {
     authContext.setShowRegister(true);
   };
 

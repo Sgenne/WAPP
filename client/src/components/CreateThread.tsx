@@ -6,8 +6,10 @@ import { useParams } from "react-router-dom";
 import { Thread } from "../../../server/src/model/thread.interface";
 import { AuthContext } from "../context/AuthContext";
 import ErrorMessage from "./ErrorMessage";
+import QuillTools, { modules, formats } from "../utils/quillTools";
 
-const CreateThread = () => {
+
+const CreateThread = (): JSX.Element => {
   const params = useParams();
   const category = params.category;
   const [value, setValue] = useState("");
@@ -20,8 +22,11 @@ const CreateThread = () => {
   };
   const authContext = useContext(AuthContext);
 
-  const submitClickHandler = async () => {
-    if (!authContext.signedInUser) return;
+  const submitClickHandler = async (): Promise<void> => {
+    if (!authContext.signedInUser) if (!authContext.signedInUser){
+      setErrorMessage("You need to sign in to create a thread");
+      return;
+    } 
 
     let signInResult: AxiosResponse;
     try {
@@ -72,8 +77,8 @@ const CreateThread = () => {
               placeholder="Thread title"
               onChange={createThreadChangeHandler}
             />
-
-            <ReactQuill value={value} onChange={setValue} />
+            <QuillTools />
+            <ReactQuill value={value} onChange={setValue} modules={modules} formats={formats}/>
 
             <div id="submitbut">
               <button

@@ -5,20 +5,26 @@ import "react-quill/dist/quill.snow.css";
 import { useParams } from "react-router-dom";
 import { Thread } from "../../../server/src/model/thread.interface";
 import { AuthContext } from "../context/AuthContext";
+import QuillTools, { formats, modules } from "../utils/quillTools";
 import ErrorMessage from "./ErrorMessage";
 
-const CreateComment = () => {
+const CreateComment = (): JSX.Element => {
   const authContext = useContext(AuthContext);
   const params = useParams();
   const category = params.category;
   const [value, setValue] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  if (params.type != "thread" && params.type != "comment") {
+  if (params.type !== "thread" && params.type !== "comment") {
     return <div>Invald type</div>;
   }
 
   const submitClickHandler = async () => {
+    if (!authContext.signedInUser){
+      setErrorMessage("You need to sign in to comment");
+      return;
+    } 
+
     let signInResult: AxiosResponse;
     try {
       signInResult = await axios.post<{ message: string; thread?: Thread }>(
@@ -66,7 +72,8 @@ const CreateComment = () => {
         </li>
         <li>
           <div id="postthread">
-            <ReactQuill value={value} onChange={setValue} />
+          <QuillTools />
+            <ReactQuill value={value} onChange={setValue} modules={modules} formats={formats}/>
 
             <div id="submitbut">
               <button

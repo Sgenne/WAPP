@@ -7,10 +7,10 @@ import axios, { AxiosResponse } from "axios";
 import { Thread } from "../../../server/src/model/thread.interface";
 import { NavLink } from "react-router-dom";
 
-const CategoryPreview = (props: { category: Category }) => {
+const CategoryPreview = (props: { category: Category }): JSX.Element => {
   const [threads, setThreads] = useState<Thread[]>([]);
 
-  async function getThreads() {
+  async function getThreads(): Promise<void> {
     try {
       threadResult = await axios.get<{
         message: string;
@@ -28,7 +28,7 @@ const CategoryPreview = (props: { category: Category }) => {
 
   let threadResult: AxiosResponse;
 
-  useEffect(() => {
+  useEffect((): void => {
     getThreads();
   }, []);
   let ThreadPreviewContent;

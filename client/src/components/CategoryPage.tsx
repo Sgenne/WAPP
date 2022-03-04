@@ -4,12 +4,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Thread } from "../../../server/src/model/thread.interface";
 import ThreadPreview from "./ThreadPreview";
 
-const CategoryPage = () => {
+const CategoryPage = (): JSX.Element => {
   const param = useParams();
   const category = param.category;
   const [threads, setThreads] = useState<Thread[]>([]);
 
-  async function getCategory() {
+  async function getCategory(): Promise<void> {
     try {
       threadResult = await axios.get<{
         message: string;
@@ -23,7 +23,7 @@ const CategoryPage = () => {
 
   let threadResult: AxiosResponse;
 
-  useEffect(() => {
+  useEffect((): void => {
     getCategory();
   }, []);
   let ThreadPreviewContent;

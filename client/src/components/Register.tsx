@@ -4,7 +4,7 @@ import Modal from "./Modal";
 import { AuthContext } from "../context/AuthContext";
 import ErrorMessage from "./ErrorMessage";
 
-const Register = () => {
+const Register = (): JSX.Element => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
@@ -13,35 +13,37 @@ const Register = () => {
 
   const authContext = useContext(AuthContext);
 
-  const closeHandler = () => {
+  const closeHandler = (): void => {
     authContext.setShowRegister(false);
   };
 
   const usernameChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  ): void => {
     setUsername(event.target.value);
   };
 
   const passwordChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  ): void => {
     setPassword(event.target.value);
   };
 
-  const emailChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const emailChangeHandler = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
     setEmail(event.target.value);
   };
 
   const birthDateChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  ): void => {
     setBirthDate(event.target.value);
   };
 
   const validInput = username && password && email && birthDate;
 
-  const submitClickHandler = async () => {
+  const submitClickHandler = async (): Promise<void> => {
     if (!validInput) return;
     let result: AxiosResponse;
     try {

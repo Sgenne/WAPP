@@ -10,12 +10,12 @@ const EditProfilePopup = (props: {
   onClose: () => void;
   owner: User;
   onUpdateOwner: (updatedOwner: User) => void;
-}) => {
+}): JSX.Element => {
   const [newProfilePicture, setNewProfilePicture] = useState<File>();
   const [bio, setBio] = useState(props.owner.bio);
   const authContext = useContext(AuthContext);
 
-  const submitProfilePictureHandler = async () => {
+  const submitProfilePictureHandler = async (): Promise<void> => {
     if (
       !(newProfilePicture && authContext.signedInUser && authContext.password)
     )
@@ -52,7 +52,7 @@ const EditProfilePopup = (props: {
     props.onClose();
   };
 
-  const submitUserInfoChanges = async () => {
+  const submitUserInfoChanges = async (): Promise<void> => {
     if (!authContext.signedInUser) return;
 
     try {
@@ -77,13 +77,15 @@ const EditProfilePopup = (props: {
 
   const profilePictureChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  ): void => {
     if (!event.target.files) return;
 
     setNewProfilePicture(event.target.files[0]);
   };
 
-  const bioChangeHandler = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const bioChangeHandler = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ): void => {
     setBio(event.target.value);
   };
 

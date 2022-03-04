@@ -5,36 +5,36 @@ import Modal from "./Modal";
 import { User } from "../../../server/src/model/user.interface";
 import ErrorMessage from "./ErrorMessage";
 
-const SignIn = () => {
+const SignIn = (): JSX.Element => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const authContext = useContext(AuthContext);
 
-  const closeHandler = () => {
+  const closeHandler = (): void => {
     authContext.setShowSignIn(false);
   };
 
   const usernameChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  ): void => {
     setUsername(event.target.value);
   };
 
   const passwordChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  ): void => {
     setPassword(event.target.value);
   };
 
-  const handleKeyDown = (event: { key: string }) => {
+  const handleKeyDown = (event: { key: string }): void => {
     if (event.key === "Enter") {
       submitClickHandler();
     }
   };
 
-  const submitClickHandler = async () => {
+  const submitClickHandler = async (): Promise<void> => {
     let signInResult: AxiosResponse;
     try {
       signInResult = await axios.post<{ message: string; user?: User }>(

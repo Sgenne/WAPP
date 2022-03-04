@@ -3,7 +3,7 @@ import { useEffect } from "react";
 const Modal = (props: {
   children: JSX.Element;
   onBackgroundClick: () => void;
-}) => {
+}): JSX.Element => {
   // Hide scrollbar while modal is shown.
   useEffect(() => {
     document.body.style.overflowY = "hidden";
