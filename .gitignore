@@ -106,5 +106,7 @@ dist
 images/
 
 environmentVariables.ts
+environmentVariables.env
+
 
 google-cloud-key.json
