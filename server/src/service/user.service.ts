@@ -128,13 +128,13 @@ export const register = async (
   const userId = new Date().getTime();
   const passwordHash = await hashPassword(password);
 
-  const newUser: User = await userModel.create({
+  const newUser: User = {
     userId,
     email,
     username,
     passwordHash,
     bio: "",
-    image: DEFAULT_IMAGE,
+    profilePicture: DEFAULT_IMAGE,
     birthDate,
     likedThreads: [],
     dislikedThreads: [],
@@ -146,11 +146,13 @@ export const register = async (
       joinDate: true,
       birthDate: true,
       bio: true,
-      image: true,
+      profilePicture: true,
       likedThreads: true,
       dislikedThreads: true,
     },
-  });
+  };
+
+  await userModel.create(newUser);
 
   return {
     statusCode: 201,
@@ -201,7 +203,7 @@ export const getUserByUsername = async (
   username: string
 ): Promise<UserServiceResult> => {
   const existingUser = await userModel.findOne({
-    username: { $regex: new RegExp('^'+ username + '$', "i") },
+    username: { $regex: new RegExp("^" + username + "$", "i") },
   });
 
   if (!existingUser)
@@ -273,8 +275,7 @@ export const updateProfilePicture = async (
     };
   }
 
-  const previousProfilePicture = user.image;
-
+  const previousProfilePicture = user.profilePicture;
   const storageResult = await storeImage(image);
   const storedImage = storageResult.image;
 
@@ -283,17 +284,17 @@ export const updateProfilePicture = async (
   }
 
   if (!previousProfilePicture.isDefault) {
-    deleteImage(user.image);
+    deleteImage(user.profilePicture);
   }
 
   await userModel.updateOne(
     { userId: userId },
     {
-      image: storedImage,
+      profilePicture: storedImage,
     }
   );
 
-  user.image = storedImage;
+  user.profilePicture = storedImage;
   return {
     message: "The profile picture was updated successfully.",
     statusCode: 200,

@@ -183,7 +183,7 @@ userRouter.post(
 
     res
       .status(result.statusCode)
-      .send({ message: result.message, profilePicture: user.image });
+      .send({ message: result.message, profilePicture: user.profilePicture });
   }
 );
 

@@ -32,7 +32,7 @@ const userSchema: Schema = new Schema({
     type: String,
     required: true,
   },
-  image: {
+  profilePicture: {
     type: Object,
     required: true,
   },

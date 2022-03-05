@@ -11,7 +11,7 @@ export interface User {
   birthDate: any;
   bio: string;
   passwordHash: string;
-  image: Image;
+  profilePicture: Image;
   likedThreads: number[];
   dislikedThreads: number[];
   likedComments: number[];
@@ -21,7 +21,7 @@ export interface User {
     joinDate: boolean;
     birthDate: boolean;
     bio: boolean;
-    image: boolean;
+    profilePicture: boolean;
     likedThreads: boolean;
     dislikedThreads: boolean;
   };
