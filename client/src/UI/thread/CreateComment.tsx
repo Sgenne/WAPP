@@ -3,10 +3,10 @@ import React, { useContext, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useParams } from "react-router-dom";
-import { Thread } from "../../../server/src/model/thread.interface";
-import { AuthContext } from "../context/AuthContext";
-import QuillTools, { formats, modules } from "../utils/quillTools";
-import ErrorMessage from "./ErrorMessage";
+import { Thread } from "../../../../server/src/model/thread.interface";
+import { AuthContext } from "../../context/AuthContext";
+import QuillTools, { formats, modules } from "../../utils/quillTools";
+import ErrorMessage from "../common/ErrorMessage";
 
 const CreateComment = (): JSX.Element => {
   const authContext = useContext(AuthContext);

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Collapse } from "react-bootstrap";
-import ThreadPreview from "./ThreadPreview";
+import ThreadPreview from "../thread/ThreadPreview";
 import { FaArrowDown } from "react-icons/fa";
-import { Category } from "../../../server/src/model/category.interface";
+import { Category } from "../../../../server/src/model/category.interface";
 import axios, { AxiosResponse } from "axios";
-import { Thread } from "../../../server/src/model/thread.interface";
+import { Thread } from "../../../../server/src/model/thread.interface";
 import { NavLink } from "react-router-dom";
 
 const CategoryPreview = (props: { category: Category }): JSX.Element => {

@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import CategoryPreview from "./CategoryPreview";
+import CategoryPreview from "./category/CategoryPreview";
 import { Category } from "../../../server/src/model/category.interface";
 import { useEffect, useState } from "react";
 

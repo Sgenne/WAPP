@@ -2,11 +2,11 @@ import axios, { AxiosResponse } from "axios";
 import { useState, useEffect, useContext } from "react";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
-import { Thread } from "../../../server/src/model/thread.interface";
-import { User } from "../../../server/src/model/user.interface";
-import { AuthContext } from "../context/AuthContext";
-import { formatDate } from "../utils/formatUtils";
-import ErrorMessage from "./ErrorMessage";
+import { Thread } from "../../../../server/src/model/thread.interface";
+import { User } from "../../../../server/src/model/user.interface";
+import { AuthContext } from "../../context/AuthContext";
+import { formatDate } from "../../utils/formatUtils";
+import ErrorMessage from "../common/ErrorMessage";
 import parse from "html-react-parser";
 
 const ThreadPreview = (props: { thread: Thread }): JSX.Element => {

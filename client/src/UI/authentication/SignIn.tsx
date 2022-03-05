@@ -1,9 +1,9 @@
 import axios, { AxiosResponse } from "axios";
 import { useContext, useState } from "react";
-import { AuthContext } from "../context/AuthContext";
-import Modal from "./Modal";
-import { User } from "../../../server/src/model/user.interface";
-import ErrorMessage from "./ErrorMessage";
+import { AuthContext } from "../../context/AuthContext";
+import Modal from "../common/Modal";
+import { User } from "../../../../server/src/model/user.interface";
+import ErrorMessage from "../common/ErrorMessage";
 
 const SignIn = (): JSX.Element => {
   const [username, setUsername] = useState("");

@@ -2,14 +2,14 @@ import axios, { AxiosResponse } from "axios";
 import { useState, useEffect, useContext } from "react";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import { useParams } from "react-router";
-import { Thread } from "../../../server/src/model/thread.interface";
-import { User } from "../../../server/src/model/user.interface";
-import { Comment } from "../../../server/src/model/comment.interface";
+import { Thread } from "../../../../server/src/model/thread.interface";
+import { User } from "../../../../server/src/model/user.interface";
+import { Comment } from "../../../../server/src/model/comment.interface";
 import ThreadComment from "./ThreadComment";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../../context/AuthContext";
 import { NavLink, useNavigate } from "react-router-dom";
-import ErrorMessage from "./ErrorMessage";
-import { formatDate } from "../utils/formatUtils";
+import ErrorMessage from "../common/ErrorMessage";
+import { formatDate } from "../../utils/formatUtils";
 import parse from "html-react-parser";
 
 const ThreadPage = ():JSX.Element => {

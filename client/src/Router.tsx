@@ -1,10 +1,10 @@
 import { Route, Routes } from "react-router-dom";
-import CategoryPage from "./components/CategoryPage";
-import CreateComment from "./components/CreateComment";
-import CreateThread from "./components/CreateThread";
-import Home from "./components/Home";
-import ProfilePage from "./components/profile/ProfilePage";
-import ThreadPage from "./components/ThreadPage";
+import CategoryPage from "./UI/category/CategoryPage";
+import CreateComment from "./UI/thread/CreateComment";
+import CreateThread from "./UI/thread/CreateThread";
+import Home from "./UI/Home";
+import ProfilePage from "./UI/profile/ProfilePage";
+import ThreadPage from "./UI/thread/ThreadPage";
 
 const Router = () => {
   return (

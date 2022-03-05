@@ -1,8 +1,8 @@
 import axios, { AxiosResponse } from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Thread } from "../../../server/src/model/thread.interface";
-import ThreadPreview from "./ThreadPreview";
+import { Thread } from "../../../../server/src/model/thread.interface";
+import ThreadPreview from "../thread/ThreadPreview";
 
 const CategoryPage = (): JSX.Element => {
   const param = useParams();

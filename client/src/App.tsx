@@ -1,9 +1,9 @@
 import { useContext } from "react";
-import Header from "./components/Header";
-import Register from "./components/Register";
+import Header from "./UI/Header";
+import Register from "./UI/authentication/Register";
 import { AuthContext } from "./context/AuthContext";
 import Router from "./Router";
-import SignIn from "./components/SignIn";
+import SignIn from "./UI/authentication/SignIn";
 
 const App = () => {
   const authContext = useContext(AuthContext);

@@ -1,8 +1,8 @@
 import { useState, useContext } from "react";
 import axios, { AxiosResponse } from "axios";
-import Modal from "./Modal";
-import { AuthContext } from "../context/AuthContext";
-import ErrorMessage from "./ErrorMessage";
+import Modal from "../common/Modal";
+import { AuthContext } from "../../context/AuthContext";
+import ErrorMessage from "../common/ErrorMessage";
 
 const Register = (): JSX.Element => {
   const [username, setUsername] = useState("");

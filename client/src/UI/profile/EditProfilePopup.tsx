@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import axios, { AxiosResponse } from "axios";
 import { User } from "../../../../server/src/model/user.interface";
-import Modal from "../Modal";
+import Modal from "../common/Modal";
 import { AuthContext } from "../../context/AuthContext";
 import FormData from "form-data";
 import { Image } from "../../../../server/src/model/image.interface";

@@ -2,12 +2,12 @@ import axios, { AxiosResponse } from "axios";
 import { useState, useEffect, useContext } from "react";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Comment } from "../../../server/src/model/comment.interface";
-import { Thread } from "../../../server/src/model/thread.interface";
-import { User } from "../../../server/src/model/user.interface";
-import { AuthContext } from "../context/AuthContext";
-import { formatDate } from "../utils/formatUtils";
-import ErrorMessage from "./ErrorMessage";
+import { Comment } from "../../../../server/src/model/comment.interface";
+import { Thread } from "../../../../server/src/model/thread.interface";
+import { User } from "../../../../server/src/model/user.interface";
+import { AuthContext } from "../../context/AuthContext";
+import { formatDate } from "../../utils/formatUtils";
+import ErrorMessage from "../common/ErrorMessage";
 
 const ThreadComment = (props: { root: Comment }): JSX.Element => {
   const [user, setThreads] = useState<User>();
