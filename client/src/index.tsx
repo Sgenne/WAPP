@@ -1,18 +1,20 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./main.css";
-//import 'bootstrap/dist/css/bootstrap.min.css';
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import { AuthContextProvider } from "./context/AuthContext";
+import ErrorBoundary from "./UI/errorPages/ErrorBoundary";
 
 ReactDOM.render(
   <React.StrictMode>
-    <AuthContextProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </AuthContextProvider>
+    <ErrorBoundary>
+      <AuthContextProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </AuthContextProvider>
+    </ErrorBoundary>
   </React.StrictMode>,
   document.getElementById("root")
 );
