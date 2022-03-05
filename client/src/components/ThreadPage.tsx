@@ -170,7 +170,7 @@ const ThreadPage = ():JSX.Element => {
 
   const title = threadObject.title;
   const context = threadObject.content;
-  const userImage = user.image.imageUrl;
+  const userImage = user.profilePicture.imageUrl;
   const likes = threadObject.likes;
   const dislikes = threadObject.dislikes;
   const date = threadObject.date;

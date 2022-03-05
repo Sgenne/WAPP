@@ -40,7 +40,7 @@ const Header = (): JSX.Element => {
               <div className="header__profile-link">
                 <img
                   className="header__profile-picture col-sm-12 col-6"
-                  src={signedInUser.image.imageUrl}
+                  src={signedInUser.profilePicture.imageUrl}
                   alt="signed in user"
                 />
                 <span className="d-sm-inline d-none col-6">

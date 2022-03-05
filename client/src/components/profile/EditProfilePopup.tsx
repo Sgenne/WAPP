@@ -43,11 +43,11 @@ const EditProfilePopup = (props: {
       return;
     }
 
-    const updatedOwner = {
+    const updatedOwner: User = {
       ...props.owner,
-      image: response.data.profilePicture,
+      profilePicture: response.data.profilePicture,
     };
-
+    
     props.onUpdateOwner(updatedOwner);
     props.onClose();
   };

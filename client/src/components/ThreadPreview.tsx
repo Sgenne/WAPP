@@ -33,10 +33,12 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
   useEffect((): void => {
     getUser();
   }, []);
+  
   let author;
   if (user) {
     author = user?.username;
-    userImage = user.image.imageUrl;
+
+    userImage = user.profilePicture.imageUrl;
   }
   const authContext = useContext(AuthContext);
 
@@ -49,7 +51,7 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
     if (!authContext.signedInUser) {
       setErrorMessage("You need to sign in to like");
       return;
-    } 
+    }
 
     let likeResult: AxiosResponse;
     try {
@@ -83,7 +85,7 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
     if (!authContext.signedInUser) {
       setErrorMessage("You need to sign in to dislike");
       return;
-    } 
+    }
 
     let dislikeResult: AxiosResponse;
     try {

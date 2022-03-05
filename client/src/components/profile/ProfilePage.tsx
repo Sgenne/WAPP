@@ -189,6 +189,7 @@ const ProfilePage = (): JSX.Element => {
 
   const updateOwnerHandler = (updatedOwner: User) => {
     setOwner(updatedOwner);
+    authContext.setSignedInUser(updatedOwner);
   };
 
   if (error) return <div>{error.message}</div>;
@@ -210,7 +211,7 @@ const ProfilePage = (): JSX.Element => {
       <div className="profile-page__userInfo">
         <img
           className="profile-page__image"
-          src={owner.image.imageUrl}
+          src={owner.profilePicture.imageUrl}
           alt="Profile"
         />
         <h1 className="profile-page__username">
