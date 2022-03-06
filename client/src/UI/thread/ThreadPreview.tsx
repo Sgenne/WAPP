@@ -57,6 +57,29 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
       return;
     }
 
+    const user: User = authContext.signedInUser;
+    const userLikes: number[] = authContext.signedInUser.likedThreads;
+    const userDislikes: number[] = authContext.signedInUser.dislikedThreads;
+
+    if (userLikes.includes(props.thread.threadId)) {
+      user.likedThreads = user.likedThreads.filter(
+        (likedId) => likedId !== props.thread.threadId
+      );
+      setLikes((prevLikes) => prevLikes - 1);
+    } else {
+      user.likedThreads = [...user.likedThreads, props.thread.threadId];
+      setLikes((prevLikes) => prevLikes + 1);
+    }
+
+    if (userDislikes.includes(props.thread.threadId)) {
+      user.dislikedThreads = user.dislikedThreads.filter(
+        (likedId) => likedId !== props.thread.threadId
+      );
+      setDislikes((prevLikes) => prevLikes - 1);
+    }
+
+    authContext.setSignedInUser(user);
+
     let likeResult: AxiosResponse;
     setDisable(true);
     setTimeout(() => setDisable(false), 500);
@@ -71,9 +94,6 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
         }
       );
       setErrorMessage("");
-      setLikes(likeResult.data.thread.likes);
-      setDislikes(likeResult.data.thread.dislikes);
-
       console.log(likeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
@@ -96,6 +116,29 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
       return;
     }
 
+    const user: User = authContext.signedInUser;
+    const userLikes: number[] = authContext.signedInUser.likedThreads;
+    const userDislikes: number[] = authContext.signedInUser.dislikedThreads;
+
+    if (userDislikes.includes(props.thread.threadId)) {
+      user.dislikedThreads = user.dislikedThreads.filter(
+        (likedId) => likedId !== props.thread.threadId
+      );
+      setDislikes((prevDislikes) => prevDislikes - 1);
+    } else {
+      user.dislikedThreads = [...user.likedThreads, props.thread.threadId];
+      setDislikes((prevDislikes) => prevDislikes + 1);
+    }
+
+    if (userLikes.includes(props.thread.threadId)) {
+      user.likedThreads = user.likedThreads.filter(
+        (likedId) => likedId !== props.thread.threadId
+      );
+      setLikes((prevLikes) => prevLikes - 1);
+    }
+
+    authContext.setSignedInUser(user);
+
     let dislikeResult: AxiosResponse;
     setDisable(true);
     setTimeout(() => setDisable(false), 500);
@@ -110,8 +153,6 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
         }
       );
       setErrorMessage("");
-      setLikes(dislikeResult.data.thread.likes);
-      setDislikes(dislikeResult.data.thread.dislikes);
       console.log(dislikeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
