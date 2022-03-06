@@ -44,7 +44,7 @@ a:visited:hover {
 ul,
 li {
   list-style-type: none;
-  padding: 0; 
+  padding: 0;
   margin: 0;
 }
 
@@ -462,6 +462,51 @@ header {
   width: 100%;
   aspect-ratio: 2/1;
 }
+
 .edit-profile__profile-picture-input-square {
   border: none;
+}
+
+.page-not-found,
+.error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin-top: 20vh;
+  text-align: center;
+}
+
+.page-not-found__header {
+  font-size: 90px;
+  font-weight: 600;
+}
+
+.page-not-found__description {
+  font-size: 40px;
+  font-weight: 500;
+}
+
+.page-not-found__buttons button,
+.error-boundary__button {
+  margin-top: 16px;
+  font-size: 24px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.error-boundary__header {
+  font-size: 42px;
+  font-weight: 600;
+}
+
+.error-boundary__sub-header {
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.error-boundary__description {
+  margin-top: 12px;
+  font-size: 28px;
+  font-weight: 500;
 }

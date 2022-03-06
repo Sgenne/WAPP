@@ -5,6 +5,7 @@ import CreateThread from "./UI/thread/CreateThread";
 import Home from "./UI/Home";
 import ProfilePage from "./UI/profile/ProfilePage";
 import ThreadPage from "./UI/thread/ThreadPage";
+import PageNotFound from "./UI/errorPages/PageNotFound";
 
 const Router = () => {
   return (
@@ -15,7 +16,7 @@ const Router = () => {
       <Route path="/profile/:username" element={<ProfilePage />} />
       <Route path="/category/:category" element={<CategoryPage />} />
       <Route path="/create-comment/:type/:id" element={<CreateComment />} />
-      <Route path="*" element={<div>Uh oh... No page was found 😿</div>} />
+      <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
 };
