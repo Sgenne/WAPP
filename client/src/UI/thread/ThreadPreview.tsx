@@ -14,7 +14,7 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
   const [errorMessage, setErrorMessage] = useState("");
   const [likes, setLikes] = useState(props.thread.likes);
   const [dislikes, setDislikes] = useState(props.thread.dislikes);
-  const [isButtonDisabled, setDisable] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
   async function getUser(): Promise<void> {
     try {
@@ -49,9 +49,10 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
   const date = props.thread.date;
 
   const likeClickHandler = async (): Promise<void> => {
-    if (isButtonDisabled) {
+    if (isFetching) {
       return;
     }
+
     if (!authContext.signedInUser) {
       setErrorMessage("You need to sign in to like");
       return;
@@ -77,12 +78,10 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
       );
       setDislikes((prevLikes) => prevLikes - 1);
     }
-
     authContext.setSignedInUser(user);
 
     let likeResult: AxiosResponse;
-    setDisable(true);
-    setTimeout(() => setDisable(false), 500);
+    setIsFetching(true);
     try {
       likeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/likeThread/",
@@ -96,21 +95,24 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
       setErrorMessage("");
       console.log(likeResult.data);
     } catch (error) {
+      setIsFetching(false);
       if (!(axios.isAxiosError(error) && error.response)) {
         setErrorMessage("Something went wrong while liking.");
         return;
       }
-
       setErrorMessage(error.response.data.message);
       console.log(error);
       return;
     }
+    setLikes(likeResult.data.thread.likes);
+    setIsFetching(false);
   };
 
   const dislikeClickHandler = async (): Promise<void> => {
-    if (isButtonDisabled) {
+    if (isFetching) {
       return;
     }
+
     if (!authContext.signedInUser) {
       setErrorMessage("You need to sign in to dislike");
       return;
@@ -140,8 +142,7 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
     authContext.setSignedInUser(user);
 
     let dislikeResult: AxiosResponse;
-    setDisable(true);
-    setTimeout(() => setDisable(false), 500);
+    setIsFetching(true);
     try {
       dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/dislikeThread/",
@@ -164,7 +165,9 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
       console.log(error);
       return;
     }
+    setIsFetching(false);
   };
+
   return (
     <li>
       <div className="category-thread container-fluid px-4">

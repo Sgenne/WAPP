@@ -15,7 +15,7 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
   const [comments, setComments] = useState<Comment[]>();
   const authContext = useContext(AuthContext);
   const [errorMessage, setErrorMessage] = useState("");
-  const [isButtonDisabled, setDisable] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const [likes, setLikes] = useState(props.root.likes);
   const [dislikes, setDislikes] = useState(props.root.dislikes);
 
@@ -70,7 +70,7 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
   }
 
   const likeClickHandler = async (): Promise<void> => {
-    if (isButtonDisabled) {
+    if (isFetching) {
       return;
     }
     if (!authContext.signedInUser) {
@@ -79,8 +79,7 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
     }
 
     let likeResult: AxiosResponse;
-    setDisable(true);
-    setTimeout(() => setDisable(false), 500);
+    setIsFetching(true);
     try {
       likeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/comment/likeComment/",
@@ -105,10 +104,11 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
       console.log(error);
       return;
     }
+    setIsFetching(false);
   };
 
   const dislikeClickHandler = async (): Promise<void> => {
-    if (isButtonDisabled) {
+    if (isFetching) {
       return;
     }
     if (!authContext.signedInUser) {
@@ -116,8 +116,7 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
       return;
     }
     let dislikeResult: AxiosResponse;
-    setDisable(true);
-    setTimeout(() => setDisable(false), 500);
+    setIsFetching(true);
     try {
       dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/comment/dislikeComment/",
@@ -133,6 +132,7 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
       setDislikes(dislikeResult.data.comment.dislikes);
       console.log(dislikeResult.data);
     } catch (error) {
+      setIsFetching(false);
       if (!(axios.isAxiosError(error) && error.response)) {
         setErrorMessage("Something went wrong when disliking.");
         return;
@@ -142,6 +142,7 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
       console.log(error);
       return;
     }
+    setIsFetching(false);
   };
 
   const navigate = useNavigate();

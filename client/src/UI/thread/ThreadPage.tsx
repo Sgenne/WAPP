@@ -21,7 +21,7 @@ const ThreadPage = (): JSX.Element => {
   const [threadObject, setThreadObject] = useState<Thread>();
   const [comments, setComments] = useState<Comment[]>();
   const [errorMessage, setErrorMessage] = useState("");
-  const [isButtonDisabled, setDisable] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const [likes, setLikes] = useState(threadObject?.likes);
   const [dislikes, setDislikes] = useState(threadObject?.dislikes);
 
@@ -106,7 +106,7 @@ const ThreadPage = (): JSX.Element => {
   }
 
   const likeClickHandler = async (): Promise<void> => {
-    if (isButtonDisabled) {
+    if (isFetching) {
       return;
     }
     if (!authContext.signedInUser) {
@@ -115,8 +115,7 @@ const ThreadPage = (): JSX.Element => {
     }
 
     let likeResult: AxiosResponse;
-    setDisable(true);
-    setTimeout(() => setDisable(false), 500);
+    setIsFetching(true);
     try {
       likeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/likeThread/",
@@ -134,6 +133,7 @@ const ThreadPage = (): JSX.Element => {
       console.log(likeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
+        console.log(error);
         setErrorMessage("Something went wrong while liking.");
         return;
       }
@@ -142,10 +142,11 @@ const ThreadPage = (): JSX.Element => {
       console.log(error);
       return;
     }
+    setIsFetching(false);
   };
 
   const dislikeClickHandler = async (): Promise<void> => {
-    if (isButtonDisabled) {
+    if (isFetching) {
       return;
     }
     if (!authContext.signedInUser) {
@@ -154,8 +155,7 @@ const ThreadPage = (): JSX.Element => {
     }
 
     let dislikeResult: AxiosResponse;
-    setDisable(true);
-    setTimeout(() => setDisable(false), 500);
+    setIsFetching(true);
     try {
       dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/dislikeThread/",
@@ -171,7 +171,9 @@ const ThreadPage = (): JSX.Element => {
       setDislikes(dislikeResult.data.thread.dislikes);
       console.log(dislikeResult.data);
     } catch (error) {
+      setIsFetching(false);
       if (!(axios.isAxiosError(error) && error.response)) {
+        console.log(error);
         setErrorMessage("Something went wrong when disliking.");
         return;
       }
@@ -180,6 +182,7 @@ const ThreadPage = (): JSX.Element => {
       console.log(error);
       return;
     }
+    setIsFetching(false);
   };
 
   const replyClickHandler = async (): Promise<void> => {
