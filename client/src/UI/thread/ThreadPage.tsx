@@ -12,7 +12,7 @@ import ErrorMessage from "../common/ErrorMessage";
 import { formatDate } from "../../utils/formatUtils";
 import parse from "html-react-parser";
 
-const ThreadPage = ():JSX.Element => {
+const ThreadPage = (): JSX.Element => {
   const navigate = useNavigate();
   const param = useParams();
   const id = param.threadId;
@@ -21,6 +21,9 @@ const ThreadPage = ():JSX.Element => {
   const [threadObject, setThreadObject] = useState<Thread>();
   const [comments, setComments] = useState<Comment[]>();
   const [errorMessage, setErrorMessage] = useState("");
+  const [isButtonDisabled, setDisable] = useState(false);
+  const [likes, setLikes] = useState(threadObject?.likes);
+  const [dislikes, setDislikes] = useState(threadObject?.dislikes);
 
   const authContext = useContext(AuthContext);
 
@@ -60,7 +63,7 @@ const ThreadPage = ():JSX.Element => {
         message: string;
         comments?: Comment[];
       }>(
-        "http://localhost:8080/thread/threadComments/" + threadObject?.threadId,
+        "http://localhost:8080/thread/threadComments/" + threadObject.threadId,
         {}
       );
     } catch (error) {
@@ -73,15 +76,17 @@ const ThreadPage = ():JSX.Element => {
   let threadResult: AxiosResponse;
   let userResult: AxiosResponse;
 
-  useEffect(():void => {
+  useEffect((): void => {
     getThread();
   }, []);
 
-  useEffect(()=> {
+  useEffect(() => {
     if (threads) {
       setThreadObject(threads);
       getUser();
       getComments();
+      setLikes(threads.likes);
+      setDislikes(threads.dislikes);
     }
   }, [threads, threadObject]);
 
@@ -101,12 +106,17 @@ const ThreadPage = ():JSX.Element => {
   }
 
   const likeClickHandler = async (): Promise<void> => {
-    if (!authContext.signedInUser){
+    if (isButtonDisabled) {
+      return;
+    }
+    if (!authContext.signedInUser) {
       setErrorMessage("You need to sign in to like");
       return;
-    } 
+    }
 
     let likeResult: AxiosResponse;
+    setDisable(true);
+    setTimeout(() => setDisable(false), 500);
     try {
       likeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/likeThread/",
@@ -118,11 +128,13 @@ const ThreadPage = ():JSX.Element => {
         }
       );
       setErrorMessage("");
+      setLikes(likeResult.data.thread.likes);
+      setDislikes(likeResult.data.thread.dislikes);
+
+      console.log(likeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
-        setErrorMessage(
-          "Something went wrong while trying to like the thread."
-        );
+        setErrorMessage("Something went wrong while liking.");
         return;
       }
 
@@ -133,12 +145,17 @@ const ThreadPage = ():JSX.Element => {
   };
 
   const dislikeClickHandler = async (): Promise<void> => {
+    if (isButtonDisabled) {
+      return;
+    }
     if (!authContext.signedInUser) {
       setErrorMessage("You need to sign in to dislike");
       return;
-    } 
+    }
 
     let dislikeResult: AxiosResponse;
+    setDisable(true);
+    setTimeout(() => setDisable(false), 500);
     try {
       dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/dislikeThread/",
@@ -150,11 +167,12 @@ const ThreadPage = ():JSX.Element => {
         }
       );
       setErrorMessage("");
+      setLikes(dislikeResult.data.thread.likes);
+      setDislikes(dislikeResult.data.thread.dislikes);
+      console.log(dislikeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
-        setErrorMessage(
-          "Something went wrong while trying to dislike the thread."
-        );
+        setErrorMessage("Something went wrong when disliking.");
         return;
       }
 
@@ -171,8 +189,6 @@ const ThreadPage = ():JSX.Element => {
   const title = threadObject.title;
   const context = threadObject.content;
   const userImage = user.profilePicture.imageUrl;
-  const likes = threadObject.likes;
-  const dislikes = threadObject.dislikes;
   const date = threadObject.date;
   return (
     <div className="wholePage">
@@ -180,7 +196,7 @@ const ThreadPage = ():JSX.Element => {
         <li>
           <div className="category-box container-fluid px-4">
             <div className="row">
-              <img src={userImage} className="row__avatar" alt="Profile"/>
+              <img src={userImage} className="row__avatar" alt="Profile" />
               <div className="col row">
                 <h3 className="thread-title col-12">{title}</h3>
                 <p className="row__thread-title col-3">

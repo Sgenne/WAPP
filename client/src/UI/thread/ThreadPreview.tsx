@@ -14,6 +14,7 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
   const [errorMessage, setErrorMessage] = useState("");
   const [likes, setLikes] = useState(props.thread.likes);
   const [dislikes, setDislikes] = useState(props.thread.dislikes);
+  const [isButtonDisabled, setDisable] = useState(false);
 
   async function getUser(): Promise<void> {
     try {
@@ -33,7 +34,7 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
   useEffect((): void => {
     getUser();
   }, []);
-  
+
   let author;
   if (user) {
     author = user?.username;
@@ -48,12 +49,17 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
   const date = props.thread.date;
 
   const likeClickHandler = async (): Promise<void> => {
+    if (isButtonDisabled) {
+      return;
+    }
     if (!authContext.signedInUser) {
       setErrorMessage("You need to sign in to like");
       return;
     }
 
     let likeResult: AxiosResponse;
+    setDisable(true);
+    setTimeout(() => setDisable(false), 500);
     try {
       likeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/likeThread/",
@@ -82,12 +88,17 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
   };
 
   const dislikeClickHandler = async (): Promise<void> => {
+    if (isButtonDisabled) {
+      return;
+    }
     if (!authContext.signedInUser) {
       setErrorMessage("You need to sign in to dislike");
       return;
     }
 
     let dislikeResult: AxiosResponse;
+    setDisable(true);
+    setTimeout(() => setDisable(false), 500);
     try {
       dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/dislikeThread/",

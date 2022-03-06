@@ -48,36 +48,24 @@ export const likeComment = async (
     };
   }
 
-  let updatedLikes = comment.likes;
-  let updatedLikedComments = user.likedComments;
-  let updatedDislikedComments = user.dislikedComments;
-
   if (user.dislikedComments.includes(commentId)) {
-    updatedDislikedComments = user.dislikedComments.filter(
+    user.dislikedComments = user.dislikedComments.filter(
       (elem) => elem !== commentId
     );
-
-    if (!user.likedComments.includes(commentId)) {
-      updatedLikedComments = [...user.likedComments, commentId];
-      updatedLikes++;
-    } else {
-      updatedLikedComments = user.likedComments.filter(
-        (elem) => elem !== commentId
-      );
-      updatedLikes--;
-    }
+    comment.dislikes--;
+  }
+  if (!user.likedComments.includes(commentId)) {
+    user.likedComments.push(commentId);
+    comment.likes++;
+  } else {
+    user.likedComments = user.likedComments.filter(
+      (elem) => elem !== commentId
+    );
+    comment.likes--;
   }
 
-  userModel.updateOne(
-    { userId: userId },
-    {
-      dislikedComments: updatedDislikedComments,
-      likedComments: updatedLikedComments,
-    }
-  );
-  commentModel.updateOne({ commentId: commentId }, { likes: updatedLikes });
-
-  comment.likes = updatedLikes;
+  await userModel.updateOne({ userId: userId }, user);
+  await commentModel.updateOne({ commentId: commentId }, comment);
 
   return {
     statusCode: 200,
@@ -106,7 +94,6 @@ export const disLikeComment = async (
   if (!comment) {
     return commentResult;
   }
-
   if (!user) {
     return userResult;
   }
@@ -118,40 +105,24 @@ export const disLikeComment = async (
     };
   }
 
-  let updatedDislikes = comment.dislikes;
-  let updatedLikedComments = user.likedComments;
-  let updatedDislikedComments = user.dislikedComments;
-
   if (user.likedComments.includes(commentId)) {
-    updatedLikedComments = user.likedComments.filter(
+    user.likedComments = user.likedComments.filter(
       (elem) => elem !== commentId
     );
-    updatedDislikes--;
+    comment.likes--;
   }
-
   if (!user.dislikedComments.includes(commentId)) {
-    updatedDislikedComments = [...user.dislikedComments, commentId];
-    updatedDislikes++;
+    user.dislikedComments.push(commentId);
+    comment.dislikes++;
   } else {
-    updatedDislikedComments = user.dislikedComments.filter(
+    user.dislikedComments = user.dislikedComments.filter(
       (elem) => elem !== commentId
     );
-    updatedDislikes--;
+    comment.dislikes--;
   }
 
-  userModel.updateOne(
-    { userId: userId },
-    {
-      dislikedComments: updatedDislikedComments,
-      likedComments: updatedLikedComments,
-    }
-  );
-  commentModel.updateOne(
-    { commentId: commentId },
-    { dislikes: updatedDislikes }
-  );
-
-  comment.dislikes = updatedDislikes;
+  await userModel.updateOne({ userId: userId }, user);
+  await commentModel.updateOne({ commentId: commentId }, comment);
 
   return {
     statusCode: 200,
@@ -377,9 +348,11 @@ export const postReply = async (
     isDeleted: false,
   };
   parentComment.replies.push(commentId);
-
-  commentModel.create(newComment);
-  commentModel.updateOne({ commentId: commentIdRoot }, parentComment);
+  await commentModel.create(newComment);
+  await commentModel.updateOne(
+    { commentId: commentIdRoot },
+    { replies: parentComment.replies }
+  );
 
   return {
     statusCode: 201,

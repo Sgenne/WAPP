@@ -8,12 +8,16 @@ import { User } from "../../../../server/src/model/user.interface";
 import { AuthContext } from "../../context/AuthContext";
 import { formatDate } from "../../utils/formatUtils";
 import ErrorMessage from "../common/ErrorMessage";
+import parse from "html-react-parser";
 
 const ThreadComment = (props: { root: Comment }): JSX.Element => {
   const [user, setThreads] = useState<User>();
   const [comments, setComments] = useState<Comment[]>();
   const authContext = useContext(AuthContext);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isButtonDisabled, setDisable] = useState(false);
+  const [likes, setLikes] = useState(props.root.likes);
+  const [dislikes, setDislikes] = useState(props.root.dislikes);
 
   async function getComments(): Promise<void> {
     let commentResult: AxiosResponse;
@@ -50,6 +54,8 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
   useEffect((): void => {
     getUser();
     getComments();
+    setLikes(props.root.likes);
+    setDislikes(props.root.dislikes);
   }, []);
   let author;
   if (user) {
@@ -64,9 +70,17 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
   }
 
   const likeClickHandler = async (): Promise<void> => {
-    if (!authContext.signedInUser) return;
+    if (isButtonDisabled) {
+      return;
+    }
+    if (!authContext.signedInUser) {
+      setErrorMessage("You need to sign in to like");
+      return;
+    }
 
     let likeResult: AxiosResponse;
+    setDisable(true);
+    setTimeout(() => setDisable(false), 500);
     try {
       likeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/comment/likeComment/",
@@ -78,6 +92,8 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
         }
       );
       setErrorMessage("");
+      setLikes(likeResult.data.comment.likes);
+      setDislikes(likeResult.data.comment.dislikes);
       console.log(likeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
@@ -92,8 +108,16 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
   };
 
   const dislikeClickHandler = async (): Promise<void> => {
-    if (!authContext.signedInUser) return;
+    if (isButtonDisabled) {
+      return;
+    }
+    if (!authContext.signedInUser) {
+      setErrorMessage("You need to sign in to dislike");
+      return;
+    }
     let dislikeResult: AxiosResponse;
+    setDisable(true);
+    setTimeout(() => setDisable(false), 500);
     try {
       dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/comment/dislikeComment/",
@@ -105,7 +129,8 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
         }
       );
       setErrorMessage("");
-
+      setLikes(dislikeResult.data.comment.likes);
+      setDislikes(dislikeResult.data.comment.dislikes);
       console.log(dislikeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
@@ -125,8 +150,6 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
   };
 
   const context: string = props.root.content;
-  const likes = props.root.likes;
-  const dislikes = props.root.dislikes;
   const date = props.root.date;
   const path = "/profile/" + user?.username;
 
@@ -139,23 +162,23 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
               {author}
             </NavLink>
           </p>
-          <p className="category-box__row__thread-title col-3">
+          <p className="category-box__row__thread-title col-5">
             {formatDate(new Date(date))}
           </p>
         </div>
         <div className="category-box__thread-desc">
-          <p>{context}</p>
+          <p>{parse(context)}</p>
         </div>
-        <div className="row">
-          <button className="col-2" onClick={likeClickHandler}>
+        <div>
+          <button className="generalButton" onClick={likeClickHandler}>
             <FaThumbsUp />
             <p className="threadLikes">{likes}</p>
           </button>
-          <button className="col-2" onClick={dislikeClickHandler}>
+          <button className="generalButton" onClick={dislikeClickHandler}>
             <FaThumbsDown />
             <p className="threadLikes">{dislikes}</p>
           </button>
-          <button className="col-2" onClick={replyClickHandler}>
+          <button className="generalButton" onClick={replyClickHandler}>
             Reply
           </button>
         </div>

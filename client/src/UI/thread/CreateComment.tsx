@@ -2,13 +2,14 @@ import axios, { AxiosResponse } from "axios";
 import React, { useContext, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Thread } from "../../../../server/src/model/thread.interface";
 import { AuthContext } from "../../context/AuthContext";
 import QuillTools, { formats, modules } from "../../utils/quillTools";
 import ErrorMessage from "../common/ErrorMessage";
 
 const CreateComment = (): JSX.Element => {
+  const navigate = useNavigate();
   const authContext = useContext(AuthContext);
   const params = useParams();
   const category = params.category;
@@ -20,10 +21,10 @@ const CreateComment = (): JSX.Element => {
   }
 
   const submitClickHandler = async () => {
-    if (!authContext.signedInUser){
+    if (!authContext.signedInUser) {
       setErrorMessage("You need to sign in to comment");
       return;
-    } 
+    }
 
     let signInResult: AxiosResponse;
     try {
@@ -40,6 +41,11 @@ const CreateComment = (): JSX.Element => {
       );
 
       console.log(signInResult.data);
+      if (params.type == "thread") {
+        navigate("/thread/" + params.id);
+      } else {
+        navigate("/thread/" + signInResult.data.comment.rootThread);
+      }
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
         setErrorMessage("Could not create comment");
@@ -72,8 +78,13 @@ const CreateComment = (): JSX.Element => {
         </li>
         <li>
           <div id="postthread">
-          <QuillTools />
-            <ReactQuill value={value} onChange={setValue} modules={modules} formats={formats}/>
+            <QuillTools />
+            <ReactQuill
+              value={value}
+              onChange={setValue}
+              modules={modules}
+              formats={formats}
+            />
 
             <div id="submitbut">
               <button

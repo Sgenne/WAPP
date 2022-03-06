@@ -2,14 +2,14 @@ import axios, { AxiosResponse } from "axios";
 import React, { useContext, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Thread } from "../../../../server/src/model/thread.interface";
 import { AuthContext } from "../../context/AuthContext";
 import ErrorMessage from "../common/ErrorMessage";
 import QuillTools, { modules, formats } from "../../utils/quillTools";
 
-
 const CreateThread = (): JSX.Element => {
+  const navigate = useNavigate();
   const params = useParams();
   const category = params.category;
   const [value, setValue] = useState("");
@@ -23,12 +23,14 @@ const CreateThread = (): JSX.Element => {
   const authContext = useContext(AuthContext);
 
   const submitClickHandler = async (): Promise<void> => {
-    if (!authContext.signedInUser) if (!authContext.signedInUser){
-      setErrorMessage("You need to sign in to create a thread");
-      return;
-    } 
+    if (!authContext.signedInUser)
+      if (!authContext.signedInUser) {
+        setErrorMessage("You need to sign in to create a thread");
+        return;
+      }
 
     let signInResult: AxiosResponse;
+    let threadid: number;
     try {
       signInResult = await axios.post<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/postThread/",
@@ -42,6 +44,7 @@ const CreateThread = (): JSX.Element => {
       );
       setErrorMessage("");
       console.log(signInResult.data);
+      navigate("/thread/" + signInResult.data.thread.threadId);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
         setErrorMessage("Could not create thread");
@@ -78,7 +81,12 @@ const CreateThread = (): JSX.Element => {
               onChange={createThreadChangeHandler}
             />
             <QuillTools />
-            <ReactQuill value={value} onChange={setValue} modules={modules} formats={formats}/>
+            <ReactQuill
+              value={value}
+              onChange={setValue}
+              modules={modules}
+              formats={formats}
+            />
 
             <div id="submitbut">
               <button

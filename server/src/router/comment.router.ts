@@ -5,6 +5,7 @@ import {
   hasContent,
   hasUsername,
   hasValidCommentId,
+  hasValidUserId,
 } from "../utils/validation.util";
 import { isAuthenticated } from "../utils/auth.util";
 
@@ -120,13 +121,13 @@ commentRouter.put(
 commentRouter.post(
   "/reply",
   hasContent,
-  hasUsername,
+  hasValidUserId,
   handleValidationResult,
   isAuthenticated,
   async (req: Request, res: Response) => {
-    const id = req.body.id;
+    const id = req.body.commentID;
     const content = req.body.content;
-    const username = req.body.username;
+    const username = req.body.userId;
 
     if (!(content && id && username)) {
       return res.status(400).send({ message: "Invalid input." });
