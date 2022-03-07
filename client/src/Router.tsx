@@ -6,6 +6,7 @@ import Home from "./UI/Home";
 import ProfilePage from "./UI/profile/ProfilePage";
 import ThreadPage from "./UI/thread/ThreadPage";
 import PageNotFound from "./UI/errorPages/PageNotFound";
+import SearchPage from "./UI/search/SearchPage";
 
 const Router = () => {
   return (
@@ -16,6 +17,7 @@ const Router = () => {
       <Route path="/profile/:username" element={<ProfilePage />} />
       <Route path="/category/:category" element={<CategoryPage />} />
       <Route path="/create-comment/:type/:id" element={<CreateComment />} />
+      <Route path="/search" element={<SearchPage />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

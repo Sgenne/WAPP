@@ -520,3 +520,24 @@ export const getCommentComments = async (
     comments: commentArr,
   };
 };
+
+export const searchThreads = async (
+  query: string
+): Promise<ThreadServiceResult> => {
+  const searchResult: Thread[] = await threadModel.find({
+    $or: [
+      {
+        content: { $regex: new RegExp(query, "i") },
+      },
+      {
+        title: { $regex: new RegExp(query, "i") },
+      },
+    ],
+  });
+
+  return {
+    statusCode: 200,
+    message: "Threads found successfully.",
+    threads: searchResult,
+  };
+};

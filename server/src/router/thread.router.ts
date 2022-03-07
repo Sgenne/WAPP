@@ -298,6 +298,24 @@ threadRouter.delete(
 );
 
 /**
+ * Returns threads that match query
+ */
+threadRouter.get("/search", async (req: Request, res: Response) => {
+  const searchTerm = req.query.q as string;
+
+  if (!searchTerm) {
+    res.status(400).send({ message: "No search query was provided." });
+    return;
+  }
+
+  const searchResult = await threadServices.searchThreads(searchTerm);
+
+  res
+    .status(searchResult.statusCode)
+    .send({ message: searchResult.message, threads: searchResult.threads });
+});
+
+/**
  * Returns the thread with the given thread-id.
  */
 threadRouter.get("/:threadId", async (req: Request, res: Response) => {
