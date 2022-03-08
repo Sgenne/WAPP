@@ -119,15 +119,16 @@ header {
   border-radius: 0 5px 5px 0;
 }
 
-.header__profile-link {
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.header__profile {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  padding: 16px;
+  height: 100%;
+  cursor: pointer;
   font-weight: 600;
   font-size: 26px;
-  width: fit-content;
-  margin: auto;
+  white-space: nowrap;
 }
 
 .header__profile-link:hover {
@@ -509,4 +510,39 @@ header {
   margin-top: 12px;
   font-size: 28px;
   font-weight: 500;
+}
+
+.dropdown {
+  position: absolute;
+  background-color: white;
+  padding: 1px;
+  border: 2px solid black;
+  border: 1px solid grey;
+  z-index: 10;
+  width: fit-content;
+  left: 18px;
+  bottom: 18px;
+  transform: translate(0, 100%);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.dropdown__option {
+  font-size: 24px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: background-color 200ms ease-in-out;
+}
+
+.dropdown__option:hover {
+  background-color: #eeeeee;
+}
+
+.dropdown__option-icon {
+  margin-right: 2px;
 }

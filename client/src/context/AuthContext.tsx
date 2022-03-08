@@ -2,55 +2,15 @@ import { createContext, useState } from "react";
 import { User } from "../../../server/src/model/user.interface";
 
 export interface AuthContextState {
-  /**
-   * Indicates if the user is signed in.
-   */
   isSignedIn: boolean;
-
   signedInUser?: User;
   setSignedInUser: React.Dispatch<React.SetStateAction<User | undefined>>;
-  // /**
-  //  * The id of the user if they are signed in.
-  //  */
-  // userId?: number;
-
-  // /**
-  //  * The username of the user if they are signed in.
-  //  */
-  // username?: string;
-
-  /**
-   * The password of the user if they are signed in.
-   */
   password?: string;
-
-  /**
-   * Updates the stored isSignedIn value.
-   */
   setIsSignedIn: React.Dispatch<React.SetStateAction<boolean>>;
-  /**
-   * Updates the stored password.
-   */
   setPassword: React.Dispatch<React.SetStateAction<string | undefined>>;
-
-  /**
-   * Indicates if the sign-in lightbox should be displayed.
-   */
   showSignIn: boolean;
-
-  /**
-   * Updates the value of showSignIn.
-   */
   setShowSignIn: React.Dispatch<React.SetStateAction<boolean>>;
-
-  /**
-   * Indicates if the register lightbox should be displayed.
-   */
   showRegister: boolean;
-
-  /**
-   * Updates the value of showRegister.
-   */
   setShowRegister: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -83,8 +43,6 @@ export const AuthContext = createContext<AuthContextState>(defaultState);
  */
 export const AuthContextProvider = (props: { children: JSX.Element }) => {
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const [userId, setUserId] = useState<number>();
-  const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
   const [showSignIn, setShowSignIn] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
