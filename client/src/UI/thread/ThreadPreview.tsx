@@ -10,7 +10,7 @@ import ErrorMessage from "../common/ErrorMessage";
 import parse from "html-react-parser";
 
 const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
-  const [user, setThreads] = useState<User>();
+  const [user, setUser] = useState<User>();
   const [errorMessage, setErrorMessage] = useState("");
   const [likes, setLikes] = useState(props.thread.likes);
   const [dislikes, setDislikes] = useState(props.thread.dislikes);
@@ -25,7 +25,7 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
     } catch (error) {
       console.log(error);
     }
-    setThreads(threadResult.data.user);
+    setUser(threadResult.data.user);
   }
 
   let threadResult: AxiosResponse;
@@ -42,6 +42,7 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
     userImage = user.profilePicture.imageUrl;
   }
   const authContext = useContext(AuthContext);
+  const signedInUser = authContext.signedInUser;
 
   const title: string = props.thread.title;
   const context: string = props.thread.content;
@@ -53,32 +54,39 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
       return;
     }
 
-    if (!authContext.signedInUser) {
+    if (!signedInUser) {
       setErrorMessage("You need to sign in to like");
       return;
     }
 
-    const user: User = authContext.signedInUser;
-    const userLikes: number[] = authContext.signedInUser.likedThreads;
-    const userDislikes: number[] = authContext.signedInUser.dislikedThreads;
+    authContext.setSignedInUser((prevUser) => {
+      if (!prevUser) return;
 
-    if (userLikes.includes(props.thread.threadId)) {
-      user.likedThreads = user.likedThreads.filter(
-        (likedId) => likedId !== props.thread.threadId
-      );
-      setLikes((prevLikes) => prevLikes - 1);
-    } else {
-      user.likedThreads = [...user.likedThreads, props.thread.threadId];
-      setLikes((prevLikes) => prevLikes + 1);
-    }
+      let updatedLikes: number[];
 
-    if (userDislikes.includes(props.thread.threadId)) {
-      user.dislikedThreads = user.dislikedThreads.filter(
-        (likedId) => likedId !== props.thread.threadId
-      );
-      setDislikes((prevLikes) => prevLikes - 1);
-    }
-    authContext.setSignedInUser(user);
+      if (prevUser.likedThreads.includes(props.thread.threadId)) {
+        updatedLikes = prevUser.likedThreads.filter(
+          (likedId) => likedId !== props.thread.threadId
+        );
+        setLikes((prevLikes) => prevLikes - 1);
+      } else {
+        setLikes((prevLikes) => prevLikes + 1);
+        updatedLikes = [...prevUser.likedThreads, props.thread.threadId];
+      }
+
+      if (prevUser.dislikedThreads.includes(props.thread.threadId)) {
+        const updatedDislikes = prevUser.dislikedThreads.filter(
+          (likedId) => likedId !== props.thread.threadId
+        );
+        setDislikes((prevValue) => prevValue - 1);
+        return {
+          ...prevUser,
+          likedThreads: updatedLikes,
+          dislikedThreads: updatedDislikes,
+        };
+      }
+      return { ...prevUser, likedThreads: updatedLikes };
+    });
 
     let likeResult: AxiosResponse;
     setIsFetching(true);
@@ -86,14 +94,13 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
       likeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/likeThread/",
         {
-          userId: authContext.signedInUser.userId,
+          userId: signedInUser.userId,
           password: authContext.password,
           threadId: props.thread.threadId,
-          username: authContext.signedInUser.username,
+          username: signedInUser.username,
         }
       );
       setErrorMessage("");
-      console.log(likeResult.data);
     } catch (error) {
       setIsFetching(false);
       if (!(axios.isAxiosError(error) && error.response)) {
@@ -113,33 +120,39 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
       return;
     }
 
-    if (!authContext.signedInUser) {
+    if (!signedInUser) {
       setErrorMessage("You need to sign in to dislike");
       return;
     }
 
-    const user: User = authContext.signedInUser;
-    const userLikes: number[] = authContext.signedInUser.likedThreads;
-    const userDislikes: number[] = authContext.signedInUser.dislikedThreads;
+    authContext.setSignedInUser((prevUser) => {
+      if (!prevUser) return;
 
-    if (userDislikes.includes(props.thread.threadId)) {
-      user.dislikedThreads = user.dislikedThreads.filter(
-        (likedId) => likedId !== props.thread.threadId
-      );
-      setDislikes((prevDislikes) => prevDislikes - 1);
-    } else {
-      user.dislikedThreads = [...user.likedThreads, props.thread.threadId];
-      setDislikes((prevDislikes) => prevDislikes + 1);
-    }
+      let updatedDislikes: number[];
+      if (prevUser.dislikedThreads.includes(props.thread.threadId)) {
+        updatedDislikes = prevUser.dislikedThreads.filter(
+          (likedId) => likedId !== props.thread.threadId
+        );
+        setDislikes((prevDislikes) => prevDislikes - 1);
+      } else {
+        updatedDislikes = [...prevUser.dislikedThreads, props.thread.threadId];
+        setDislikes((prevDislikes) => prevDislikes + 1);
+      }
 
-    if (userLikes.includes(props.thread.threadId)) {
-      user.likedThreads = user.likedThreads.filter(
-        (likedId) => likedId !== props.thread.threadId
-      );
-      setLikes((prevLikes) => prevLikes - 1);
-    }
+      if (prevUser.likedThreads.includes(props.thread.threadId)) {
+        const updatedLikedThreads = prevUser.likedThreads.filter(
+          (likedId) => likedId !== props.thread.threadId
+        );
+        setLikes((prevLikes) => prevLikes - 1);
+        return {
+          ...prevUser,
+          dislikedThreads: updatedDislikes,
+          likedThreads: updatedLikedThreads,
+        };
+      }
 
-    authContext.setSignedInUser(user);
+      return { ...prevUser, dislikedThreads: updatedDislikes };
+    });
 
     let dislikeResult: AxiosResponse;
     setIsFetching(true);
@@ -147,10 +160,10 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
       dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/dislikeThread/",
         {
-          userId: authContext.signedInUser.userId,
+          userId: signedInUser.userId,
           password: authContext.password,
           threadId: props.thread.threadId,
-          username: authContext.signedInUser.username,
+          username: signedInUser.username,
         }
       );
       setErrorMessage("");
@@ -167,6 +180,16 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
     }
     setIsFetching(false);
   };
+
+  const likeButtonClassName =
+    signedInUser && signedInUser.likedThreads.includes(props.thread.threadId)
+      ? "generalButton like-button--highlight"
+      : "generalButton";
+
+  const dislikeButtonClassName =
+    signedInUser && signedInUser.dislikedThreads.includes(props.thread.threadId)
+      ? "generalButton dislike-button--highlight"
+      : "generalButton";
 
   return (
     <li>
@@ -193,11 +216,14 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
           {parse(context)}
         </div>
         <div>
-          <button className="generalButton" onClick={likeClickHandler}>
+          <button className={likeButtonClassName} onClick={likeClickHandler}>
             <FaThumbsUp />
             <p className="threadLikes">{likes}</p>
           </button>
-          <button className="generalButton" onClick={dislikeClickHandler}>
+          <button
+            className={dislikeButtonClassName}
+            onClick={dislikeClickHandler}
+          >
             <FaThumbsDown />
             <p className="threadLikes">{dislikes}</p>
           </button>

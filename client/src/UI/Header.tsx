@@ -19,7 +19,7 @@ const Header = (): JSX.Element => {
         profileRef.current &&
         profileRef.current.contains(event.target as Node)
       ) {
-        setShowProfileOptions(true);
+        setShowProfileOptions((prevValue) => !prevValue);
       } else {
         setShowProfileOptions(false);
       }

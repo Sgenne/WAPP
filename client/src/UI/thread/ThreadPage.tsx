@@ -16,86 +16,76 @@ const ThreadPage = (): JSX.Element => {
   const navigate = useNavigate();
   const param = useParams();
   const id = param.threadId;
-  const [threads, setThreads] = useState<Thread>();
   const [user, setuser] = useState<User>();
   const [threadObject, setThreadObject] = useState<Thread>();
   const [comments, setComments] = useState<Comment[]>();
   const [errorMessage, setErrorMessage] = useState("");
   const [isFetching, setIsFetching] = useState(false);
-  const [likes, setLikes] = useState(threadObject?.likes);
-  const [dislikes, setDislikes] = useState(threadObject?.dislikes);
 
   const authContext = useContext(AuthContext);
-
-  async function getThread(): Promise<void> {
-    try {
-      threadResult = await axios.get<{
-        message: string;
-        threads?: Thread;
-      }>("http://localhost:8080/thread/" + id, {});
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-    setThreads(threadResult.data.thread);
-  }
-
-  async function getUser(): Promise<void> {
-    if (!threadObject) return;
-
-    try {
-      userResult = await axios.get<{
-        message: string;
-        threads?: Thread[];
-      }>("http://localhost:8080/user/" + threadObject.author, {});
-    } catch (error) {
-      console.log(error);
-    }
-    setuser(userResult.data.user);
-  }
-
-  async function getComments(): Promise<void> {
-    let commentResult: AxiosResponse;
-    if (!threadObject) return;
-
-    try {
-      commentResult = await axios.get<{
-        message: string;
-        comments?: Comment[];
-      }>(
-        "http://localhost:8080/thread/threadComments/" + threadObject.threadId,
-        {}
-      );
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-    setComments(commentResult.data.comments);
-  }
-
-  let threadResult: AxiosResponse;
-  let userResult: AxiosResponse;
+  const signedInUser = authContext.signedInUser;
 
   useEffect((): void => {
+    const getThread = async (): Promise<void> => {
+      let threadResult: AxiosResponse;
+      try {
+        threadResult = await axios.get<{
+          message: string;
+          threads?: Thread;
+        }>("http://localhost:8080/thread/" + id, {});
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+      setThreadObject(threadResult.data.thread);
+    };
     getThread();
-  }, []);
+  }, [id]);
 
   useEffect(() => {
-    if (threads) {
-      setThreadObject(threads);
-      getUser();
-      getComments();
-      setLikes(threads.likes);
-      setDislikes(threads.dislikes);
-    }
-  }, [threads, threadObject]);
+    const getUser = async (): Promise<void> => {
+      if (!threadObject) return;
 
-  let author;
+      let userResult: AxiosResponse;
+      try {
+        userResult = await axios.get<{
+          message: string;
+          threads?: Thread[];
+        }>("http://localhost:8080/user/" + threadObject.author, {});
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+      setuser(userResult.data.user);
+    };
 
-  if (!threadObject) return <div>No thread</div>;
+    const getComments = async (): Promise<void> => {
+      let commentResult: AxiosResponse;
+      if (!threadObject) return;
+
+      try {
+        commentResult = await axios.get<{
+          message: string;
+          comments?: Comment[];
+        }>(
+          "http://localhost:8080/thread/threadComments/" +
+            threadObject.threadId,
+          {}
+        );
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+      setComments(commentResult.data.comments);
+    };
+    getUser();
+    getComments();
+  }, [threadObject]);
+
+  if (!threadObject) return <></>;
   if (!user) return <div>An error has occured.</div>;
 
-  author = user.username;
+  const author = user.username;
   const path = "/profile/" + user.username;
 
   const list: JSX.Element[] = [];
@@ -106,13 +96,60 @@ const ThreadPage = (): JSX.Element => {
   }
 
   const likeClickHandler = async (): Promise<void> => {
-    if (isFetching) {
+    if (isFetching || !threadObject) {
       return;
     }
-    if (!authContext.signedInUser) {
+
+    if (!signedInUser) {
       setErrorMessage("You need to sign in to like");
       return;
     }
+
+    authContext.setSignedInUser((prevUser) => {
+      if (!(prevUser && threadObject)) return;
+
+      let updatedLikes: number[];
+      if (prevUser.likedThreads.includes(threadObject.threadId)) {
+        updatedLikes = user.likedThreads.filter(
+          (likedId) => likedId !== threadObject.threadId
+        );
+        setThreadObject((prevThread) =>
+          prevThread
+            ? { ...prevThread, likes: prevThread.likes - 1 }
+            : undefined
+        );
+      } else {
+        updatedLikes = [...user.likedThreads, threadObject.threadId];
+        setThreadObject((prevThread) =>
+          prevThread
+            ? { ...prevThread, likes: prevThread.likes + 1 }
+            : undefined
+        );
+      }
+
+      if (prevUser.dislikedThreads.includes(threadObject.threadId)) {
+        const updatedDislikes = prevUser.dislikedThreads.filter(
+          (likedId) => likedId !== threadObject.threadId
+        );
+
+        setThreadObject((prevThread) =>
+          prevThread
+            ? { ...prevThread, dislikes: prevThread.dislikes - 1 }
+            : undefined
+        );
+
+        return {
+          ...prevUser,
+          likedThreads: updatedLikes,
+          dislikedThreads: updatedDislikes,
+        };
+      }
+
+      return {
+        ...prevUser,
+        likedThreads: updatedLikes,
+      };
+    });
 
     let likeResult: AxiosResponse;
     setIsFetching(true);
@@ -120,24 +157,20 @@ const ThreadPage = (): JSX.Element => {
       likeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/likeThread/",
         {
-          userId: authContext.signedInUser.userId,
+          userId: signedInUser.userId,
           password: authContext.password,
           threadId: threadObject.threadId,
-          username: authContext.signedInUser.username,
+          username: signedInUser.username,
         }
       );
       setErrorMessage("");
-      setLikes(likeResult.data.thread.likes);
-      setDislikes(likeResult.data.thread.dislikes);
-
       console.log(likeResult.data);
     } catch (error) {
+      setIsFetching(false);
       if (!(axios.isAxiosError(error) && error.response)) {
-        console.log(error);
         setErrorMessage("Something went wrong while liking.");
         return;
       }
-
       setErrorMessage(error.response.data.message);
       console.log(error);
       return;
@@ -146,13 +179,57 @@ const ThreadPage = (): JSX.Element => {
   };
 
   const dislikeClickHandler = async (): Promise<void> => {
-    if (isFetching) {
+    if (isFetching || !threadObject) {
       return;
     }
-    if (!authContext.signedInUser) {
+
+    if (!signedInUser) {
       setErrorMessage("You need to sign in to dislike");
       return;
     }
+
+    authContext.setSignedInUser((prevUser) => {
+      if (!(prevUser && threadObject)) return;
+
+      let updatedDislikes: number[];
+      if (prevUser.dislikedThreads.includes(threadObject.threadId)) {
+        updatedDislikes = user.dislikedThreads.filter(
+          (likedId) => likedId !== threadObject.threadId
+        );
+        setThreadObject((prevThread) =>
+          prevThread
+            ? { ...prevThread, dislikes: prevThread.dislikes - 1 }
+            : undefined
+        );
+      } else {
+        updatedDislikes = [...user.dislikedThreads, threadObject.threadId];
+        setThreadObject((prevThread) =>
+          prevThread
+            ? { ...prevThread, dislikes: prevThread.dislikes + 1 }
+            : undefined
+        );
+      }
+
+      if (prevUser.likedThreads.includes(threadObject.threadId)) {
+        const updatedLikes = user.likedThreads.filter(
+          (likedId) => likedId !== threadObject.threadId
+        );
+        setThreadObject((prevThread) =>
+          prevThread
+            ? { ...prevThread, likes: prevThread.likes - 1 }
+            : undefined
+        );
+        return {
+          ...prevUser,
+          likedThreads: updatedLikes,
+          dislikedThreads: updatedDislikes,
+        };
+      }
+      return {
+        ...prevUser,
+        dislikedThreads: updatedDislikes,
+      };
+    });
 
     let dislikeResult: AxiosResponse;
     setIsFetching(true);
@@ -160,20 +237,16 @@ const ThreadPage = (): JSX.Element => {
       dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/dislikeThread/",
         {
-          userId: authContext.signedInUser.userId,
+          userId: signedInUser.userId,
           password: authContext.password,
           threadId: threadObject.threadId,
-          username: authContext.signedInUser.username,
+          username: signedInUser.username,
         }
       );
       setErrorMessage("");
-      setLikes(dislikeResult.data.thread.likes);
-      setDislikes(dislikeResult.data.thread.dislikes);
       console.log(dislikeResult.data);
     } catch (error) {
-      setIsFetching(false);
       if (!(axios.isAxiosError(error) && error.response)) {
-        console.log(error);
         setErrorMessage("Something went wrong when disliking.");
         return;
       }
@@ -193,6 +266,17 @@ const ThreadPage = (): JSX.Element => {
   const context = threadObject.content;
   const userImage = user.profilePicture.imageUrl;
   const date = threadObject.date;
+
+  const likeButtonClassName =
+    signedInUser && signedInUser.likedThreads.includes(threadObject.threadId)
+      ? "generalButton like-button--highlight"
+      : "generalButton";
+
+  const dislikeButtonClassName =
+    signedInUser && signedInUser.dislikedThreads.includes(threadObject.threadId)
+      ? "generalButton dislike-button--highlight"
+      : "generalButton";
+
   return (
     <div className="wholePage">
       <ul>
@@ -214,13 +298,19 @@ const ThreadPage = (): JSX.Element => {
             </div>
             <div className="category-box__thread-desc">{parse(context)}</div>
             <div>
-              <button className="generalButton" onClick={likeClickHandler}>
+              <button
+                className={likeButtonClassName}
+                onClick={likeClickHandler}
+              >
                 <FaThumbsUp />
-                <p className="threadLikes">{likes}</p>
+                <p className="threadLikes">{threadObject.likes}</p>
               </button>
-              <button className="generalButton" onClick={dislikeClickHandler}>
+              <button
+                className={dislikeButtonClassName}
+                onClick={dislikeClickHandler}
+              >
                 <FaThumbsDown />
-                <p className="threadLikes">{dislikes}</p>
+                <p className="threadLikes">{threadObject.dislikes}</p>
               </button>
               <button className="generalButton" onClick={replyClickHandler}>
                 Reply

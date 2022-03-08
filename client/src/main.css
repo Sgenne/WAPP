@@ -64,7 +64,7 @@ button {
   padding: 8px;
   border-radius: 5px;
   background-color: white;
-  transition: background-color 100ms ease-in-out;
+  transition: background-color 100ms ease-in-out, color 100ms ease-in-out;
   font-weight: 600;
 }
 
@@ -169,6 +169,8 @@ header {
   height: 70px;
   width: 70px;
   padding: 0;
+  object-fit: cover;
+  border-radius: 5px;
 }
 
 .row__thread-title {
@@ -546,3 +548,24 @@ header {
 .dropdown__option-icon {
   margin-right: 2px;
 }
+
+.like-button--highlight{
+  background-color: #24922F;
+  color: white;
+}
+
+.like-button--highlight:hover {
+  background-color: #208029;
+}
+
+.dislike-button--highlight {
+  background-color: #EB2438;
+  color: white;
+}
+
+.dislike-button--highlight:hover {
+  background-color: #c51a2b;
+  
+}
+
+

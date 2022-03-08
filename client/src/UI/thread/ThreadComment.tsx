@@ -13,11 +13,13 @@ import parse from "html-react-parser";
 const ThreadComment = (props: { root: Comment }): JSX.Element => {
   const [user, setThreads] = useState<User>();
   const [comments, setComments] = useState<Comment[]>();
-  const authContext = useContext(AuthContext);
   const [errorMessage, setErrorMessage] = useState("");
   const [isFetching, setIsFetching] = useState(false);
   const [likes, setLikes] = useState(props.root.likes);
   const [dislikes, setDislikes] = useState(props.root.dislikes);
+
+  const authContext = useContext(AuthContext);
+  const signedInUser = authContext.signedInUser;
 
   async function getComments(): Promise<void> {
     let commentResult: AxiosResponse;
@@ -54,9 +56,8 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
   useEffect((): void => {
     getUser();
     getComments();
-    setLikes(props.root.likes);
-    setDislikes(props.root.dislikes);
   }, []);
+
   let author;
   if (user) {
     author = user?.username;
@@ -73,10 +74,51 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
     if (isFetching) {
       return;
     }
-    if (!authContext.signedInUser) {
+    if (!signedInUser) {
       setErrorMessage("You need to sign in to like");
       return;
     }
+
+    authContext.setSignedInUser((prevUser) => {
+      if (!prevUser) return;
+
+      let updatedLikes: number[];
+      if (prevUser.likedComments.includes(props.root.commentId)) {
+        updatedLikes = prevUser.likedComments.filter(
+          (likedId) => likedId !== props.root.commentId
+        );
+      } else {
+        updatedLikes = [...prevUser.likedComments, props.root.commentId];
+      }
+
+      if (prevUser.dislikedComments.includes(props.root.commentId)) {
+        const updatedDislikes = prevUser.dislikedComments.filter(
+          (likedId) => likedId !== props.root.commentId
+        );
+
+        return {
+          ...prevUser,
+          likedComments: updatedLikes,
+          dislikedComments: updatedDislikes,
+        };
+      }
+
+      return {
+        ...prevUser,
+        likedComments: updatedLikes,
+      };
+    });
+
+    setLikes((prevLikes) =>
+      signedInUser.likedComments.includes(props.root.commentId)
+        ? prevLikes - 1
+        : prevLikes + 1
+    );
+    setDislikes((prevDislikes) =>
+      signedInUser.dislikedComments.includes(props.root.commentId)
+        ? prevDislikes - 1
+        : prevDislikes
+    );
 
     let likeResult: AxiosResponse;
     setIsFetching(true);
@@ -84,15 +126,13 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
       likeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/comment/likeComment/",
         {
-          userId: authContext.signedInUser.userId,
+          userId: signedInUser.userId,
           password: authContext.password,
           commentID: props.root.commentId,
-          username: authContext.signedInUser.username,
+          username: signedInUser.username,
         }
       );
       setErrorMessage("");
-      setLikes(likeResult.data.comment.likes);
-      setDislikes(likeResult.data.comment.dislikes);
       console.log(likeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
@@ -111,28 +151,58 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
     if (isFetching) {
       return;
     }
-    if (!authContext.signedInUser) {
+
+    if (!signedInUser) {
       setErrorMessage("You need to sign in to dislike");
       return;
     }
+
+    authContext.setSignedInUser((prevUser) => {
+      if (!prevUser) return;
+
+      let updatedDislikes: number[];
+      if (prevUser.dislikedComments.includes(props.root.commentId)) {
+        updatedDislikes = prevUser.dislikedComments.filter(
+          (likedId) => likedId !== props.root.commentId
+        );
+        setDislikes((prevValue) => prevValue - 1);
+      } else {
+        updatedDislikes = [...prevUser.dislikedComments, props.root.commentId];
+        setDislikes((prevValue) => prevValue + 1);
+      }
+
+      if (prevUser.likedComments.includes(props.root.commentId)) {
+        const updatedLikes = prevUser.likedComments.filter(
+          (likedId) => likedId !== props.root.commentId
+        );
+        setLikes((prevValue) => prevValue - 1);
+        return {
+          ...prevUser,
+          likedComments: updatedLikes,
+          dislikedComments: updatedDislikes,
+        };
+      }
+      return {
+        ...prevUser,
+        dislikedComments: updatedDislikes,
+      };
+    });
+
     let dislikeResult: AxiosResponse;
     setIsFetching(true);
     try {
       dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/comment/dislikeComment/",
         {
-          userId: authContext.signedInUser.userId,
+          userId: signedInUser.userId,
           password: authContext.password,
           commentID: props.root.commentId,
-          username: authContext.signedInUser.username,
+          username: signedInUser.username,
         }
       );
       setErrorMessage("");
-      setLikes(dislikeResult.data.comment.likes);
-      setDislikes(dislikeResult.data.comment.dislikes);
       console.log(dislikeResult.data);
     } catch (error) {
-      setIsFetching(false);
       if (!(axios.isAxiosError(error) && error.response)) {
         setErrorMessage("Something went wrong when disliking.");
         return;
@@ -154,6 +224,16 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
   const date = props.root.date;
   const path = "/profile/" + user?.username;
 
+  const likeButtonClassName =
+    signedInUser && signedInUser.likedComments.includes(props.root.commentId)
+      ? "generalButton like-button--highlight"
+      : "generalButton";
+
+  const dislikeButtonClassName =
+    signedInUser && signedInUser.dislikedComments.includes(props.root.commentId)
+      ? "generalButton dislike-button--highlight"
+      : "generalButton";
+
   return (
     <li style={{ marginLeft: "30px" }}>
       <div className="category-box container-fluid px-4">
@@ -171,11 +251,14 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
           <p>{parse(context)}</p>
         </div>
         <div>
-          <button className="generalButton" onClick={likeClickHandler}>
+          <button className={likeButtonClassName} onClick={likeClickHandler}>
             <FaThumbsUp />
             <p className="threadLikes">{likes}</p>
           </button>
-          <button className="generalButton" onClick={dislikeClickHandler}>
+          <button
+            className={dislikeButtonClassName}
+            onClick={dislikeClickHandler}
+          >
             <FaThumbsDown />
             <p className="threadLikes">{dislikes}</p>
           </button>
