@@ -104,7 +104,6 @@ threadRouter.post(
     const id = req.body.threadId;
     const content = req.body.content;
     const userId = req.body.userId;
-    console.log(id);
 
     const result = await threadServices.commentThread(userId, id, content);
 

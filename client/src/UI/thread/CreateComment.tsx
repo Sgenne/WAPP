@@ -40,8 +40,7 @@ const CreateComment = (): JSX.Element => {
         }
       );
 
-      console.log(signInResult.data);
-      if (params.type == "thread") {
+      if (params.type === "thread") {
         navigate("/thread/" + params.id);
       } else {
         navigate("/thread/" + signInResult.data.comment.rootThread);

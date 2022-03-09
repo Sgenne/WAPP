@@ -43,7 +43,6 @@ const CreateThread = (): JSX.Element => {
         }
       );
       setErrorMessage("");
-      console.log(signInResult.data);
       navigate("/thread/" + signInResult.data.thread.threadId);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {

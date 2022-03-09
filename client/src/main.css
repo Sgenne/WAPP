@@ -565,7 +565,24 @@ header {
 
 .dislike-button--highlight:hover {
   background-color: #c51a2b;
-  
+}
+
+.search-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-weight: 600;
+  margin-top: 32px;
+}
+
+.search-page__search-help {
+  margin-top: 16px 
+}
+
+.search-page__search-help-list li::before {
+  content: "•";
+  padding-right: 8px;
 }
 
 

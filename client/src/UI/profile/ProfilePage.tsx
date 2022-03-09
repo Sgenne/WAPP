@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { formatDate } from "../../utils/formatUtils";
-import ProfileListItem from "./ProfileListItem";
+import ListItem from "../common/ListItem";
 import { Thread } from "../../../../server/src/model/thread.interface";
 import { Comment } from "../../../../server/src/model/comment.interface";
 import axios, { AxiosResponse } from "axios";
@@ -122,7 +122,7 @@ const ProfilePage = (): JSX.Element => {
   const showCreatedThreads = useCallback(() => {
     const threadListItems = createdThreads.map((thread) => (
       <div className="profile-page__list-item" key={thread.threadId}>
-        <ProfileListItem
+        <ListItem
           header={thread.title}
           content={thread.content}
           info={`Posted at: ${formatDate(new Date(thread.date))}`}
@@ -142,7 +142,7 @@ const ProfilePage = (): JSX.Element => {
   const showCreatedComments = () => {
     const commentListItems = createdComments.map((comment) => (
       <div className="profile-page__list-item" key={comment.commentId}>
-        <ProfileListItem
+        <ListItem
           content={comment.content}
           info={`Posted at: ${formatDate(new Date(comment.date))}`}
           link={`/thread/${comment.rootThread}`}
@@ -155,7 +155,7 @@ const ProfilePage = (): JSX.Element => {
   const showLikedThreads = () => {
     const threadListItems = likedThreads.map((thread) => (
       <div className="profile-page__list-item" key={thread.threadId}>
-        <ProfileListItem
+        <ListItem
           header={thread.title}
           content={thread.content}
           info={`Posted at: ${formatDate(new Date(thread.date))}`}
@@ -169,7 +169,7 @@ const ProfilePage = (): JSX.Element => {
   const showLikedComments = () => {
     const commentListItems = likedComments.map((comment) => (
       <div className="profile-page__list-item" key={comment.commentId}>
-        <ProfileListItem
+        <ListItem
           content={comment.content}
           info={`Posted at: ${formatDate(new Date(comment.date))}`}
           link={`/thread/${comment.rootThread}`}

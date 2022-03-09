@@ -8,6 +8,8 @@ import Dropdown from "./common/Dropdown";
 
 const Header = (): JSX.Element => {
   const [showProfileOptions, setShowProfileOptions] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+
   const profileRef = useRef<HTMLDivElement>(null);
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
@@ -50,6 +52,18 @@ const Header = (): JSX.Element => {
     document.location.reload();
   };
 
+  const searchInputChangeHandler: React.ChangeEventHandler<HTMLInputElement> = (
+    event
+  ) => {
+    setSearchInput(event.target.value);
+  };
+
+  const searchButtonClickHandler = () => {
+    if (!searchInput) return;
+
+    navigate(`/search?query=${searchInput}`)
+  }
+
   const profileDropdownOptions = [
     {
       title: "Profile page",
@@ -75,8 +89,12 @@ const Header = (): JSX.Element => {
           </NavLink>
         </div>
         <div className="header__search col-6">
-          <input type="text" placeholder="what are you looking for?" />
-          <button className="header__search-button">
+          <input
+            onChange={searchInputChangeHandler}
+            type="text"
+            placeholder="what are you looking for?"
+          />
+          <button onClick={searchButtonClickHandler} className="header__search-button">
             <FaSearch />
           </button>
         </div>

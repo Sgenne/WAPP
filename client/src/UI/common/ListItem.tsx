@@ -14,7 +14,7 @@ const options: HTMLReactParserOptions = {
   },
 };
 
-const ProfileListItem = (props: {
+const ListItem = (props: {
   header?: string;
   content: string;
   info?: string;
@@ -49,4 +49,4 @@ const ProfileListItem = (props: {
   return <li className="profile-list-item">{listItem}</li>;
 };
 
-export default ProfileListItem;
+export default ListItem;

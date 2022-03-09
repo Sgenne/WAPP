@@ -1,30 +1,75 @@
 import axios, { AxiosResponse } from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Thread } from "../../../../server/src/model/thread.interface";
+import ListItem from "../common/ListItem";
+import { formatDate } from "../../utils/formatUtils";
+import { useLocation } from "react-router-dom";
+
 
 const SearchPage = () => {
+  const [searchResult, setSearchResult] = useState<Thread[]>([]);
+  const [noResult, setNoResult] = useState(false);
+  
+  // If searching for a new term when this component is already mounted, then 
+  // useLocation() triggers a rerender.
+  useLocation();
+
+  const query = new URLSearchParams(window.location.search).get("query");
+
   useEffect(() => {
     const fetch = async () => {
-      const query = new URLSearchParams(window.location.search).get("query");
+      setSearchResult([]);
+      setNoResult(false);
 
-      let searchResult: AxiosResponse;
+      let result: AxiosResponse<{message: string, threads?: Thread[]}>;
       try {
-        searchResult = await axios.get<{ message: string; threads?: Thread[] }>(
-          "https://localhost/thread/search?q=" + query
+        result = await axios.get(
+          "http://localhost:8080/thread/search?q=" + query
         );
       } catch (error) {
         console.log(error);
         return;
       }
 
-      console.log("searchResult: ", searchResult.data.threads);
+      const resultThreads = result.data.threads;
 
-      console.log(query);
+      if (!resultThreads || resultThreads.length === 0) {
+        setNoResult(true);
+        setSearchResult([]);
+        return;
+      }
+      
+      setSearchResult(resultThreads);
     };
     fetch();
-  }, []);
+  }, [query]);
 
-  return <div>SearchPage</div>;
+  const searchResultItems = searchResult.map((result) => (
+    <ListItem header={result.title} content={result.content} 
+    info={`Posted at: ${formatDate(new Date(result.date))}`}
+    link={`/thread/${result.threadId}`}
+    />
+
+  ));
+
+    if (noResult) {
+      return <div className="search-page">
+        <h1>No results for "{query}"</h1>
+        <div className="search-page__search-help">
+        <h3>Search help</h3>
+        <ul className="search-page__search-help-list">
+          <li>Check your search for typos.</li>
+          <li>Use more generic search terms.</li>
+        </ul>
+        </div>
+      </div>
+    }
+
+
+  return <div className="search-page">
+  <h1>Search Result</h1>
+  <ul >{searchResultItems}</ul>
+  </div>
 };
 
 export default SearchPage;
