@@ -28,7 +28,8 @@ export const updateUser = async (
     birthDate?: any;
     bio?: string;
     password?: string;
-    image?: any;
+    visibleProperties?: object;
+    email?: string;
   }
 ): Promise<UserServiceResult> => {
   const existingUser: User | null = await userModel.findOne({
@@ -44,6 +45,10 @@ export const updateUser = async (
     {
       birthDate: update.birthDate ? update.birthDate : existingUser.birthDate,
       bio: update.bio ? update.bio : existingUser.bio,
+      email: update.email ? update.email : existingUser.email,
+      visibleProperties: update.visibleProperties
+        ? update.visibleProperties
+        : existingUser.visibleProperties,
       password: update.password
         ? await hashPassword(update.password)
         : existingUser.passwordHash,

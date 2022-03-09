@@ -30,7 +30,8 @@ export const handleValidationResult = (
 export const hasValidUsername = body("username")
   .exists()
   .withMessage("No username was provided.")
-  .isLength({ min: 4, max: 16 }).withMessage("Usernames have to be within 4 and 16 characters long.")
+  .isLength({ min: 4, max: 16 })
+  .withMessage("Usernames have to be within 4 and 16 characters long.")
   .isAlphanumeric()
   .withMessage("The given username was invalid.");
 
@@ -87,22 +88,7 @@ export const hasPassword = body("password")
 export const hasVisiblePropertiesOptions = body("options")
   .isObject()
   .withMessage("No options object was provided.")
-  .custom((options) => {
-    if (
-      !(
-        typeof options.email === "boolean" &&
-        typeof options.joinDate === "boolean" &&
-        typeof options.birthDate === "boolean" &&
-        typeof options.bio === "boolean" &&
-        typeof options.image === "boolean" &&
-        typeof options.likedThreads === "boolean" &&
-        typeof options.dislikedThreads === "boolean"
-      )
-    ) {
-      throw new Error("The given options object was invalid.");
-    }
-    return true;
-  });
+  .custom((options) => visiblePropertiesAreValid(options));
 
 /**
  * Verifies that the request body has a valid thread-id.
@@ -154,3 +140,56 @@ export const hasValidCommentId = body("commentID")
 export const hasValidUserId = body("userId")
   .notEmpty()
   .withMessage("No user-id was provided.");
+
+/**
+ * Verifies that any present property that will be used to update a user is valid.
+ */
+export const hasUpdate = [
+  body("birthDate")
+    .optional()
+    .isISO8601()
+    .withMessage("The given birth date was invalid."),
+  body("password")
+    .optional()
+    .custom((value) => !/\s/.test(value))
+    .withMessage("No whitespace is allowed in the password.")
+    .isLength({ min: 5, max: 42 })
+    .withMessage("The given password was invalid."),
+  body("visibleProperties")
+    .optional()
+    .custom((options) => visiblePropertiesAreValid(options))
+    .withMessage("The provided visibleProperties object was invalid."),
+  body("email")
+    .optional()
+    .isEmail()
+    .withMessage("The given email was invalid."),
+];
+
+const visiblePropertiesAreValid = (options: {
+  email: boolean;
+  joinDate: boolean;
+  birthDate: boolean;
+  bio: boolean;
+  image: boolean;
+  likedThreads: boolean;
+  dislikedThreads: boolean;
+  likedComments: boolean;
+  dislikedComments: boolean;
+}) => {
+  if (
+    !(
+      typeof options.email === "boolean" &&
+      typeof options.joinDate === "boolean" &&
+      typeof options.birthDate === "boolean" &&
+      typeof options.bio === "boolean" &&
+      typeof options.image === "boolean" &&
+      typeof options.likedThreads === "boolean" &&
+      typeof options.dislikedThreads === "boolean" &&
+      typeof options.likedComments === "boolean" &&
+      typeof options.dislikedComments === "boolean"
+    )
+  ) {
+    return false;
+  }
+  return true;
+};

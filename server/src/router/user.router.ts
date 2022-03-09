@@ -3,6 +3,7 @@ import { Request, Response, Router } from "express";
 import {
   handleValidationResult,
   hasPassword,
+  hasUpdate,
   hasUsername,
   hasValidBirthDate,
   hasValidEmail,
@@ -48,7 +49,7 @@ userRouter.post(
 
     res.status(201).send({
       message: "The new user was created successfully",
-      user: user
+      user: user,
     });
   }
 );
@@ -59,6 +60,8 @@ userRouter.post(
 userRouter.put(
   "/update-user",
   isAuthenticated,
+  hasUpdate,
+  handleValidationResult,
   async (req: Request, res: Response) => {
     const userId = req.body.userId;
 
@@ -66,6 +69,8 @@ userRouter.put(
       birthDate: req.body.birthDate,
       bio: req.body.bio,
       password: req.body.newPassword,
+      visibleProperties: req.body.visibleProperties,
+      email: req.body.email
     };
 
     await userServices.updateUser(userId, update);
@@ -88,34 +93,6 @@ userRouter.delete(
     const result = await userServices.deleteUser(userId);
 
     return res.status(result.statusCode).send({ message: result.message });
-  }
-);
-
-/**
- * Updates the visible properties of a user.
- */
-userRouter.put(
-  "/set-visible-properties",
-  isAuthenticated,
-  hasVisiblePropertiesOptions,
-  handleValidationResult,
-  async (req: Request, res: Response) => {
-    const options = req.body.options;
-    const userId = req.body.userId;
-
-    const result = await userServices.setVisibleProperties(userId, options);
-
-    const user = result.user;
-
-    if (!user) {
-      res.status(result.statusCode).send({ message: result.message });
-      return;
-    }
-
-    res.status(200).send({
-      message: "Preferences updated successfully.",
-      userId: user.userId,
-    });
   }
 );
 
