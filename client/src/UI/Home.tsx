@@ -25,10 +25,10 @@ const Home = (): JSX.Element => {
     getCategory();
   }, []);
 
-  const categoryPreviewComponents = categories.map((cat) => {
+  const categoryPreviewComponents = categories.map((category) => {
     return (
-      <span key={cat.categoryId}>
-        <CategoryPreview category={cat} />
+      <span key={category.title}>
+        <CategoryPreview category={category} />
       </span>
     );
   });

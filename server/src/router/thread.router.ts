@@ -130,13 +130,15 @@ threadRouter.post(
   isAuthenticated,
   async (req: Request, res: Response) => {
     const userId = req.body.userId;
-    const categoryId = +req.body.categoryId;
+    const categoryTitle = req.body.categoryTitle;
     const title = req.body.title;
     const content = req.body.content;
 
+    console.log(categoryTitle)
+
     const result = await threadServices.postThread(
       userId,
-      categoryId,
+      categoryTitle,
       title,
       content
     );
@@ -171,10 +173,10 @@ threadRouter.get("/categories", async (req: Request, res: Response) => {
  * Returns all threads from a specified category.
  */
 threadRouter.get(
-  "/categoryThreads/:categoryId",
+  "/categoryThreads/:categoryTitle",
   async (req: Request, res: Response) => {
     const result = await threadServices.getCategoryThreads(
-      +req.params.categoryId
+      req.params.categoryTitle
     );
 
     if (result.statusCode !== 200) {
@@ -186,13 +188,31 @@ threadRouter.get(
 );
 
 /**
+ * Returns all threads from a specified category.
+ */
+ threadRouter.get(
+  "/categoryDetails/:categoryTitle",
+  async (req: Request, res: Response) => {
+    const result = await threadServices.getCategoryDetails(
+      req.params.categoryTitle
+    );
+
+    if (result.statusCode !== 200) {
+      return res.status(result.statusCode).send({ message: result.message });
+    }
+
+    res.status(200).send({ message: result.message, category: result.category });
+  }
+);
+
+/**
  * Returns three sample threads from the specified category.
  */
 threadRouter.get(
-  "/sampleThreads/:categoryId",
+  "/sampleThreads/:categoryTitle",
   async (req: Request, res: Response) => {
     const result = await threadServices.getSampleThreads(
-      +req.params.categoryId
+      req.params.categoryTitle
     );
 
     if (result.statusCode !== 200) {

@@ -28,6 +28,7 @@ interface ThreadServiceResult {
 interface CategoryServiceResult {
   statusCode: number;
   message: string;
+  category?: Category;
   categories?: Category[];
 }
 
@@ -115,7 +116,7 @@ export const getLikedThreads = async (
  *
  * @param threadId - id of the thread the user likes.
  *
- * @param username - the user who likes the thread.
+ * @param userId - the user who likes the thread.
  */
 export const likeThread = async (
   threadId: number,
@@ -164,7 +165,7 @@ export const likeThread = async (
  *
  * @param threadId - id of the thread the user dislikes.
  *
- * @param username - the user who dislikes the thread.
+ * @param userId - the user who dislikes the thread.
  */
 export const disLikeThread = async (
   threadId: number,
@@ -366,7 +367,7 @@ export const postThread = async (
   }
 
   const existingCategory: Category | null = await categoryModel.findOne({
-    CategoryId: category,
+    CategoryTitle: category,
   });
 
   if (!existingCategory) {
@@ -415,14 +416,38 @@ export const getCategories = async (): Promise<CategoryServiceResult> => {
 };
 
 /**
+ * Returns a list of all categories.
+ */
+export const getCategoryDetails = async (
+  categoryTitle: string
+): Promise<CategoryServiceResult> => {
+  const category: Category | null = await categoryModel.findOne({
+    title: categoryTitle,
+  });
+
+  if (!category) {
+    return {
+      statusCode: 404,
+      message: "No category with the given category title was found.",
+    };
+  }
+
+  return {
+    statusCode: 200,
+    message: "The category's details were found and returned successfully.",
+    category: category,
+  };
+};
+
+/**
  * Returns three sample threads from a specified category.
  */
 export const getSampleThreads = async (
-  categoryId: number
+  categoryTitle: string
 ): Promise<ThreadServiceResult> => {
   const allCategories = await categoryModel.find();
   const category: Category | null = await categoryModel.findOne({
-    categoryId: categoryId,
+    categoryTitle: categoryTitle,
   });
 
   if (!category) {
@@ -433,7 +458,7 @@ export const getSampleThreads = async (
   }
 
   const sampleThreads = await threadModel
-    .find({ category: categoryId })
+    .find({ category: categoryTitle })
     .limit(3);
 
   return {
@@ -446,12 +471,14 @@ export const getSampleThreads = async (
 /**
  * Returns all threads from a specified category.
  *
- * @param categoryId - The id of the category whose threads should be returned.
+ * @param categoryTitle - The title of the category whose threads should be returned.
  */
 export const getCategoryThreads = async (
-  categoryId: number
+  categoryTitle: string
 ): Promise<ThreadServiceResult> => {
-  const threadArr: Thread[] = await threadModel.find({ category: categoryId });
+  const threadArr: Thread[] = await threadModel.find({
+    category: categoryTitle,
+  });
 
   return {
     statusCode: 200,

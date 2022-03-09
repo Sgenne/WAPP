@@ -33,7 +33,7 @@ const CreateComment = (): JSX.Element => {
         {
           userId: authContext.signedInUser?.userId,
           password: authContext.password,
-          categoryId: category,
+          title: category,
           threadId: params.id,
           commentID: params.id,
           content: value,

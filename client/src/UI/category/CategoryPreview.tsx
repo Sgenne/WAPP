@@ -17,7 +17,7 @@ const CategoryPreview = (props: { category: Category }): JSX.Element => {
         threads?: Thread[];
       }>(
         "http://localhost:8080/thread/sampleThreads/" +
-          props.category.categoryId,
+          props.category.title,
         {}
       );
     } catch (error) {
@@ -41,13 +41,13 @@ const CategoryPreview = (props: { category: Category }): JSX.Element => {
   }
 
   const [open, setOpen] = useState(false);
-  const link = `/category/${props.category.categoryId}`;
+  const link = `/category/${props.category.title}`;
   return (
     <li className="category-box container-fluid px-4">
       <div className="flex">
         <h2>
           <NavLink to={link} className="fullHeight">
-            {props.category.title}
+            {props.category.title.replaceAll("-", " ")}
           </NavLink>
         </h2>
 
