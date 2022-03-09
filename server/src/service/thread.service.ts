@@ -478,7 +478,7 @@ export const getCategoryThreads = async (
 ): Promise<ThreadServiceResult> => {
   const threadArr: Thread[] = await threadModel.find({
     category: categoryTitle,
-  });
+  }).sort({"_id" : -1});
 
   return {
     statusCode: 200,

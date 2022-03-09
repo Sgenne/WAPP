@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useNavigate, useParams } from "react-router-dom";
@@ -7,6 +7,8 @@ import { Thread } from "../../../../server/src/model/thread.interface";
 import { AuthContext } from "../../context/AuthContext";
 import QuillTools, { formats, modules } from "../../utils/quillTools";
 import ErrorMessage from "../common/ErrorMessage";
+import parse from "html-react-parser";
+
 
 const CreateComment = (): JSX.Element => {
   const navigate = useNavigate();
@@ -15,10 +17,35 @@ const CreateComment = (): JSX.Element => {
   const category = params.category;
   const [value, setValue] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [commentFor, setCommentFor] = useState<Thread>();
 
-  if (params.type !== "thread" && params.type !== "comment") {
-    return <div>Invald type</div>;
-  }
+  useEffect((): void => {
+    const getComment = async (): Promise<void> => {
+      let result: AxiosResponse;
+      if(params.type === "thread"){
+        try {
+          result = await axios.get<{
+            message: string;
+            thread?: Thread;
+          }>("http://localhost:8080/thread/" + params.id, {});
+        } catch (error) {
+          return;
+        }
+        setCommentFor(result.data.thread);
+       } //else{
+      //   try {
+      //     result = await axios.get<{
+      //       message: string;
+      //       comment?: Comment;
+      //     }>("http://localhost:8080/comment/" + params.id, {});
+      //   } catch (error) {
+      //     return;
+      //   }
+      // }
+
+    };
+    getComment();
+  }, [params.id, params.type]);
 
   const submitClickHandler = async () => {
     if (!authContext.signedInUser) {
@@ -64,14 +91,11 @@ const CreateComment = (): JSX.Element => {
           <div className="category-box container-fluid px-4">
             <div className="row1">
               <h3 className="thread-title">
-                You are about to create a comment for {params.type} {params.id}
+                You are about to create a comment for {params.type} {(params.type === "thread" && commentFor?.title) || params.id}
               </h3>
             </div>
             <div className="thread-desc">
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-                malesuada odio at magna faucibus, eget mollis erat tempor.
-              </p>
+              {commentFor && parse(commentFor?.content)}
             </div>
           </div>
         </li>

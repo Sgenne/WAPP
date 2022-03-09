@@ -248,7 +248,7 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
           </p>
         </div>
         <div className="category-box__thread-desc">
-          <p>{parse(context)}</p>
+          {parse(context)}
         </div>
         <div>
           <button className={likeButtonClassName} onClick={likeClickHandler}>

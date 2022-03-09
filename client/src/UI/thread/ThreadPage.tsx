@@ -11,7 +11,6 @@ import { NavLink, useNavigate } from "react-router-dom";
 import ErrorMessage from "../common/ErrorMessage";
 import { formatDate } from "../../utils/formatUtils";
 import parse from "html-react-parser";
-import PageNotFound from "../errorPages/PageNotFound";
 
 const ThreadPage = (): JSX.Element => {
   const navigate = useNavigate();
@@ -85,9 +84,6 @@ const ThreadPage = (): JSX.Element => {
 
   if (!threadObject) return <></>;
   if (!user) return <div>An error has occured.</div>;
-
- // setTimeout(() => {erro = true}, 1000);
- // if (!category) return <div><PageNotFound /></div>;
 
   const author = user.username;
   const path = "/profile/" + user.username;
@@ -282,8 +278,6 @@ const ThreadPage = (): JSX.Element => {
     signedInUser && signedInUser.dislikedThreads.includes(threadObject.threadId)
       ? "generalButton dislike-button--highlight"
       : "generalButton";
-
-
 
 
   return (
