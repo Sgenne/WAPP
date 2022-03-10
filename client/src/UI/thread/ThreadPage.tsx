@@ -96,7 +96,7 @@ const ThreadPage = (): JSX.Element => {
   }
 
   const likeClickHandler = async (): Promise<void> => {
-    if (isFetching || !threadObject) {
+    if (isFetching) {
       return;
     }
 
@@ -105,51 +105,55 @@ const ThreadPage = (): JSX.Element => {
       return;
     }
 
-    authContext.setSignedInUser((prevUser) => {
-      if (!(prevUser && threadObject)) return;
+    if (signedInUser.likedThreads.includes(threadObject.threadId)) {
+      authContext.setSignedInUser(
+        (prevUser) =>
+          prevUser && {
+            ...prevUser,
+            likedThreads: prevUser.likedThreads.filter(
+              (likedId) => likedId !== threadObject.threadId
+            ),
+          }
+      );
+      setThreadObject(
+        (prevObject) =>
+          prevObject && { ...prevObject, likes: prevObject.likes - 1 }
+      );
+    } else {
+      authContext.setSignedInUser(
+        (prevUser) =>
+          prevUser && {
+            ...prevUser,
+            likedThreads: [...prevUser.likedThreads, threadObject.threadId],
+          }
+      );
+      setThreadObject(
+        (prevObject) =>
+          prevObject && {
+            ...prevObject,
+            likes: prevObject.likes + 1,
+          }
+      );
+    }
 
-      let updatedLikes: number[];
-      if (prevUser.likedThreads.includes(threadObject.threadId)) {
-        updatedLikes = user.likedThreads.filter(
-          (likedId) => likedId !== threadObject.threadId
-        );
-        setThreadObject((prevThread) =>
-          prevThread
-            ? { ...prevThread, likes: prevThread.likes - 1 }
-            : undefined
-        );
-      } else {
-        updatedLikes = [...user.likedThreads, threadObject.threadId];
-        setThreadObject((prevThread) =>
-          prevThread
-            ? { ...prevThread, likes: prevThread.likes + 1 }
-            : undefined
-        );
-      }
-
-      if (prevUser.dislikedThreads.includes(threadObject.threadId)) {
-        const updatedDislikes = prevUser.dislikedThreads.filter(
-          (likedId) => likedId !== threadObject.threadId
-        );
-
-        setThreadObject((prevThread) =>
-          prevThread
-            ? { ...prevThread, dislikes: prevThread.dislikes - 1 }
-            : undefined
-        );
-
-        return {
-          ...prevUser,
-          likedThreads: updatedLikes,
-          dislikedThreads: updatedDislikes,
-        };
-      }
-
-      return {
-        ...prevUser,
-        likedThreads: updatedLikes,
-      };
-    });
+    if (signedInUser.dislikedThreads.includes(threadObject.threadId)) {
+      authContext.setSignedInUser(
+        (prevUser) =>
+          prevUser && {
+            ...prevUser,
+            dislikedThreads: prevUser.dislikedThreads.filter(
+              (dislikedId) => dislikedId !== threadObject.threadId
+            ),
+          }
+      );
+      setThreadObject(
+        (prevObject) =>
+          prevObject && {
+            ...prevObject,
+            likes: prevObject.likes - 1,
+          }
+      );
+    }
 
     let likeResult: AxiosResponse;
     setIsFetching(true);
@@ -164,7 +168,6 @@ const ThreadPage = (): JSX.Element => {
         }
       );
       setErrorMessage("");
-      console.log(likeResult.data);
     } catch (error) {
       setIsFetching(false);
       if (!(axios.isAxiosError(error) && error.response)) {
@@ -188,48 +191,58 @@ const ThreadPage = (): JSX.Element => {
       return;
     }
 
-    authContext.setSignedInUser((prevUser) => {
-      if (!(prevUser && threadObject)) return;
+    if (signedInUser.dislikedThreads.includes(threadObject.threadId)) {
+      authContext.setSignedInUser(
+        (prevUser) =>
+          prevUser && {
+            ...prevUser,
+            dislikedThreads: prevUser.dislikedThreads.filter(
+              (dislikedId) => dislikedId !== threadObject.threadId
+            ),
+          }
+      );
+      setThreadObject(
+        (prevObject) =>
+          prevObject && { ...prevObject, dislikes: prevObject.dislikes - 1 }
+      );
+    } else {
+      authContext.setSignedInUser(
+        (prevUser) =>
+          prevUser && {
+            ...prevUser,
+            dislikedThreads: [
+              ...prevUser.dislikedThreads,
+              threadObject.threadId,
+            ],
+          }
+      );
+      setThreadObject(
+        (prevObject) =>
+          prevObject && {
+            ...prevObject,
+            dislikes: prevObject.dislikes + 1,
+          }
+      );
+    }
 
-      let updatedDislikes: number[];
-      if (prevUser.dislikedThreads.includes(threadObject.threadId)) {
-        updatedDislikes = user.dislikedThreads.filter(
-          (likedId) => likedId !== threadObject.threadId
-        );
-        setThreadObject((prevThread) =>
-          prevThread
-            ? { ...prevThread, dislikes: prevThread.dislikes - 1 }
-            : undefined
-        );
-      } else {
-        updatedDislikes = [...user.dislikedThreads, threadObject.threadId];
-        setThreadObject((prevThread) =>
-          prevThread
-            ? { ...prevThread, dislikes: prevThread.dislikes + 1 }
-            : undefined
-        );
-      }
-
-      if (prevUser.likedThreads.includes(threadObject.threadId)) {
-        const updatedLikes = user.likedThreads.filter(
-          (likedId) => likedId !== threadObject.threadId
-        );
-        setThreadObject((prevThread) =>
-          prevThread
-            ? { ...prevThread, likes: prevThread.likes - 1 }
-            : undefined
-        );
-        return {
-          ...prevUser,
-          likedThreads: updatedLikes,
-          dislikedThreads: updatedDislikes,
-        };
-      }
-      return {
-        ...prevUser,
-        dislikedThreads: updatedDislikes,
-      };
-    });
+    if (signedInUser.likedThreads.includes(threadObject.threadId)) {
+      authContext.setSignedInUser(
+        (prevUser) =>
+          prevUser && {
+            ...prevUser,
+            likedThreads: prevUser.likedThreads.filter(
+              (likedId) => likedId !== threadObject.threadId
+            ),
+          }
+      );
+      setThreadObject(
+        (prevObject) =>
+          prevObject && {
+            ...prevObject,
+            likes: prevObject.likes - 1,
+          }
+      );
+    }
 
     let dislikeResult: AxiosResponse;
     setIsFetching(true);
@@ -244,7 +257,6 @@ const ThreadPage = (): JSX.Element => {
         }
       );
       setErrorMessage("");
-      console.log(dislikeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
         setErrorMessage("Something went wrong when disliking.");

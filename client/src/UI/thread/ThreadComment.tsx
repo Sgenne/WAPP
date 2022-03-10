@@ -79,47 +79,44 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
       return;
     }
 
-    authContext.setSignedInUser((prevUser) => {
-      if (!prevUser) return;
-
-      let updatedLikes: number[];
-      if (prevUser.likedComments.includes(props.root.commentId)) {
-        updatedLikes = prevUser.likedComments.filter(
-          (likedId) => likedId !== props.root.commentId
-        );
-      } else {
-        updatedLikes = [...prevUser.likedComments, props.root.commentId];
-      }
-
-      if (prevUser.dislikedComments.includes(props.root.commentId)) {
-        const updatedDislikes = prevUser.dislikedComments.filter(
-          (likedId) => likedId !== props.root.commentId
-        );
+    if (signedInUser.likedComments.includes(props.root.commentId)) {
+      authContext.setSignedInUser((prevUser) => {
+        if (!prevUser) return;
 
         return {
           ...prevUser,
-          likedComments: updatedLikes,
-          dislikedComments: updatedDislikes,
+          likedComments: prevUser.likedComments.filter(
+            (likedId) => likedId !== props.root.commentId
+          ),
         };
-      }
+      });
+      setLikes((prevLikes) => prevLikes - 1);
+    } else {
+      authContext.setSignedInUser((prevUser) => {
+        if (!prevUser) return;
 
-      return {
-        ...prevUser,
-        likedComments: updatedLikes,
-      };
-    });
+        return {
+          ...prevUser,
+          likedComments: [...prevUser.likedComments, props.root.commentId],
+        };
+      });
+      setLikes((prevLikes) => prevLikes + 1);
+    }
 
-    setLikes((prevLikes) =>
-      signedInUser.likedComments.includes(props.root.commentId)
-        ? prevLikes - 1
-        : prevLikes + 1
-    );
-    setDislikes((prevDislikes) =>
-      signedInUser.dislikedComments.includes(props.root.commentId)
-        ? prevDislikes - 1
-        : prevDislikes
-    );
+    if (signedInUser.dislikedComments.includes(props.root.commentId)) {
+      authContext.setSignedInUser((prevUser) => {
+        if (!prevUser) return;
 
+        return {
+          ...prevUser,
+          dislikedComments: prevUser.dislikedComments.filter(
+            (dislikedId) => dislikedId !== props.root.commentId
+          ),
+        };
+      });
+
+      setDislikes((prevDislikes) => prevDislikes - 1);
+    }
     let likeResult: AxiosResponse;
     setIsFetching(true);
     try {
@@ -133,7 +130,6 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
         }
       );
       setErrorMessage("");
-      console.log(likeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
         setErrorMessage("Something went wrong when liking.");
@@ -157,36 +153,47 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
       return;
     }
 
-    authContext.setSignedInUser((prevUser) => {
-      if (!prevUser) return;
+    if (signedInUser.dislikedComments.includes(props.root.commentId)) {
+      authContext.setSignedInUser((prevUser) => {
+        if (!prevUser) return;
 
-      let updatedDislikes: number[];
-      if (prevUser.dislikedComments.includes(props.root.commentId)) {
-        updatedDislikes = prevUser.dislikedComments.filter(
-          (likedId) => likedId !== props.root.commentId
-        );
-        setDislikes((prevValue) => prevValue - 1);
-      } else {
-        updatedDislikes = [...prevUser.dislikedComments, props.root.commentId];
-        setDislikes((prevValue) => prevValue + 1);
-      }
-
-      if (prevUser.likedComments.includes(props.root.commentId)) {
-        const updatedLikes = prevUser.likedComments.filter(
-          (likedId) => likedId !== props.root.commentId
-        );
-        setLikes((prevValue) => prevValue - 1);
         return {
           ...prevUser,
-          likedComments: updatedLikes,
-          dislikedComments: updatedDislikes,
+          dislikedComments: prevUser.dislikedComments.filter(
+            (dislikedId) => dislikedId !== props.root.commentId
+          ),
         };
-      }
-      return {
-        ...prevUser,
-        dislikedComments: updatedDislikes,
-      };
-    });
+      });
+      setDislikes((prevDislikes) => prevDislikes - 1);
+    } else {
+      authContext.setSignedInUser((prevUser) => {
+        if (!prevUser) return;
+
+        return {
+          ...prevUser,
+          dislikedComments: [
+            ...prevUser.dislikedComments,
+            props.root.commentId,
+          ],
+        };
+      });
+      setDislikes((prevDislikes) => prevDislikes + 1);
+    }
+
+    if (signedInUser.likedComments.includes(props.root.commentId)) {
+      authContext.setSignedInUser((prevUser) => {
+        if (!prevUser) return;
+
+        return {
+          ...prevUser,
+          likedComments: prevUser.likedComments.filter(
+            (likedId) => likedId !== props.root.commentId
+          ),
+        };
+      });
+
+      setDislikes((prevDislikes) => prevDislikes - 1);
+    }
 
     let dislikeResult: AxiosResponse;
     setIsFetching(true);
@@ -201,7 +208,6 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
         }
       );
       setErrorMessage("");
-      console.log(dislikeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
         setErrorMessage("Something went wrong when disliking.");

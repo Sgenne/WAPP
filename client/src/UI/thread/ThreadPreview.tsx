@@ -59,35 +59,44 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
       return;
     }
 
-    authContext.setSignedInUser((prevUser) => {
-      if (!prevUser) return;
+    if (signedInUser.likedThreads.includes(props.thread.threadId)) {
+      authContext.setSignedInUser((prevUser) => {
+        if (!prevUser) return;
 
-      let updatedLikes: number[];
-
-      if (prevUser.likedThreads.includes(props.thread.threadId)) {
-        updatedLikes = prevUser.likedThreads.filter(
-          (likedId) => likedId !== props.thread.threadId
-        );
-        setLikes((prevLikes) => prevLikes - 1);
-      } else {
-        setLikes((prevLikes) => prevLikes + 1);
-        updatedLikes = [...prevUser.likedThreads, props.thread.threadId];
-      }
-
-      if (prevUser.dislikedThreads.includes(props.thread.threadId)) {
-        const updatedDislikes = prevUser.dislikedThreads.filter(
-          (likedId) => likedId !== props.thread.threadId
-        );
-        setDislikes((prevValue) => prevValue - 1);
         return {
           ...prevUser,
-          likedThreads: updatedLikes,
-          dislikedThreads: updatedDislikes,
+          likedThreads: prevUser.likedThreads.filter(
+            (likedId) => likedId !== props.thread.threadId
+          ),
         };
-      }
-      return { ...prevUser, likedThreads: updatedLikes };
-    });
+      });
+      setLikes((prevLikes) => prevLikes - 1);
+    } else {
+      authContext.setSignedInUser((prevUser) => {
+        if (!prevUser) return;
 
+        return {
+          ...prevUser,
+          likedThreads: [...prevUser.likedThreads, props.thread.threadId],
+        };
+      });
+      setLikes((prevLikes) => prevLikes + 1);
+    }
+
+    if (signedInUser.dislikedThreads.includes(props.thread.threadId)) {
+      authContext.setSignedInUser((prevUser) => {
+        if (!prevUser) return;
+
+        return {
+          ...prevUser,
+          dislikedThreads: prevUser.dislikedThreads.filter(
+            (dislikedId) => dislikedId !== props.thread.threadId
+          ),
+        };
+      });
+
+      setDislikes((prevDislikes) => prevDislikes - 1);
+    }
     let likeResult: AxiosResponse;
     setIsFetching(true);
     try {
@@ -125,34 +134,44 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
       return;
     }
 
-    authContext.setSignedInUser((prevUser) => {
-      if (!prevUser) return;
+    if (signedInUser.dislikedThreads.includes(props.thread.threadId)) {
+      authContext.setSignedInUser((prevUser) => {
+        if (!prevUser) return;
 
-      let updatedDislikes: number[];
-      if (prevUser.dislikedThreads.includes(props.thread.threadId)) {
-        updatedDislikes = prevUser.dislikedThreads.filter(
-          (likedId) => likedId !== props.thread.threadId
-        );
-        setDislikes((prevDislikes) => prevDislikes - 1);
-      } else {
-        updatedDislikes = [...prevUser.dislikedThreads, props.thread.threadId];
-        setDislikes((prevDislikes) => prevDislikes + 1);
-      }
-
-      if (prevUser.likedThreads.includes(props.thread.threadId)) {
-        const updatedLikedThreads = prevUser.likedThreads.filter(
-          (likedId) => likedId !== props.thread.threadId
-        );
-        setLikes((prevLikes) => prevLikes - 1);
         return {
           ...prevUser,
-          dislikedThreads: updatedDislikes,
-          likedThreads: updatedLikedThreads,
+          dislikedThreads: prevUser.dislikedThreads.filter(
+            (dislikedId) => dislikedId !== props.thread.threadId
+          ),
         };
-      }
+      });
+      setDislikes((prevDislikes) => prevDislikes - 1);
+    } else {
+      authContext.setSignedInUser((prevUser) => {
+        if (!prevUser) return;
 
-      return { ...prevUser, dislikedThreads: updatedDislikes };
-    });
+        return {
+          ...prevUser,
+          dislikedThreads: [...prevUser.dislikedThreads, props.thread.threadId],
+        };
+      });
+      setDislikes((prevDislikes) => prevDislikes + 1);
+    }
+
+    if (signedInUser.likedThreads.includes(props.thread.threadId)) {
+      authContext.setSignedInUser((prevUser) => {
+        if (!prevUser) return;
+
+        return {
+          ...prevUser,
+          likedThreads: prevUser.likedThreads.filter(
+            (likedId) => likedId !== props.thread.threadId
+          ),
+        };
+      });
+
+      setLikes((prevLikes) => prevLikes - 1);
+    }
 
     let dislikeResult: AxiosResponse;
     setIsFetching(true);
@@ -167,7 +186,6 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
         }
       );
       setErrorMessage("");
-      console.log(dislikeResult.data);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
         setErrorMessage("Something went wrong when disliking.");
