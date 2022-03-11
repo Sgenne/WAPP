@@ -5,6 +5,7 @@ import Modal from "../common/Modal";
 import { AuthContext } from "../../context/AuthContext";
 import FormData from "form-data";
 import { Image } from "../../../../server/src/model/image.interface";
+import { useNavigate } from "react-router-dom";
 
 const EditProfilePopup = (props: {
   onClose: () => void;
@@ -14,6 +15,7 @@ const EditProfilePopup = (props: {
   const [newProfilePicture, setNewProfilePicture] = useState<File>();
   const [bio, setBio] = useState(props.owner.bio);
   const authContext = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const submitProfilePictureHandler = async (): Promise<void> => {
     if (
@@ -47,7 +49,7 @@ const EditProfilePopup = (props: {
       ...props.owner,
       profilePicture: response.data.profilePicture,
     };
-    
+
     props.onUpdateOwner(updatedOwner);
     props.onClose();
   };
@@ -73,6 +75,27 @@ const EditProfilePopup = (props: {
 
     props.onUpdateOwner(updatedOwner);
     props.onClose();
+  };
+
+  const deleteUser = async (): Promise<void> => {
+    if (!authContext.signedInUser) return;
+    const data = {
+      userId: authContext.signedInUser.userId,
+      password: authContext.password,
+    };
+    try {
+      await axios.delete("http://localhost:8080/user/delete-user", {
+        data,
+      });
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+    authContext.setIsSignedIn(false);
+    authContext.setSignedInUser(undefined);
+
+    props.onClose();
+    navigate("/");
   };
 
   const profilePictureChangeHandler = (
@@ -115,6 +138,8 @@ const EditProfilePopup = (props: {
             <div className="edit-profile__user-info-buttons">
               <button onClick={submitUserInfoChanges}>Submit bio</button>
               <button onClick={props.onClose}>Cancel</button>
+              <button onClick={deleteUser}>Delete user</button>
+              
             </div>
           </div>
         </div>
