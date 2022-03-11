@@ -38,6 +38,7 @@ const Register = (): JSX.Element => {
   const birthDateChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
+    console.log("birthDateChange")
     setBirthDate(event.target.value);
   };
 
@@ -109,10 +110,12 @@ const Register = (): JSX.Element => {
         </div>
 
         <div className="register__input-container">
-          <label>Date of birth: </label>
+          <label htmlFor="date">Date of birth:</label>
           <input
+          placeholder="Enter your date of birth:"
             name="date of birth"
             type="date"
+            id="date"
             className="register__birth-date-input"
             onChange={birthDateChangeHandler}
           />

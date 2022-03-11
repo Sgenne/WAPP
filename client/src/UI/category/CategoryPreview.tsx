@@ -16,8 +16,7 @@ const CategoryPreview = (props: { category: Category }): JSX.Element => {
         message: string;
         threads?: Thread[];
       }>(
-        "http://localhost:8080/thread/sampleThreads/" +
-          props.category.title,
+        "http://localhost:8080/thread/sampleThreads/" + props.category.title,
         {}
       );
     } catch (error) {
