@@ -377,6 +377,7 @@ header {
 
 .hide {
   display: none;
+  visibility: hidden;
 }
 
 .profile-list-item {
