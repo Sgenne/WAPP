@@ -41,6 +41,7 @@ const CategoryPreview = (props: { category: Category }): JSX.Element => {
 
   const [open, setOpen] = useState(false);
   const link = `/category/${props.category.title}`;
+
   return (
     <li className="category-box container-fluid px-4">
       <div className="flex">
@@ -51,7 +52,7 @@ const CategoryPreview = (props: { category: Category }): JSX.Element => {
         </h2>
 
         <button
-          onClick={() => setOpen(!open)}
+          onClick={() => setOpen((prevValue) => !prevValue)}
           aria-controls="example-collapse-text"
           aria-expanded={open}
           className="generalButton mostRight"
@@ -59,7 +60,7 @@ const CategoryPreview = (props: { category: Category }): JSX.Element => {
           <FaArrowDown />
         </button>
       </div>
-      <Collapse in={open}>
+      <Collapse in={open} timeout={0}>
         <div className="row mt-2 collapse" id="collapseCat">
           <p className="col-12 col-lg-3">{props.category.description}</p>
           <ul className="category-box__threads col-12 col-lg-9">

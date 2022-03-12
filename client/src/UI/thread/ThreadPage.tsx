@@ -22,7 +22,6 @@ const ThreadPage = (): JSX.Element => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isFetching, setIsFetching] = useState(false);
 
-
   const authContext = useContext(AuthContext);
   const signedInUser = authContext.signedInUser;
 
@@ -105,6 +104,7 @@ const ThreadPage = (): JSX.Element => {
       return;
     }
 
+
     if (signedInUser.likedThreads.includes(threadObject.threadId)) {
       authContext.setSignedInUser(
         (prevUser) =>
@@ -150,7 +150,7 @@ const ThreadPage = (): JSX.Element => {
         (prevObject) =>
           prevObject && {
             ...prevObject,
-            likes: prevObject.likes - 1,
+            dislikes: prevObject.dislikes - 1,
           }
       );
     }
@@ -274,8 +274,6 @@ const ThreadPage = (): JSX.Element => {
     navigate(`/create-comment/thread/${threadObject.threadId}`);
   };
 
-
-
   const title = threadObject.title;
   const context = threadObject.content;
   const userImage = user.profilePicture.imageUrl;
@@ -290,7 +288,6 @@ const ThreadPage = (): JSX.Element => {
     signedInUser && signedInUser.dislikedThreads.includes(threadObject.threadId)
       ? "generalButton dislike-button--highlight"
       : "generalButton";
-
 
   return (
     <div className="wholePage">

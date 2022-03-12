@@ -1,11 +1,12 @@
-import CategoryPreview from "../CategoryPreview";
-import { setupServer } from "msw/node";
-import { rest } from "msw";
-import { Category } from "../../../../../server/src/model/category.interface";
 import { render, screen } from "@testing-library/react";
+import { rest } from "msw";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { Category } from "../../../../../server/src/model/category.interface";
 import { Thread } from "../../../../../server/src/model/thread.interface";
+import CategoryPage from "../CategoryPage";
+import { setupServer } from "msw/node";
 import { User } from "../../../../../server/src/model/user.interface";
+import userEvent from "@testing-library/user-event";
 
 const DUMMY_CATEGORY: Category = {
   title: "Cats",
@@ -48,7 +49,7 @@ const DUMMY_CATEGORY_THREAD2: Thread = {
   threadId: 2,
 };
 
-const DUMMY_AUTHOR: User = {
+const DUMMY_USER: User = {
   userId: 1646911445626,
   username: "Simon",
   email: "samham@test.com",
@@ -79,7 +80,7 @@ const DUMMY_AUTHOR: User = {
 
 const server = setupServer(
   rest.get(
-    "http://localhost:8080/thread/sampleThreads/" + DUMMY_CATEGORY.title,
+    "http://localhost:8080/thread/categoryThreads/" + DUMMY_CATEGORY.title,
     (req, res, ctx) =>
       res(
         ctx.json({
@@ -91,33 +92,66 @@ const server = setupServer(
         })
       )
   ),
-  rest.get("http://localhost:8080/user/0", (req, res, ctx) => {
-    return res(
+  rest.get(
+    "http://localhost:8080/thread/categoryDetails/" + DUMMY_CATEGORY.title,
+    (req, res, ctx) =>
+      res(
+        ctx.json({
+          category: DUMMY_CATEGORY,
+        })
+      )
+  ),
+  rest.get("http://localhost:8080/user/0", (req, res, ctx) =>
+    res(
       ctx.json({
-        user: DUMMY_AUTHOR,
+        user: DUMMY_USER,
       })
-    );
-  })
+    )
+  )
 );
 
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-test("The thread returned from the backend is displayed", async () => {
+test("All threads returned from the backend are shown.", async () => {
+  mountPage();
+
+  expect(await screen.findByText(DUMMY_CATEGORY_THREAD0.content)).toBeVisible();
+  expect(screen.getByText(DUMMY_CATEGORY_THREAD1.content)).toBeVisible();
+  expect(screen.getByText(DUMMY_CATEGORY_THREAD2.content)).toBeVisible();
+});
+
+test("Clicking new thread button updates the url.", async () => {
   render(
-    <MemoryRouter initialEntries={["/"]}>
+    <MemoryRouter initialEntries={[`/${DUMMY_CATEGORY.title}`]}>
       <Routes>
+        <Route path="/:category" element={<CategoryPage />} />
         <Route
-          path="/"
-          element={<CategoryPreview category={DUMMY_CATEGORY} />}
+          path={`/create-thread/${DUMMY_CATEGORY.title}`}
+          element={<div>NEW THREAD</div>}
         />
       </Routes>
     </MemoryRouter>
   );
 
-  expect(await screen.findByText(DUMMY_CATEGORY_THREAD0.title)).toBeVisible();
-  expect(await screen.findByText(DUMMY_CATEGORY_THREAD1.title)).toBeVisible();
-  expect(await screen.findByText(DUMMY_CATEGORY_THREAD2.title)).toBeVisible();
-  expect((await screen.findAllByText(DUMMY_AUTHOR.username))[0]).toBeVisible();
+  await screen.findByText(DUMMY_CATEGORY.title);
+
+  userEvent.click(screen.getByRole("button", { name: "Thread" }));
+
+  expect(await screen.findByText("NEW THREAD")).toBeVisible();
 });
+
+const mountPage = (): JSX.Element => {
+  const memoryRouter = (
+    <MemoryRouter initialEntries={[`/${DUMMY_CATEGORY.title}`]}>
+      <Routes>
+        <Route path="/:category" element={<CategoryPage />} />
+      </Routes>
+    </MemoryRouter>
+  );
+
+  render(memoryRouter);
+
+  return memoryRouter;
+};

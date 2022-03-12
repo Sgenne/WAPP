@@ -192,7 +192,7 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
         };
       });
 
-      setDislikes((prevDislikes) => prevDislikes - 1);
+      setLikes((prevLikes) => prevLikes - 1);
     }
 
     let dislikeResult: AxiosResponse;

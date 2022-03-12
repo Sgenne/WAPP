@@ -12,10 +12,10 @@ import EditProfilePopup from "./EditProfilePopup";
 
 const ProfilePage = (): JSX.Element => {
   const [owner, setOwner] = useState<User>();
-  const [createdThreads, setCreatedThreads] = useState<Thread[]>([]);
-  const [createdComments, setCreatedComments] = useState<Comment[]>([]);
-  const [likedThreads, setLikedThreads] = useState<Thread[]>([]);
-  const [likedComments, setLikedComments] = useState<Comment[]>([]);
+  const [createdThreads, setCreatedThreads] = useState<Thread[]>();
+  const [createdComments, setCreatedComments] = useState<Comment[]>();
+  const [likedThreads, setLikedThreads] = useState<Thread[]>();
+  const [likedComments, setLikedComments] = useState<Comment[]>();
   const [listItems, setListItems] = useState<JSX.Element[]>([]);
   const [showSettings, setShowSettings] = useState(false);
   const [error, setError] = useState<Error>();
@@ -66,7 +66,7 @@ const ProfilePage = (): JSX.Element => {
         `http://localhost:8080/thread/author/${userId}`
       );
     } catch (error) {
-      console.log(error); // TODO: Show error
+      console.log(error);
       return;
     }
     const fetchedThreads: Thread[] = response.data.threads;
@@ -120,6 +120,8 @@ const ProfilePage = (): JSX.Element => {
   };
 
   const showCreatedThreads = useCallback(() => {
+    if (!createdThreads) return;
+
     const threadListItems = createdThreads.map((thread) => (
       <div className="profile-page__list-item" key={thread.threadId}>
         <ListItem
@@ -140,6 +142,8 @@ const ProfilePage = (): JSX.Element => {
   }, [showCreatedThreads]);
 
   const showCreatedComments = () => {
+    if (!createdComments) return;
+
     const commentListItems = createdComments.map((comment) => (
       <div className="profile-page__list-item" key={comment.commentId}>
         <ListItem
@@ -153,6 +157,8 @@ const ProfilePage = (): JSX.Element => {
   };
 
   const showLikedThreads = () => {
+    if (!likedThreads) return;
+
     const threadListItems = likedThreads.map((thread) => (
       <div className="profile-page__list-item" key={thread.threadId}>
         <ListItem
@@ -167,6 +173,8 @@ const ProfilePage = (): JSX.Element => {
   };
 
   const showLikedComments = () => {
+    if (!likedComments) return;
+
     const commentListItems = likedComments.map((comment) => (
       <div className="profile-page__list-item" key={comment.commentId}>
         <ListItem
@@ -193,7 +201,16 @@ const ProfilePage = (): JSX.Element => {
   };
 
   if (error) return <div>{error.message}</div>;
-  if (!owner) return <div>Loading...........</div>;
+  if (
+    !(
+      owner &&
+      createdThreads &&
+      createdComments &&
+      likedThreads &&
+      likedComments
+    )
+  )
+    return <></>;
 
   const isOwner =
     authContext.signedInUser &&

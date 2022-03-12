@@ -38,7 +38,6 @@ const Register = (): JSX.Element => {
   const birthDateChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    console.log("birthDateChange")
     setBirthDate(event.target.value);
   };
 
