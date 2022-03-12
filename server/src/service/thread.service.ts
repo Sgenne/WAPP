@@ -43,7 +43,6 @@ export const getThread = async (
   const thread: Thread | null = await threadModel.findOne({
     threadId: threadId,
   });
-  console.log(thread);
   if (!thread) {
     return {
       statusCode: 404,
@@ -447,9 +446,8 @@ export const getCategoryDetails = async (
 export const getSampleThreads = async (
   categoryTitle: string
 ): Promise<ThreadServiceResult> => {
-  const allCategories = await categoryModel.find();
   const category: Category | null = await categoryModel.findOne({
-    categoryTitle: categoryTitle,
+    title: categoryTitle,
   });
 
   if (!category) {
@@ -478,6 +476,17 @@ export const getSampleThreads = async (
 export const getCategoryThreads = async (
   categoryTitle: string
 ): Promise<ThreadServiceResult> => {
+  const category: Category | null = await categoryModel.findOne({
+    title: categoryTitle,
+  });
+
+  if (!category) {
+    return {
+      statusCode: 404,
+      message: "No category with the given category id was found.",
+    };
+  }
+
   const threadArr: Thread[] = await threadModel
     .find({
       category: categoryTitle,

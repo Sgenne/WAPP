@@ -25,7 +25,7 @@ export interface UserServiceResult {
 export const updateUser = async (
   userId: number,
   update: {
-    birthDate?: any;
+    birthDate?: Date;
     bio?: string;
     password?: string;
     visibleProperties?: object;
@@ -49,16 +49,24 @@ export const updateUser = async (
       visibleProperties: update.visibleProperties
         ? update.visibleProperties
         : existingUser.visibleProperties,
-      password: update.password
+      passwordHash: update.password
         ? await hashPassword(update.password)
         : existingUser.passwordHash,
     }
   );
 
+  const updatedUser = await userModel.findOne({
+    userId: userId,
+  });
+
+  if (!updatedUser) {
+    return { statusCode: 404, message: "No user with the given id was found." };
+  }
+
   return {
     statusCode: 200,
     message: "User updated successfully",
-    user: existingUser,
+    user: updatedUser,
   };
 };
 
