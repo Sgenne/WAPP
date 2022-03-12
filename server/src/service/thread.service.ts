@@ -395,8 +395,7 @@ export const postThread = async (
     threadId,
   };
 
-  threadModel.create(newThread);
-  console.log(threadId);
+  await threadModel.create(newThread);
 
   return {
     statusCode: 201,

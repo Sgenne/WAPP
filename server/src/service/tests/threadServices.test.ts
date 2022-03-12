@@ -1,5 +1,6 @@
 import { Console } from "console";
 import mongoose from "mongoose";
+import "dotenv/config";
 import { categoryModel } from "../../db/category.db";
 import { commentModel } from "../../db/comment.db";
 import { threadModel } from "../../db/thread.db";
@@ -16,6 +17,7 @@ import {
   getThread,
 } from "../thread.service";
 import { register, getUser } from "../user.service";
+import { connectToDb } from "../../db/connection";
 
 const dummyUsername = "¯_(ツ)_/¯";
 const dummyTitle = "Will we succed tonight";
@@ -24,17 +26,7 @@ const dummyPassword = "password";
 const dummyEmail = "email@email.com";
 const dummyDateOfBirth = new Date(1972, 11, 10);
 
-mongoose.Schema.Types.String.checkRequired((v) => v != undefined);
 
-const connectToDb = (): Promise<void> =>
-  new Promise(async (resolve) => {
-    mongoose.connect(
-      "mongodb+srv://wapp:eGECpmlt5neeo23g@cluster0.6ofc1.mongodb.net/WAPPTest?retryWrites=true&w=majority"
-    );
-    resolve();
-  });
-
-// Clear all arrays before each test.
 beforeAll(async () => {
   await connectToDb();
 });
@@ -46,12 +38,13 @@ beforeEach(async () => {
   await categoryModel.deleteMany({});
 });
 
-// afterAll(async () => {
-//   await threadModel.deleteMany({});
-//   await commentModel.deleteMany({});
-//   await userModel.deleteMany({});
-//   await categoryModel.deleteMany({});
-// });
+afterAll(async () => {
+  await threadModel.deleteMany({});
+  await commentModel.deleteMany({});
+  await userModel.deleteMany({});
+  await categoryModel.deleteMany({});
+  await mongoose.connection.close();
+});
 
 async function userSetup(): Promise<number> {
   const registerResult = await register(
@@ -88,31 +81,27 @@ async function categorySetup(): Promise<string> {
   postThread
   ================================
   */
-// test("Create thread succeds if username, category, title and content is provided.", async () => {
-//   console.log("working 1");
-//   const userId = await userSetup();
-//   console.log("working 2");
-//   const category = await categorySetup();
-//   console.log("working 3");
-//   const result = await postThread(userId, category, dummyTitle, dummyContent);
-//   console.log("working 4");
+test("Create thread succeds if username, category, title and content is provided.", async () => {
+  const userId = await userSetup();
+  const category = await categorySetup();
+  const result = await postThread(userId, category, dummyTitle, dummyContent);
 
-//   if (!result.thread) throw new Error("User is undefined.");
+  if (!result.thread) throw new Error("User is undefined.");
 
-//   expect(result.thread.author).toBe(userId);
-//   expect(result.thread.category).toBe(category);
-//   expect(result.thread.title).toBe(dummyTitle);
-//   expect(result.thread.content).toBe(dummyContent);
-//   expect(result.statusCode).toBe(201);
-// });
+  expect(result.thread.author).toBe(userId);
+  expect(result.thread.category).toBe(category);
+  expect(result.thread.title).toBe(dummyTitle);
+  expect(result.thread.content).toBe(dummyContent);
+  expect(result.statusCode).toBe(201);
+});
 
-// test("Create thread fails if given category does not exists.", async () => {
-//   const userId = await userSetup();
-//   const result = await postThread(userId, "dummy", dummyTitle, dummyContent);
+test("Create thread fails if given category does not exists.", async () => {
+  const userId = await userSetup();
+  const result = await postThread(userId, "dummy", dummyTitle, dummyContent);
 
-//   expect(result.thread).toBeUndefined;
-//   expect(result.statusCode).toBe(400);
-// });
+  expect(result.thread).toBeUndefined;
+  expect(result.statusCode).toBe(400);
+});
 
 /*
   ================================
@@ -120,9 +109,10 @@ async function categorySetup(): Promise<string> {
   ================================
   */
 test("Get thread succeds if given id exists.", async () => {
-  const category = await categorySetup();
   const userId = await userSetup();
+  const category = await categorySetup();
   const threadId = await threadSetup(userId);
+  console.log(threadId);
   const result = await getThread(threadId);
 
   expect(result.statusCode).toBe(200); //gets 404
