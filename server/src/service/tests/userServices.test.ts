@@ -1,9 +1,12 @@
+import mongoose from "mongoose";
+import { connectToDbTest } from "../../db/connectiontest";
+import { userModel } from "../../db/user.db";
 import {
   updateUser,
   register,
-  users,
   deleteUser,
   validatePassword,
+  getUser,
 } from "../user.service";
 
 const dummyUsername = "¯_(ツ)_/¯";
@@ -12,9 +15,19 @@ const dummyEmail = "email@email.com";
 const dummyDateOfBirth = new Date(1972, 11, 10);
 
 // Clear users before each test.
-beforeEach(async () =>
-  Object.keys(users).forEach((userId) => delete users[userId])
-);
+beforeAll(async () => {
+  await connectToDbTest();
+});
+
+beforeEach(async () => {
+  await userModel.deleteMany({});
+  jest.setTimeout(8000);
+});
+
+afterAll(async () => {
+  await userModel.deleteMany({});
+  await mongoose.connection.close();
+});
 
 /*
 ================================
@@ -45,7 +58,7 @@ test("Editing an existing user with the correct password succeeds.", async () =>
 
   expect(updateResult.statusCode).toBe(200);
   expect(updateResult.user.username).toBe(dummyUsername);
-  expect(updateResult.user.birthDate).toBe(update.birthDate);
+  expect(updateResult.user.birthDate).toMatchObject(update.birthDate);
   expect(updateResult.user.bio).toBe(update.bio);
   expect(validationResult.statusCode).toBe(200);
 });
@@ -100,11 +113,11 @@ test("After deleting a user, that user is no longer stored.", async () => {
 
   const userId = registrationResult.user.userId;
 
-  const existingUser = users[userId];
+  const existingUser = (await getUser(userId)).user;
   expect(existingUser).toBeDefined();
 
   await deleteUser(userId);
 
-  const deletedUser = users[userId];
+  const deletedUser = (await getUser(userId)).user;
   expect(deletedUser).toBeUndefined();
 });

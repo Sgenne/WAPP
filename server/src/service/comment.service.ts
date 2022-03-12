@@ -43,7 +43,7 @@ export const likeComment = async (
 
   if (comment.isDeleted) {
     return {
-      statusCode: 400,
+      statusCode: 405,
       message: "The specified comment is deleted.",
     };
   }
@@ -268,17 +268,17 @@ export const deleteComment = async (
     return commentResult;
   }
 
+  if (comment.isDeleted) {
+    return {
+      statusCode: 405,
+      message: "The comment is already deleted.",
+    };
+  }
+
   if (comment.author !== userId) {
     return {
       statusCode: 403,
       message: "The user does not have permission to delete thic comment.",
-    };
-  }
-
-  if (comment.isDeleted) {
-    return {
-      statusCode: 403,
-      message: "The comment is already deleted.",
     };
   }
 
@@ -288,7 +288,7 @@ export const deleteComment = async (
   comment.likes = 0;
   comment.isDeleted = true;
 
-  commentModel.updateOne({ commentId: commentId }, comment);
+  await commentModel.updateOne({ commentId: commentId }, comment);
 
   return {
     statusCode: 200,

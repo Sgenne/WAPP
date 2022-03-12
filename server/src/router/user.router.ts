@@ -88,6 +88,7 @@ userRouter.delete(
   "/delete-user",
   isAuthenticated,
   async (req: Request, res: Response) => {
+    
     const userId = req.body.userId;
 
     const result = await userServices.deleteUser(userId);

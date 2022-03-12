@@ -11,6 +11,7 @@ export const isAuthenticated = async (
   res: Response,
   next: NextFunction
 ) => {
+  
   const userId = req.body.userId;
   const password = req.body.password;
 
