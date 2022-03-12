@@ -43,6 +43,7 @@ export const getThread = async (
   const thread: Thread | null = await threadModel.findOne({
     threadId: threadId,
   });
+  console.log(thread);
   if (!thread) {
     return {
       statusCode: 404,
@@ -334,7 +335,8 @@ export const deleteThread = async (
     };
   }
 
-  commentModel.deleteMany({ thread: threadId });
+  await threadModel.deleteOne({ threadId: threadId });
+  await commentModel.deleteMany({ root: threadId });
 
   return {
     statusCode: 200,
@@ -355,7 +357,7 @@ export const deleteThread = async (
  */
 export const postThread = async (
   userId: number,
-  category: number,
+  category: string,
   title: string,
   content: string
 ): Promise<ThreadServiceResult> => {
@@ -394,6 +396,7 @@ export const postThread = async (
   };
 
   threadModel.create(newThread);
+  console.log(threadId);
 
   return {
     statusCode: 201,
@@ -476,9 +479,11 @@ export const getSampleThreads = async (
 export const getCategoryThreads = async (
   categoryTitle: string
 ): Promise<ThreadServiceResult> => {
-  const threadArr: Thread[] = await threadModel.find({
-    category: categoryTitle,
-  }).sort({"_id" : -1});
+  const threadArr: Thread[] = await threadModel
+    .find({
+      category: categoryTitle,
+    })
+    .sort({ _id: -1 });
 
   return {
     statusCode: 200,

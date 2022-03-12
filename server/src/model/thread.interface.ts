@@ -8,7 +8,7 @@ export interface Thread {
   content: string;
   author: number;
   date: Date;
-  category: number;
+  category: string;
   replies: number[];
   threadId: number;
 }

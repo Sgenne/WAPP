@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import 'dotenv/config'
+import "dotenv/config";
 
 // To allow empty string but not undefined in all schemas.
 mongoose.Schema.Types.String.checkRequired((v) => v != undefined);
