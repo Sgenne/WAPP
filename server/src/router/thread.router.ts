@@ -133,9 +133,6 @@ threadRouter.post(
     const categoryTitle = req.body.categoryTitle;
     const title = req.body.title;
     const content = req.body.content;
-
-    console.log(categoryTitle)
-
     const result = await threadServices.postThread(
       userId,
       categoryTitle,
