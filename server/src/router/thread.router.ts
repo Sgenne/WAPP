@@ -78,8 +78,9 @@ threadRouter.put(
     const threadID = req.body.threadId;
     const content = req.body.content;
     const title = req.body.title;
+    const userId = req.body.userId
 
-    const result = await threadServices.editThread(threadID, content, title);
+    const result = await threadServices.editThread(userId, threadID, content, title);
 
     if (result.statusCode !== 200) {
       return res.status(result.statusCode).send({ message: result.message });
@@ -187,7 +188,7 @@ threadRouter.get(
 /**
  * Returns all threads from a specified category.
  */
- threadRouter.get(
+threadRouter.get(
   "/categoryDetails/:categoryTitle",
   async (req: Request, res: Response) => {
     const result = await threadServices.getCategoryDetails(
@@ -198,7 +199,9 @@ threadRouter.get(
       return res.status(result.statusCode).send({ message: result.message });
     }
 
-    res.status(200).send({ message: result.message, category: result.category });
+    res
+      .status(200)
+      .send({ message: result.message, category: result.category });
   }
 );
 

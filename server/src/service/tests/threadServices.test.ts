@@ -32,7 +32,7 @@ const dummyTitle = "Will we succed tonight";
 const dummyContent = ":)";
 const dummyPassword = "password";
 const dummyEmail = "email@email.com";
-const dummyDateOfBirth = new Date(1972, 11, 10);
+const dummyDateOfBirth = new Date(197, 11, 10);
 
 beforeAll(async () => {
   await connectToDbTest();
@@ -54,10 +54,10 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
-async function userSetup(): Promise<number> {
+async function userSetup(usernameSufix = ""): Promise<number> {
   const registerResult = await register(
     dummyEmail,
-    dummyUsername,
+    dummyUsername + usernameSufix,
     dummyPassword,
     dummyDateOfBirth
   );
@@ -251,7 +251,12 @@ test("Editing an existing thread with the correct variables succeeds.", async ()
   const category = await categorySetup();
   const threadId = await threadSetup(userId);
 
-  const result = await editThread(threadId, "凸༼ຈل͜ຈ༽凸", "Lenny faces uwu");
+  const result = await editThread(
+    userId,
+    threadId,
+    "凸༼ຈل͜ຈ༽凸",
+    "Lenny faces uwu"
+  );
   if (!result.thread) throw new Error("Thread is undefined.");
 
   expect(result.thread.author).toBe(userId);
@@ -263,12 +268,38 @@ test("Editing an existing thread with the correct variables succeeds.", async ()
 });
 
 test("Attempting to edit a thread that doesn't exist fails.", async () => {
-  await userSetup();
+  const userId = await userSetup();
   const category = await categorySetup();
 
-  const result = await editThread(100, "凸༼ຈل͜ຈ༽凸", "Lenny faces uwu");
+  const result = await editThread(userId, 100, "凸༼ຈل͜ຈ༽凸", "Lenny faces uwu");
   expect(result.thread).toBeUndefined;
   expect(result.statusCode).toBe(404);
+});
+
+test("Editing a thread created by another user fails.", async () => {
+  const dummyEditContent = "凸༼ຈل͜ຈ༽凸";
+  const dummyEditTitle = "Lenny faces uwu";
+
+  const ownerId = await userSetup();
+  const editorId = await userSetup("2");
+
+  await categorySetup();
+  const threadId = await threadSetup(ownerId);
+
+  const editResult = await editThread(
+    editorId,
+    threadId,
+    dummyEditContent,
+    dummyEditTitle
+  );
+
+  const thread = await threadModel.findOne({ threadId: threadId });
+  if (!thread) throw new Error("No thread was created.");
+
+  expect(editResult.thread).toBeUndefined();
+  expect(editResult.statusCode).toBe(403);
+  expect(thread.title).not.toBe(dummyEditTitle);
+  expect(thread.content).not.toBe(dummyEditContent);
 });
 
 /*

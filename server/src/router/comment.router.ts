@@ -3,7 +3,6 @@ import { Request, Response, Router } from "express";
 import {
   handleValidationResult,
   hasContent,
-  hasUsername,
   hasValidCommentId,
   hasValidUserId,
 } from "../utils/validation.util";
@@ -17,7 +16,6 @@ export const commentRouter = Router();
 commentRouter.put(
   "/likeComment",
   hasValidCommentId,
-  hasUsername,
   handleValidationResult,
   isAuthenticated,
   async (req: Request, res: Response) => {
@@ -43,7 +41,6 @@ commentRouter.put(
 commentRouter.put(
   "/disLikeComment",
   hasValidCommentId,
-  hasUsername,
   handleValidationResult,
   isAuthenticated,
   async (req: Request, res: Response) => {
@@ -93,7 +90,7 @@ commentRouter.put(
 /**
  * Allows the creator of a comment to delete that comment.
  */
-commentRouter.put(
+commentRouter.delete(
   "/deleteComment",
   hasValidCommentId,
   handleValidationResult,
