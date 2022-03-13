@@ -45,7 +45,7 @@ const DUMMY_THREAD: Thread = {
   content: "This is a thread",
   author: 1646911445626,
   date: new Date(),
-  category: 0,
+  category: "Cats",
   replies: [],
   threadId: 0,
 };

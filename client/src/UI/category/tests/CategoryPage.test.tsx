@@ -20,7 +20,7 @@ const DUMMY_CATEGORY_THREAD0: Thread = {
   content: "This is a thread about cats",
   author: 0,
   date: new Date(),
-  category: 0,
+  category: "Cats",
   replies: [],
   threadId: 0,
 };
@@ -32,7 +32,7 @@ const DUMMY_CATEGORY_THREAD1: Thread = {
   content: "This is another thread about cats",
   author: 0,
   date: new Date(),
-  category: 0,
+  category: "Cats",
   replies: [],
   threadId: 1,
 };
@@ -44,7 +44,7 @@ const DUMMY_CATEGORY_THREAD2: Thread = {
   content: "This is a third thread about cats",
   author: 0,
   date: new Date(),
-  category: 0,
+  category: "Cats",
   replies: [],
   threadId: 2,
 };

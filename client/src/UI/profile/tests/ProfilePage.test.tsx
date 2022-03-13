@@ -44,7 +44,7 @@ const DUMMY_CREATED_THREAD: Thread = {
   content: "This is a created thread",
   author: 1646911445626,
   date: new Date(),
-  category: 0,
+  category: "Cats",
   replies: [],
   threadId: 2,
 };
@@ -56,7 +56,7 @@ const DUMMY_LIKED_THREAD: Thread = {
   content: "This is a liked thread",
   author: 16469187,
   date: new Date(),
-  category: 0,
+  category: "Cats",
   replies: [],
   threadId: 2,
 };
@@ -193,7 +193,9 @@ test("Clicking comments shows the comments created by the owner.", async () => {
 });
 
 test("Clicking liked comments shows the comments liked by the owner.", async () => {
-  await screen.findByText(DUMMY_CREATED_THREAD.content, undefined, {timeout: 1000});
+  await screen.findByText(DUMMY_CREATED_THREAD.content, undefined, {
+    timeout: 1000,
+  });
 
   userEvent.click(screen.getByRole("button", { name: "Liked Comments" }));
   expect(
