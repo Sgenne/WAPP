@@ -41,15 +41,12 @@ userRouter.post(
 
     const user = result.user;
 
-    if (!user) {
-      res.status(result.statusCode).send({ message: result.message });
-      return;
-    }
-
-    res.status(201).send({
-      message: "The new user was created successfully",
-      user: user,
-    });
+    user
+      ? res.status(201).send({
+          message: "The new user was created successfully",
+          user: user,
+        })
+      : res.status(result.statusCode).send({ message: result.message });
   }
 );
 
@@ -69,14 +66,16 @@ userRouter.put(
       bio: req.body.bio,
       password: req.body.newPassword,
       visibleProperties: req.body.visibleProperties,
-      email: req.body.email
+      email: req.body.email,
     };
 
-    await userServices.updateUser(userId, update);
+    const result = await userServices.updateUser(userId, update);
 
-    res.status(200).send({
-      message: "User information updated successfully.",
-    });
+    result.statusCode === 200
+      ? res.status(200).send({
+          message: "User information updated successfully.",
+        })
+      : res.status(res.statusCode).send({ message: result.message });
   }
 );
 
@@ -87,7 +86,6 @@ userRouter.delete(
   "/delete-user",
   isAuthenticated,
   async (req: Request, res: Response) => {
-    
     const userId = req.body.userId;
 
     const result = await userServices.deleteUser(userId);
@@ -153,14 +151,14 @@ userRouter.post(
 
     const user = result.user;
 
-    if (!user) {
-      res.status(result.statusCode).send({ message: result.message });
-      return;
-    }
-
-    res
-      .status(result.statusCode)
-      .send({ message: result.message, profilePicture: user.profilePicture });
+    user
+      ? res
+          .status(result.statusCode)
+          .send({
+            message: result.message,
+            profilePicture: user.profilePicture,
+          })
+      : res.status(result.statusCode).send({ message: result.message });
   }
 );
 
@@ -174,20 +172,30 @@ userRouter.get("/:userId", async (req: Request, res: Response) => {
 
   const user = result.user;
 
-  res
-    .status(result.statusCode)
-    .send({ message: result.message, user: result.user });
+  user
+  ? res
+      .status(result.statusCode)
+      .send({
+        message: result.message,
+        user: user,
+      })
+  : res.status(result.statusCode).send({ message: result.message });
 });
 
 /**
- * Returns the user oject of the user with the given username.
+ * Returns the user object of the user with the given username.
  */
 userRouter.get("/username/:username", async (req: Request, res: Response) => {
   const username = req.params.username;
 
   const result = await userServices.getUserByUsername(username);
 
-  res
-    .status(result.statusCode)
-    .send({ message: result.message, user: result.user });
+  result.user
+  ? res
+      .status(result.statusCode)
+      .send({
+        message: result.message,
+        user: result.user,
+      })
+  : res.status(result.statusCode).send({ message: result.message });
 });

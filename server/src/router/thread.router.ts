@@ -27,14 +27,12 @@ threadRouter.put(
 
     const result = await threadServices.likeThread(threadID, userId);
 
-    if (result.statusCode !== 200) {
-      return res.status(result.statusCode).send({ message: result.message });
-    }
-
-    res.status(200).send({
-      message: "Like status changed successfully.",
-      thread: result.thread,
-    });
+    result.statusCode === 200
+      ? res.status(200).send({
+          message: "Like status changed successfully.",
+          thread: result.thread,
+        })
+      : res.status(result.statusCode).send({ message: result.message });
   }
 );
 
@@ -51,16 +49,14 @@ threadRouter.put(
     const threadID = req.body.threadId;
     const userId = req.body.userId;
 
-    const result = await threadServices.dislikeThread(threadID, userId);
+    const result = await threadServices.disLikeThread(threadID, userId);
 
-    if (result.statusCode !== 200) {
-      return res.status(result.statusCode).send({ message: result.message });
-    }
-
-    res.status(200).send({
-      message: "Dislike status changed successfully.",
-      thread: result.thread,
-    });
+    result.statusCode === 200
+      ? res.status(200).send({
+          message: "Dislike status changed successfully.",
+          thread: result.thread,
+        })
+      : res.status(result.statusCode).send({ message: result.message });
   }
 );
 
@@ -78,18 +74,21 @@ threadRouter.put(
     const threadID = req.body.threadId;
     const content = req.body.content;
     const title = req.body.title;
-    const userId = req.body.userId
+    const userId = req.body.userId;
 
-    const result = await threadServices.editThread(userId, threadID, content, title);
+    const result = await threadServices.editThread(
+      userId,
+      threadID,
+      content,
+      title
+    );
 
-    if (result.statusCode !== 200) {
-      return res.status(result.statusCode).send({ message: result.message });
-    }
-
-    res.status(200).send({
-      message: "Thread edited successfully.",
-      thread: result.thread,
-    });
+    result.statusCode === 200
+      ? res.status(200).send({
+          message: "Thread edited successfully.",
+          thread: result.thread,
+        })
+      : res.status(result.statusCode).send({ message: result.message });
   }
 );
 
@@ -108,14 +107,12 @@ threadRouter.post(
 
     const result = await threadServices.commentThread(userId, id, content);
 
-    if (result.statusCode !== 201) {
-      return res.status(result.statusCode).send({ message: result.message });
-    }
-
-    res.status(201).send({
-      message: "Comment posted successfully.",
-      thread: result.thread,
-    });
+    result.statusCode === 201
+      ? res.status(201).send({
+          message: "Comment posted successfully.",
+          thread: result.thread,
+        })
+      : res.status(result.statusCode).send({ message: result.message });
   }
 );
 
@@ -141,14 +138,12 @@ threadRouter.post(
       content
     );
 
-    if (result.statusCode !== 201) {
-      return res.status(result.statusCode).send({ message: result.message });
-    }
-
-    res.status(201).send({
-      message: "Thread posted successfully.",
-      thread: result.thread,
-    });
+    result.statusCode === 201
+      ? res.status(201).send({
+          message: "Thread posted successfully.",
+          thread: result.thread,
+        })
+      : res.status(result.statusCode).send({ message: result.message });
   }
 );
 
@@ -158,13 +153,11 @@ threadRouter.post(
 threadRouter.get("/categories", async (req: Request, res: Response) => {
   const result = await threadServices.getCategories();
 
-  if (result.statusCode !== 200) {
-    return res.status(result.statusCode).send({ message: result.message });
-  }
-
-  res
-    .status(200)
-    .send({ message: result.message, categories: result.categories });
+  result.statusCode === 200
+    ? res
+        .status(200)
+        .send({ message: result.message, categories: result.categories })
+    : res.status(result.statusCode).send({ message: result.message });
 });
 
 /**
@@ -177,11 +170,11 @@ threadRouter.get(
       req.params.categoryTitle
     );
 
-    if (result.statusCode !== 200) {
-      return res.status(result.statusCode).send({ message: result.message });
-    }
-
-    res.status(200).send({ message: result.message, threads: result.threads });
+    result.statusCode === 200
+      ? res
+          .status(200)
+          .send({ message: result.message, threads: result.threads })
+      : res.status(result.statusCode).send({ message: result.message });
   }
 );
 
@@ -195,13 +188,11 @@ threadRouter.get(
       req.params.categoryTitle
     );
 
-    if (result.statusCode !== 200) {
-      return res.status(result.statusCode).send({ message: result.message });
-    }
-
-    res
-      .status(200)
-      .send({ message: result.message, category: result.category });
+    result.statusCode === 200
+      ? res
+          .status(200)
+          .send({ message: result.message, category: result.category })
+      : res.status(result.statusCode).send({ message: result.message });
   }
 );
 
@@ -215,11 +206,11 @@ threadRouter.get(
       req.params.categoryTitle
     );
 
-    if (result.statusCode !== 200) {
-      return res.status(result.statusCode).send({ message: result.message });
-    }
-
-    res.status(200).send({ message: result.message, threads: result.threads });
+    result.statusCode === 200
+      ? res
+          .status(200)
+          .send({ message: result.message, threads: result.threads })
+      : res.status(result.statusCode).send({ message: result.message });
   }
 );
 
@@ -231,33 +222,11 @@ threadRouter.get(
   async (req: Request, res: Response) => {
     const result = await threadServices.getThreadComments(+req.params.threadId);
 
-    if (result.statusCode !== 200) {
-      return res.status(result.statusCode).send({ message: result.message });
-    }
-
-    res
-      .status(200)
-      .send({ message: result.message, comments: result.comments });
-  }
-);
-
-/**
- * Returns all replies to a specific comment.
- */
-threadRouter.get(
-  "/comment-comments/:commentId",
-  async (req: Request, res: Response) => {
-    const result = await threadServices.getCommentComments(
-      +req.params.commentId
-    );
-
-    if (result.statusCode !== 200) {
-      return res.status(result.statusCode).send({ message: result.message });
-    }
-
-    res
-      .status(200)
-      .send({ message: result.message, comments: result.comments });
+    result.statusCode === 200
+      ? res
+          .status(200)
+          .send({ message: result.message, comments: result.comments })
+      : res.status(result.statusCode).send({ message: result.message });
   }
 );
 
@@ -269,12 +238,9 @@ threadRouter.get("/author/:userId", async (req: Request, res: Response) => {
 
   const result = await threadServices.getThreadsByAuthor(+userId);
 
-  if (!result.threads) {
-    res.status(result.statusCode).send({ message: result.message });
-    return;
-  }
-
-  res.status(200).send({ message: result.message, threads: result.threads });
+  result.threads
+    ? res.status(200).send({ message: result.message, threads: result.threads })
+    : res.status(result.statusCode).send({ message: result.message });
 });
 
 /**
@@ -285,11 +251,9 @@ threadRouter.get("/liked/:userId", async (req: Request, res: Response) => {
 
   const result = await threadServices.getLikedThreads(+userId);
 
-  if (!result.threads) {
-    res.status(result.statusCode).send({ message: result.message });
-    return;
-  }
-  res.status(200).send({ message: result.message, threads: result.threads });
+  result.threads
+    ? res.status(200).send({ message: result.message, threads: result.threads })
+    : res.status(result.statusCode).send({ message: result.message });
 });
 
 /**
@@ -306,13 +270,11 @@ threadRouter.delete(
 
     const result = await threadServices.deleteThread(threadId, userId);
 
-    if (result.statusCode !== 200) {
-      return res.status(result.statusCode).send({ message: result.message });
-    }
-
-    res.status(200).send({
-      message: "Thread deleted successfully.",
-    });
+    result.statusCode === 200
+      ? res.status(200).send({
+          message: "Thread deleted successfully.",
+        })
+      : res.status(result.statusCode).send({ message: result.message });
   }
 );
 
@@ -342,9 +304,7 @@ threadRouter.get("/:threadId", async (req: Request, res: Response) => {
 
   const result = await threadServices.getThread(threadId);
 
-  if (result.statusCode !== 200) {
-    return res.status(result.statusCode).send({ message: result.message });
-  }
-
-  res.status(200).send({ message: result.message, thread: result.thread });
+  result.statusCode === 200
+    ? res.status(200).send({ message: result.message, thread: result.thread })
+    : res.status(result.statusCode).send({ message: result.message });
 });

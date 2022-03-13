@@ -1,4 +1,3 @@
-import React from "react";
 import { NavLink } from "react-router-dom";
 import parse, { HTMLReactParserOptions } from "html-react-parser";
 import { isTag, isText } from "domhandler";

@@ -167,7 +167,7 @@ export const likeThread = async (
  *
  * @param userId - the user who dislikes the thread.
  */
-export const dislikeThread = async (
+export const disLikeThread = async (
   threadId: number,
   userId: number
 ): Promise<ThreadServiceResult> => {
@@ -435,7 +435,6 @@ export const getCategoryDetails = async (
   const category: Category | null = await categoryModel.findOne({
     title: categoryTitle,
   });
-
   if (!category) {
     return {
       statusCode: 404,
@@ -532,36 +531,6 @@ export const getThreadComments = async (
 
   const commentArr = await commentModel.find({
     commentId: { $in: thread.replies },
-  });
-
-  return {
-    statusCode: 200,
-    message: "Comments has successfully been recived.",
-    comments: commentArr,
-  };
-};
-
-/**
- * Returns all replies to a specific root comment.
- *
- * @param rootId - The id of the root comment.
- */
-export const getCommentComments = async (
-  rootId: number
-): Promise<ThreadServiceResult> => {
-  const comment: Comment | null = await commentModel.findOne({
-    commentId: rootId,
-  });
-
-  if (!comment) {
-    return {
-      statusCode: 404,
-      message: "No comment with the given root comment id exists.",
-    };
-  }
-
-  const commentArr: Comment[] = await commentModel.find({
-    commentId: { $in: comment.replies },
   });
 
   return {

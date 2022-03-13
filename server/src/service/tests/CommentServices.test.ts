@@ -12,8 +12,8 @@ import {
   getComment,
   getCommentsByAuthor,
   getLikedComments,
+  getCommentComments,
 } from "../comment.service";
-//import { DEFAULT_IMAGE_ID, images } from "../image.service";
 import { commentThread, postThread } from "../thread.service";
 import { getUser, register } from "../user.service";
 
@@ -178,6 +178,46 @@ test("Get liked comments by author fails if the author doesnt exists", async () 
   const commentId = await commentSetup(user.userId, thread.threadId);
   await likeComment(commentId, user.userId);
   const result = await getLikedComments(0);
+
+  expect(result.statusCode).toBe(404);
+});
+
+test("getting comments from a comment", async () => {
+  const commentResult = await commentThread(
+    user.userId,
+    thread.threadId,
+    "Markus was here hehe"
+  );
+  if (!commentResult.thread) throw new Error("Thread is undefined.");
+
+  const comment2Result = await postReply(
+    commentResult.thread.replies[0],
+    "Markus was here hehe",
+    user.userId
+  );
+
+  const result = await getCommentComments(commentResult.thread.replies[0]);
+  if (!result.comments) throw new Error("Unable to fetch comments");
+
+  expect(result.comments.length).toBe(1);
+  expect(result.statusCode).toBe(200);
+});
+
+test("Fails to get comments from a comment that doesnt exist", async () => {
+  const commentResult = await commentThread(
+    user.userId,
+    thread.threadId,
+    "Markus was here hehe"
+  );
+  if (!commentResult.thread) throw new Error("Thread is undefined.");
+
+  const comment2Result = await postReply(
+    commentResult.thread.replies[0],
+    "Markus was here hehe",
+    user.userId
+  );
+
+  const result = await getCommentComments(0);
 
   expect(result.statusCode).toBe(404);
 });

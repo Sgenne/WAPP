@@ -186,3 +186,21 @@ commentRouter.get("/:commentId", async (req: Request, res: Response) => {
 
   res.status(200).send({ message: result.message, comment: result.comment });
 });
+
+/**
+ * Returns all replies to a specific comment.
+ */
+ commentRouter.get(
+  "/comment-comments/:commentId",
+  async (req: Request, res: Response) => {
+    const result = await commentService.getCommentComments(
+      +req.params.commentId
+    );
+
+    result.statusCode === 200
+      ? res
+          .status(200)
+          .send({ message: result.message, comments: result.comments })
+      : res.status(result.statusCode).send({ message: result.message });
+  }
+);

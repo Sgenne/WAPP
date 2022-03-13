@@ -29,7 +29,7 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
         message: string;
         comments?: Comment[];
       }>(
-        "http://localhost:8080/thread/comment-comments/" + props.root.commentId,
+        "http://localhost:8080/comment/comment-comments/" + props.root.commentId,
         {}
       );
     } catch (error) {

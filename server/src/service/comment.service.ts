@@ -360,3 +360,33 @@ export const postReply = async (
     comment: newComment,
   };
 };
+
+/**
+ * Returns all replies to a specific root comment.
+ *
+ * @param rootId - The id of the root comment.
+ */
+ export const getCommentComments = async (
+  rootId: number
+): Promise<CommentServiceResult> => {
+  const comment: Comment | null = await commentModel.findOne({
+    commentId: rootId,
+  });
+
+  if (!comment) {
+    return {
+      statusCode: 404,
+      message: "No comment with the given root comment id exists.",
+    };
+  }
+
+  const commentArr: Comment[] = await commentModel.find({
+    commentId: { $in: comment.replies },
+  });
+
+  return {
+    statusCode: 200,
+    message: "Comments has successfully been recived.",
+    comments: commentArr,
+  };
+};
