@@ -212,6 +212,8 @@ export const disLikeThread = async (
 /**
  * Edits the content of a thread.
  *
+ * @param userId - The id of the user editing the thread.
+ *
  * @param threadId - The id of the thread to edit.
  *
  * @param content - The new content of the thread.
@@ -219,6 +221,7 @@ export const disLikeThread = async (
  * @param title - The new title of the thread.
  */
 export const editThread = async (
+  userId: number,
   threadId: number,
   content: string,
   title: string
@@ -228,6 +231,13 @@ export const editThread = async (
 
   if (!thread) {
     return threadResult;
+  }
+
+  if (thread.author !== userId) {
+    return {
+      statusCode: 403,
+      message: "The user does not have permission to edit this thread.",
+    };
   }
 
   const today: Date = new Date();

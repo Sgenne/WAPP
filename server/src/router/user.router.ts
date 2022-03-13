@@ -9,7 +9,6 @@ import {
   hasValidEmail,
   hasValidPassword,
   hasValidUsername,
-  hasVisiblePropertiesOptions,
 } from "../utils/validation.util";
 import { isAuthenticated } from "../utils/auth.util";
 import { handleUploadedImage } from "../utils/image.util";
@@ -143,7 +142,7 @@ userRouter.post(
   isAuthenticated,
   async (req: Request, res: Response) => {
     // Can safely cast to Express.Multer.File as handleUploadedImage will
-    // return an error message to the client if req.file is undefined.
+    // return an error response to the client if req.file is undefined.
     const image = req.file as Express.Multer.File;
     const userId: number = req.body.userId;
 

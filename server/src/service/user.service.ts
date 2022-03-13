@@ -233,42 +233,6 @@ export const getUserByUsername = async (
 };
 
 /**
- * Updates the visible properties of the user with the given userId.
- *
- * @param userId - The id of the user to update.
- *
- * @param options  - An object describing which of the users properties should be visible.
- */
-export const setVisibleProperties = async (
-  userId: number,
-  options: {
-    email: boolean;
-    joinDate: boolean;
-    birthDate: boolean;
-    bio: boolean;
-    image: boolean;
-    likedThreads: boolean;
-    dislikedThreads: boolean;
-  }
-): Promise<UserServiceResult> => {
-  const updateResult = await userModel.updateOne(
-    { userId: userId },
-    {
-      visibleProperties: options,
-    }
-  );
-
-  if (updateResult.matchedCount === 0) {
-    return { statusCode: 404, message: "User not found." };
-  }
-
-  return {
-    statusCode: 200,
-    message: "Visible properties updated successfully.",
-  };
-};
-
-/**
  * Updates the profile picture of the specified user.
  *
  * @param userId - The id of the user to update.
