@@ -1,9 +1,6 @@
-import mongoose from "mongoose";
 import "dotenv/config";
 import { categoryModel } from "../../db/category.db";
-import { commentModel } from "../../db/comment.db";
 import { threadModel } from "../../db/thread.db";
-import { userModel } from "../../db/user.db";
 import { Category } from "../../model/category.interface";
 import { getComment, postReply } from "../comment.service";
 import {
@@ -26,6 +23,7 @@ import {
 } from "../thread.service";
 import { register, getUser } from "../user.service";
 import { connectToDbTest } from "../../db/connectiontest";
+import { clearTestDB, closeTestDB, startTestDB } from "../../setupTests";
 
 const dummyUsername = "¯_(ツ)_/¯";
 const dummyTitle = "Will we succed tonight";
@@ -35,23 +33,15 @@ const dummyEmail = "email@email.com";
 const dummyDateOfBirth = new Date(197, 11, 10);
 
 beforeAll(async () => {
-  await connectToDbTest();
+  await startTestDB();
 });
 
 beforeEach(async () => {
-  jest.setTimeout(8000);
-  await threadModel.deleteMany({});
-  await commentModel.deleteMany({});
-  await userModel.deleteMany({});
-  await categoryModel.deleteMany({});
+  await clearTestDB();
 });
 
 afterAll(async () => {
-  await threadModel.deleteMany({});
-  await commentModel.deleteMany({});
-  await userModel.deleteMany({});
-  await categoryModel.deleteMany({});
-  await mongoose.connection.close();
+  await closeTestDB();
 });
 
 async function userSetup(usernameSufix = ""): Promise<number> {

@@ -1,12 +1,7 @@
-import mongoose from "mongoose";
-import { categoryModel } from "../../db/category.db";
-import { commentModel } from "../../db/comment.db";
-import { connectToDbTest } from "../../db/connectiontest";
-import { threadModel } from "../../db/thread.db";
-import { userModel } from "../../db/user.db";
 import SuperTest from "supertest";
 import { app } from "../../start";
 import { register } from "../../service/user.service";
+import { clearTestDB, closeTestDB, startTestDB } from "../../setupTests";
 
 const dummyUsername = "username";
 const dummyPassword = "password";
@@ -27,23 +22,15 @@ async function userSetup(): Promise<number> {
 }
 
 beforeAll(async () => {
-  await connectToDbTest();
+  await startTestDB();
 });
 
 beforeEach(async () => {
-  jest.setTimeout(8000);
-  await threadModel.deleteMany({});
-  await commentModel.deleteMany({});
-  await userModel.deleteMany({});
-  await categoryModel.deleteMany({});
+  await clearTestDB();
 });
 
 afterAll(async () => {
-  await threadModel.deleteMany({});
-  await commentModel.deleteMany({});
-  await userModel.deleteMany({});
-  await categoryModel.deleteMany({});
-  await mongoose.connection.close();
+  await closeTestDB();
 });
 
 test("Registering a user with an occupied username results in status code 403.", async () => {

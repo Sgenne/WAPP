@@ -1,6 +1,4 @@
-import mongoose from "mongoose";
-import { connectToDbTest } from "../../db/connectiontest";
-import { userModel } from "../../db/user.db";
+import { clearTestDB, closeTestDB, startTestDB } from "../../setupTests";
 import {
   updateUser,
   register,
@@ -14,19 +12,16 @@ const dummyPassword = "password";
 const dummyEmail = "email@email.com";
 const dummyDateOfBirth = new Date(1972, 11, 10);
 
-// Clear users before each test.
 beforeAll(async () => {
-  await connectToDbTest();
+  await startTestDB();
 });
 
 beforeEach(async () => {
-  await userModel.deleteMany({});
-  jest.setTimeout(8000);
+  await clearTestDB();
 });
 
 afterAll(async () => {
-  await userModel.deleteMany({});
-  await mongoose.connection.close();
+  await closeTestDB();
 });
 
 /*

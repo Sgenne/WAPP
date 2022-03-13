@@ -1,9 +1,4 @@
-import mongoose from "mongoose";
 import { categoryModel } from "../../db/category.db";
-import { commentModel } from "../../db/comment.db";
-import { connectToDbTest } from "../../db/connectiontest";
-import { threadModel } from "../../db/thread.db";
-import { userModel } from "../../db/user.db";
 import { Category } from "../../model/category.interface";
 import { Thread } from "../../model/thread.interface";
 import { User } from "../../model/user.interface";
@@ -11,6 +6,7 @@ import { postThread, commentThread } from "../../service/thread.service";
 import { register } from "../../service/user.service";
 import SuperTest from "supertest";
 import { app } from "../../start";
+import { clearTestDB, closeTestDB, startTestDB } from "../../setupTests";
 
 const dummyUsername = "¯_(ツ)_/¯";
 const dummyCategory = "gaming";
@@ -23,32 +19,19 @@ const dummyDateOfBirth = new Date(1972, 11, 10);
 let user: User;
 let thread: Thread;
 
-// Clear all arrays before each test.
 beforeAll(async () => {
-  await connectToDbTest();
+  await startTestDB();
 });
 
 beforeEach(async () => {
-  jest.setTimeout(8000);
-  await threadModel.deleteMany({});
-  await commentModel.deleteMany({});
-  await userModel.deleteMany({});
-  await categoryModel.deleteMany({});
+  await clearTestDB();
 });
 
 afterAll(async () => {
-  await threadModel.deleteMany({});
-  await commentModel.deleteMany({});
-  await userModel.deleteMany({});
-  await categoryModel.deleteMany({});
-  await mongoose.connection.close();
+  await closeTestDB();
 });
 
 beforeEach(async () => {
-  await threadModel.deleteMany({});
-  await commentModel.deleteMany({});
-  await userModel.deleteMany({});
-  await categoryModel.deleteMany({});
   user = await userSetup();
   await categorySetup();
   thread = await threadSetup(user.userId);
