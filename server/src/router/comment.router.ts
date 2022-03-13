@@ -14,7 +14,7 @@ export const commentRouter = Router();
  * Adds a like by a specified user to a specified comment.
  */
 commentRouter.put(
-  "/likeComment",
+  "/like-comment",
   hasValidCommentId,
   handleValidationResult,
   isAuthenticated,
@@ -39,7 +39,7 @@ commentRouter.put(
  * Adds a dislike by a specified user to a specified comment.
  */
 commentRouter.put(
-  "/disLikeComment",
+  "/dislike-comment",
   hasValidCommentId,
   handleValidationResult,
   isAuthenticated,
@@ -47,7 +47,7 @@ commentRouter.put(
     const commentID = req.body.commentID;
     const userId = req.body.userId;
 
-    const result = await commentService.disLikeComment(commentID, userId);
+    const result = await commentService.dislikeComment(commentID, userId);
 
     if (result.statusCode !== 200) {
       return res.status(result.statusCode).send({ message: result.message });
@@ -64,7 +64,7 @@ commentRouter.put(
  * Allows the creator of a comment to edit that comment.
  */
 commentRouter.put(
-  "/editComment",
+  "/edit-comment",
   hasValidCommentId,
   hasContent,
   handleValidationResult,
@@ -91,7 +91,7 @@ commentRouter.put(
  * Allows the creator of a comment to delete that comment.
  */
 commentRouter.delete(
-  "/deleteComment",
+  "/delete-comment",
   hasValidCommentId,
   handleValidationResult,
   isAuthenticated,
@@ -147,7 +147,7 @@ commentRouter.post(
  * Returns all comments that have been liked by a specified user.
  */
 commentRouter.get(
-  "/likedComments/:userId",
+  "/liked-comments/:userId",
   async (req: Request, res: Response) => {
     const userId = req.params.userId;
 

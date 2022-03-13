@@ -15,7 +15,7 @@ const CategoryPage = (): JSX.Element => {
       threadResult = await axios.get<{
         message: string;
         threads?: Thread[];
-      }>("http://localhost:8080/thread/categoryThreads/" + param.category, {});
+      }>("http://localhost:8080/thread/category-threads/" + param.category, {});
     } catch (error) {
       return;
     }
@@ -27,7 +27,7 @@ const CategoryPage = (): JSX.Element => {
       categoryResult = await axios.get<{
         message: string;
         category?: Category;
-      }>("http://localhost:8080/thread/categoryDetails/" + param.category, {});
+      }>("http://localhost:8080/thread/category-details/" + param.category, {});
     } catch (error) {
       return;
     }

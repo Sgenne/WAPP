@@ -79,7 +79,7 @@ const DUMMY_AUTHOR: User = {
 
 const server = setupServer(
   rest.get(
-    "http://localhost:8080/thread/sampleThreads/" + DUMMY_CATEGORY.title,
+    "http://localhost:8080/thread/sample-threads/" + DUMMY_CATEGORY.title,
     (req, res, ctx) =>
       res(
         ctx.json({

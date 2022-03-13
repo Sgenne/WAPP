@@ -16,7 +16,7 @@ export const threadRouter = Router();
  * Adds a like from a specified user to a specified thread.
  */
 threadRouter.put(
-  "/likeThread",
+  "/like-thread",
   hasValidUserId,
   hasValidThreadId,
   handleValidationResult,
@@ -42,7 +42,7 @@ threadRouter.put(
  * Adds a dislike by a specified user to a specified thread.
  */
 threadRouter.put(
-  "/dislikeThread",
+  "/dislike-thread",
   hasValidUserId,
   hasValidThreadId,
   handleValidationResult,
@@ -51,7 +51,7 @@ threadRouter.put(
     const threadID = req.body.threadId;
     const userId = req.body.userId;
 
-    const result = await threadServices.disLikeThread(threadID, userId);
+    const result = await threadServices.dislikeThread(threadID, userId);
 
     if (result.statusCode !== 200) {
       return res.status(result.statusCode).send({ message: result.message });
@@ -68,7 +68,7 @@ threadRouter.put(
  * Allows the creator of a thread to edit the thread's content and title.
  */
 threadRouter.put(
-  "/editThread",
+  "/edit-thread",
   hasValidThreadId,
   hasContent,
   hasValidThreadTitle,
@@ -123,7 +123,7 @@ threadRouter.post(
  * Creates a thread.
  */
 threadRouter.post(
-  "/postThread",
+  "/post-thread",
   hasCategory,
   hasValidThreadTitle,
   hasContent,
@@ -171,7 +171,7 @@ threadRouter.get("/categories", async (req: Request, res: Response) => {
  * Returns all threads from a specified category.
  */
 threadRouter.get(
-  "/categoryThreads/:categoryTitle",
+  "/category-threads/:categoryTitle",
   async (req: Request, res: Response) => {
     const result = await threadServices.getCategoryThreads(
       req.params.categoryTitle
@@ -189,7 +189,7 @@ threadRouter.get(
  * Returns all threads from a specified category.
  */
 threadRouter.get(
-  "/categoryDetails/:categoryTitle",
+  "/category-details/:categoryTitle",
   async (req: Request, res: Response) => {
     const result = await threadServices.getCategoryDetails(
       req.params.categoryTitle
@@ -209,7 +209,7 @@ threadRouter.get(
  * Returns three sample threads from the specified category.
  */
 threadRouter.get(
-  "/sampleThreads/:categoryTitle",
+  "/sample-threads/:categoryTitle",
   async (req: Request, res: Response) => {
     const result = await threadServices.getSampleThreads(
       req.params.categoryTitle
@@ -227,7 +227,7 @@ threadRouter.get(
  * Returns all replies to a specific comment.
  */
 threadRouter.get(
-  "/threadComments/:threadId",
+  "/thread-comments/:threadId",
   async (req: Request, res: Response) => {
     const result = await threadServices.getThreadComments(+req.params.threadId);
 
@@ -245,7 +245,7 @@ threadRouter.get(
  * Returns all replies to a specific comment.
  */
 threadRouter.get(
-  "/commentComments/:commentId",
+  "/comment-comments/:commentId",
   async (req: Request, res: Response) => {
     const result = await threadServices.getCommentComments(
       +req.params.commentId
@@ -296,7 +296,7 @@ threadRouter.get("/liked/:userId", async (req: Request, res: Response) => {
  * Deletes a specified thread.
  */
 threadRouter.delete(
-  "/deleteThread",
+  "/delete-thread",
   hasValidThreadId,
   handleValidationResult,
   isAuthenticated,

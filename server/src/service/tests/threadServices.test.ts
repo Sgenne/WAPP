@@ -8,7 +8,7 @@ import { Category } from "../../model/category.interface";
 import { getComment, postReply } from "../comment.service";
 import {
   likeThread,
-  disLikeThread,
+  dislikeThread,
   editThread,
   commentThread,
   deleteThread,
@@ -349,7 +349,7 @@ test("Liking an already disliked thread succeeds if the thread exists and the us
   const category = await categorySetup();
   const threadId = await threadSetup(userId);
 
-  await disLikeThread(threadId, userId);
+  await dislikeThread(threadId, userId);
 
   let user = (await getUser(userId)).user;
   if (!user) throw new Error("Unable to fetch user");
@@ -397,7 +397,7 @@ test("Disliking a thread adds that thread to the users list of disliked threads.
   const category = await categorySetup();
   const threadId = await threadSetup(userId);
 
-  await disLikeThread(threadId, userId);
+  await dislikeThread(threadId, userId);
 
   const user = (await getUser(userId)).user;
   if (!user) throw new Error("Unable to fetch user");
@@ -414,7 +414,7 @@ test("disLiking thread fails if the thread exists and the user doesnt exists", a
   const category = await categorySetup();
   const threadId = await threadSetup(userId);
 
-  const likeResult = await disLikeThread(threadId, 0);
+  const likeResult = await dislikeThread(threadId, 0);
 
   expect(likeResult.statusCode).toBe(404);
 });
@@ -424,7 +424,7 @@ test("disLiking thread fails if the thread doesnt exists and the user exists", a
   const category = await categorySetup();
   const threadId = await threadSetup(userId);
 
-  const likeResult = await disLikeThread(0, userId);
+  const likeResult = await dislikeThread(0, userId);
 
   expect(likeResult.statusCode).toBe(404);
 });
@@ -442,7 +442,7 @@ test("Disliking an already liked thread succeeds if the thread exists and the us
   expect(user.dislikedThreads.includes(threadId)).toBe(false);
   expect(user.likedThreads.includes(threadId)).toBe(true);
 
-  await disLikeThread(threadId, userId);
+  await dislikeThread(threadId, userId);
 
   user = (await getUser(userId)).user;
   if (!user) throw new Error("Unable to fetch user");
@@ -456,14 +456,14 @@ test("Disliking an already disliked thread removes the previous dislike", async 
   const category = await categorySetup();
   const threadId = await threadSetup(userId);
 
-  await disLikeThread(threadId, userId);
+  await dislikeThread(threadId, userId);
 
   let user = (await getUser(userId)).user;
   if (!user) throw new Error("Unable to fetch user");
 
   expect(user.dislikedThreads.includes(threadId)).toBe(true);
 
-  await disLikeThread(threadId, userId);
+  await dislikeThread(threadId, userId);
 
   user = (await getUser(userId)).user;
   if (!user) throw new Error("Unable to fetch user");

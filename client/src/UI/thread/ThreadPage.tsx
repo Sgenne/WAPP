@@ -67,7 +67,7 @@ const ThreadPage = (): JSX.Element => {
           message: string;
           comments?: Comment[];
         }>(
-          "http://localhost:8080/thread/threadComments/" +
+          "http://localhost:8080/thread/thread-comments/" +
             threadObject.threadId,
           {}
         );
@@ -159,7 +159,7 @@ const ThreadPage = (): JSX.Element => {
     setIsFetching(true);
     try {
       likeResult = await axios.put<{ message: string; thread?: Thread }>(
-        "http://localhost:8080/thread/likeThread/",
+        "http://localhost:8080/thread/like-thread/",
         {
           userId: signedInUser.userId,
           password: authContext.password,
@@ -248,7 +248,7 @@ const ThreadPage = (): JSX.Element => {
     setIsFetching(true);
     try {
       dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
-        "http://localhost:8080/thread/dislikeThread/",
+        "http://localhost:8080/thread/dislike-thread/",
         {
           userId: signedInUser.userId,
           password: authContext.password,

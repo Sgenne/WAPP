@@ -123,7 +123,7 @@ const server = setupServer(
       )
   ),
   rest.get(
-    `http://localhost:8080/comment/likedComments/${DUMMY_USER.userId}`,
+    `http://localhost:8080/comment/liked-comments/${DUMMY_USER.userId}`,
     (req, res, ctx) =>
       res(
         ctx.json({

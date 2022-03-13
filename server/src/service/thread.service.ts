@@ -167,7 +167,7 @@ export const likeThread = async (
  *
  * @param userId - the user who dislikes the thread.
  */
-export const disLikeThread = async (
+export const dislikeThread = async (
   threadId: number,
   userId: number
 ): Promise<ThreadServiceResult> => {

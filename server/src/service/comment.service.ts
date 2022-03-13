@@ -81,7 +81,7 @@ export const likeComment = async (
  *
  * @param userId - Id of the user trying to dislike
  */
-export const disLikeComment = async (
+export const dislikeComment = async (
   commentId: number,
   userId: number
 ): Promise<CommentServiceResult> => {

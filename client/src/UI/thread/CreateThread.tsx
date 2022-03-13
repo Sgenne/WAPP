@@ -29,7 +29,7 @@ const CreateThread = (): JSX.Element => {
       categoryResult = await axios.get<{
         message: string;
         category?: Category;
-      }>("http://localhost:8080/thread/categoryDetails/" + param.category, {});
+      }>("http://localhost:8080/thread/category-details/" + param.category, {});
     } catch (error) {
       return;
     }
@@ -52,7 +52,7 @@ const CreateThread = (): JSX.Element => {
     let signInResult: AxiosResponse;
     try {
       signInResult = await axios.post<{ message: string; thread?: Thread }>(
-        "http://localhost:8080/thread/postThread/",
+        "http://localhost:8080/thread/post-thread/",
         {
           userId: authContext.signedInUser.userId,
           password: authContext.password,

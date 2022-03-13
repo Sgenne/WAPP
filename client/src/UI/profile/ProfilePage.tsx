@@ -109,7 +109,7 @@ const ProfilePage = (): JSX.Element => {
 
     try {
       response = await axios.get<{ comments: Comment[] }>(
-        `http://localhost:8080/comment/likedComments/${userId}`
+        `http://localhost:8080/comment/liked-comments/${userId}`
       );
     } catch (error) {
       setError(new Error("Liked comments could not be fetched."));

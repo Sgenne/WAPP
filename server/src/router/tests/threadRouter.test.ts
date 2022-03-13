@@ -74,7 +74,7 @@ test("Registering a user with an occupied username results in status code 403.",
 
   const categoryTitle = await categorySetup();
 
-  const threadPostResult = await request.post("/thread/postThread").send({
+  const threadPostResult = await request.post("/thread/post-thread").send({
     userId: userId,
     password: dummyPassword,
     categoryTitle: categoryTitle,

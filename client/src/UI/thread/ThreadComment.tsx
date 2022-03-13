@@ -29,7 +29,7 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
         message: string;
         comments?: Comment[];
       }>(
-        "http://localhost:8080/thread/commentComments/" + props.root.commentId,
+        "http://localhost:8080/thread/comment-comments/" + props.root.commentId,
         {}
       );
     } catch (error) {
@@ -121,7 +121,7 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
     setIsFetching(true);
     try {
       likeResult = await axios.put<{ message: string; thread?: Thread }>(
-        "http://localhost:8080/comment/likeComment/",
+        "http://localhost:8080/comment/like-comment/",
         {
           userId: signedInUser.userId,
           password: authContext.password,
@@ -199,7 +199,7 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
     setIsFetching(true);
     try {
       dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
-        "http://localhost:8080/comment/dislikeComment/",
+        "http://localhost:8080/comment/dislike-comment/",
         {
           userId: signedInUser.userId,
           password: authContext.password,

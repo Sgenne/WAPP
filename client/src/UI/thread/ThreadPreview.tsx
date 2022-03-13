@@ -101,7 +101,7 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
     setIsFetching(true);
     try {
       likeResult = await axios.put<{ message: string; thread?: Thread }>(
-        "http://localhost:8080/thread/likeThread/",
+        "http://localhost:8080/thread/like-thread/",
         {
           userId: signedInUser.userId,
           password: authContext.password,
@@ -177,7 +177,7 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
     setIsFetching(true);
     try {
       dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
-        "http://localhost:8080/thread/dislikeThread/",
+        "http://localhost:8080/thread/dislike-thread/",
         {
           userId: signedInUser.userId,
           password: authContext.password,
