@@ -1,4 +1,3 @@
-import { Console } from "console";
 import mongoose from "mongoose";
 import "dotenv/config";
 import { categoryModel } from "../../db/category.db";

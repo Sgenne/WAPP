@@ -1,6 +1,4 @@
-import path from "path";
 import { Image } from "../model/image.interface";
-import { imageFolderPath } from "../utils/image.util";
 import { imageStorage } from "../imageStorage/image.storage";
 
 export const DEFAULT_IMAGE: Image = {
