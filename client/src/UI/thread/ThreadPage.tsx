@@ -11,6 +11,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import ErrorMessage from "../common/ErrorMessage";
 import { formatDate } from "../../utils/formatUtils";
 import parse from "html-react-parser";
+import LoggedInButtonsThread from "../common/LoggedInButtonsThread";
 
 const ThreadPage = (): JSX.Element => {
   const [user, setuser] = useState<User>();
@@ -323,6 +324,7 @@ const ThreadPage = (): JSX.Element => {
               <button className="generalButton" onClick={replyClickHandler}>
                 Reply
               </button>
+              <LoggedInButtonsThread userId={authContext.signedInUser?.userId} thread={threadObject}/>
             </div>
             <div>
               <ErrorMessage>{errorMessage}</ErrorMessage>

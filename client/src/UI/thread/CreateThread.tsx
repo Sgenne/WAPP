@@ -14,10 +14,13 @@ const CreateThread = (): JSX.Element => {
   const [titleInput, setTitleInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [category, setCategory] = useState<Category>();
+  const [thread, setThread] = useState<Thread>();
 
   const navigate = useNavigate();
   const param = useParams();
   const authContext = useContext(AuthContext);
+
+  let variable = param.category;
 
   const threadTitleChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -32,10 +35,7 @@ const CreateThread = (): JSX.Element => {
         categoryResult = await axios.get<{
           message: string;
           category?: Category;
-        }>(
-          "http://localhost:8080/thread/category-details/" + param.category,
-          {}
-        );
+        }>("http://localhost:8080/thread/category-details/" + variable, {});
       } catch (error) {
         console.log(error);
         return;
@@ -43,8 +43,37 @@ const CreateThread = (): JSX.Element => {
       setCategory(categoryResult.data.category);
     };
 
-    getCategoryDetails();
-  }, [param.category]);
+    const getThreadDetails = async (): Promise<void> => {
+      let ThreadResult: AxiosResponse;
+      try {
+        ThreadResult = await axios.get<{
+          message: string;
+          thread: Thread;
+        }>("http://localhost:8080/thread/" + variable, {});
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+      setThread(ThreadResult.data.thread);
+      variable = ThreadResult.data.thread.category;
+      getCategoryDetails();
+      ThreadResult.data.thread.content.includes("last edited")
+        ? setContentInput(
+            ThreadResult.data.thread.content.substring(
+              0,
+              ThreadResult.data.thread.content.length - 22
+            )
+          )
+        : setContentInput(ThreadResult.data.thread.content);
+      setTitleInput(ThreadResult.data.thread.title);
+    };
+
+    if (variable && !isNaN(+variable) && authContext.isSignedIn) {
+      getThreadDetails();
+    } else {
+      getCategoryDetails();
+    }
+  }, [variable]);
 
   if (!category) return <></>;
 
@@ -54,9 +83,35 @@ const CreateThread = (): JSX.Element => {
       return;
     }
 
-    let signInResult: AxiosResponse;
+    let threadPostResult: AxiosResponse;
+    if (thread) {
+      try {
+        threadPostResult = await axios.put<{
+          message: string;
+          thread?: Thread;
+        }>("http://localhost:8080/thread/edit-thread/", {
+          threadId: thread.threadId,
+          userId: authContext.signedInUser.userId,
+          password: authContext.password,
+          title: titleInput,
+          content: contentInput,
+        });
+        setErrorMessage("");
+        navigate("/thread/" + threadPostResult.data.thread.threadId);
+      } catch (error) {
+        if (!(axios.isAxiosError(error) && error.response)) {
+          setErrorMessage("Could not edit thread");
+          return;
+        }
+
+        setErrorMessage(error.response.data.message);
+        console.log(error);
+        return;
+      }
+      return;
+    }
     try {
-      signInResult = await axios.post<{ message: string; thread?: Thread }>(
+      threadPostResult = await axios.post<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/post-thread/",
         {
           userId: authContext.signedInUser.userId,
@@ -67,7 +122,7 @@ const CreateThread = (): JSX.Element => {
         }
       );
       setErrorMessage("");
-      navigate("/thread/" + signInResult.data.thread.threadId);
+      navigate("/thread/" + threadPostResult.data.thread.threadId);
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
         setErrorMessage("Could not create thread");
@@ -99,6 +154,7 @@ const CreateThread = (): JSX.Element => {
               maxLength={54}
               id="threadinput"
               placeholder="Thread title"
+              value={titleInput}
               onChange={threadTitleChangeHandler}
             />
             <QuillTools />
