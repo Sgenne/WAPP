@@ -5,12 +5,27 @@ import {
   deleteUser,
   validatePassword,
   getUser,
+  updateProfilePicture,
 } from "../user.service";
+import { Image } from "../../model/image.interface";
 
 const dummyUsername = "¯_(ツ)_/¯";
 const dummyPassword = "password";
 const dummyEmail = "email@email.com";
 const dummyDateOfBirth = new Date(1972, 11, 10);
+
+const dummyImageUrl = "http://fake-url.com/theImage.jpeg";
+const dummyFilename = "theImage.jpeg";
+
+jest.mock("../../imageStorage/image.storage", () => ({
+  imageStorage: {
+    storeImage: async (): Promise<Image> => ({
+      imageUrl: dummyImageUrl,
+      filename: dummyFilename,
+    }),
+    deleteImage: async (image: Image): Promise<void> => {},
+  },
+}));
 
 beforeAll(async () => {
   await startTestDB();
@@ -71,33 +86,36 @@ test("Attempting to edit a user that doesn't exist fails.", async () => {
   expect(result.statusCode).toBe(404);
 });
 
-// test("Updating an existing users profilepicture with the correct password and valid image succeeds.", async () => {
-//   const result = await register(
-//     dummyEmail,
-//     dummyUsername,
-//     dummyPassword,
-//     dummyDateOfBirth
-//   );
-//   if (!result.user) throw new Error("User registration failed.");
+test("Updating an existing users profilepicture with the correct password and valid image succeeds.", async () => {
+  const result = await register(
+    dummyEmail,
+    dummyUsername,
+    dummyPassword,
+    dummyDateOfBirth
+  );
+  if (!result.user) throw new Error("User registration failed.");
 
-//   const userId = result.user.userId;
+  const userId = result.user.userId;
 
-//   const update = {
-//     birthDate: new Date(1996, 8, 26),
-//     password: "newPassword",
-//     bio: "biobio",
-//   };
+  // const update = {
+  //   birthDate: new Date(1996, 8, 26),
+  //   password: "newPassword",
+  //   bio: "biobio",
+  // };
 
-//   const updateResult = await updateUser(userId, update);
-//   const validationResult = await validatePassword(userId, update.password);
-//   if (!updateResult.user) throw new Error("User was undefined.");
+  const newProfilePicture = {
+    imageBuffer: Buffer.from([]),
+    filename: "newPicture.jpg",
+  };
 
-//   expect(updateResult.statusCode).toBe(200);
-//   expect(updateResult.user.username).toBe(dummyUsername);
-//   expect(updateResult.user.birthDate).toMatchObject(update.birthDate);
-//   expect(updateResult.user.bio).toBe(update.bio);
-//   expect(validationResult.statusCode).toBe(200);
-// });
+  // const updateResult = await updateUser(userId, update);
+  const updateResult = await updateProfilePicture(userId, newProfilePicture);
+  if (!updateResult.user) throw new Error("User was undefined.");
+
+  expect(updateResult.statusCode).toBe(200);
+  expect(updateResult.user.profilePicture.imageUrl).toBe(dummyImageUrl);
+  expect(updateResult.user.profilePicture.filename).toBe(dummyFilename);
+});
 
 /*
 ================================

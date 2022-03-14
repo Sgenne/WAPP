@@ -2,6 +2,20 @@ import SuperTest from "supertest";
 import { app } from "../../start";
 import { register } from "../../service/user.service";
 import { clearTestDB, closeTestDB, startTestDB } from "../../setupTests";
+import { Image } from "../../model/image.interface";
+import path from "path";
+
+jest.mock("../../imageStorage/image.storage", () => {
+  return {
+    imageStorage: {
+      storeImage: async (): Promise<Image> => ({
+        imageUrl: "http://fake-url.com/theImage.jpeg",
+        filename: "theImage.jpeg",
+      }),
+      deleteImage: async (image: Image): Promise<void> => {},
+    },
+  };
+});
 
 const dummyUsername = "username";
 const dummyPassword = "password";
@@ -125,23 +139,20 @@ test("Signing into a user with an invalid password returns a status code of 403"
   expect(signInResult.body.user).toBeUndefined;
 });
 
-// test("Uploading an existing image returns a statuscode of 200", async () => {
-//   const request = SuperTest(app);
+test("Uploading an existing image returns a statuscode of 200", async () => {
+  const request = SuperTest(app);
 
-//   const userId = await userSetup();
+  const userId = await userSetup();
 
-//   const testImage:HTMLImageElement = new Image();
-//   testImage.src = "./testPicture.jpg";
+  const result = await request
+    .post("/user/upload-profile-picture")
+    .attach("image", path.resolve(__dirname, "testPicture.jpg"))
+    .field("userId", userId)
+    .field("password", dummyPassword);
 
-//   const signInResult = await request.post("/user/upload-profile-picture").send({
-//     userId: userId,
-//     password: dummyPassword,
-//     file: testImage,
-//   });
-
-//   expect(signInResult.status).toBe(200);
-//   //expect(signInResult.body.user).toBeUndefined;
-// });
+  expect(result.status).toBe(200);
+  expect(result.body.user).toBeUndefined;
+});
 
 test("Getting a user with its userId returns a status code of 200", async () => {
   const request = SuperTest(app);
