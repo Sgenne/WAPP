@@ -108,6 +108,10 @@ const CreateComment = (): JSX.Element => {
               >
                 Create comment
               </button>
+              {/* <LoggedInButtonsComment
+                userId={authContext.signedInUser?.userId}
+                commentId={params.id ? params.id : undefined}
+              /> */}
             </div>
             <div>
               <ErrorMessage>{errorMessage}</ErrorMessage>

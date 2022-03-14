@@ -1,4 +1,7 @@
+import { categoryModel } from "../../db/category.db";
+import { Category } from "../../model/category.interface";
 import { clearTestDB, closeTestDB, startTestDB } from "../../setupTests";
+import { postThread } from "../thread.service";
 import {
   updateUser,
   register,
@@ -143,7 +146,7 @@ deleteUser
 ================================
 */
 
-test("After deleting a user, that user is no longer stored.", async () => {
+test("After deleting a user, that user is no longer stored and all their threads are removed.", async () => {
   const registrationResult = await register(
     dummyEmail,
     dummyUsername,
@@ -151,6 +154,19 @@ test("After deleting a user, that user is no longer stored.", async () => {
     dummyDateOfBirth
   );
   if (!registrationResult.user) throw new Error("Registration failed.");
+  const category: Category = {
+    title: "dummy",
+    description: "this is a test",
+  };
+  await categoryModel.create(category);
+
+  const threadres = await postThread(
+    registrationResult.user.userId,
+    "dummy",
+    "dummyTitle",
+    "dummyContent"
+  );
+  if (!threadres.thread) throw new Error("Thread failed");
 
   const userId = registrationResult.user.userId;
 

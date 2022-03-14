@@ -1,4 +1,5 @@
 import * as threadServices from "../service/thread.service";
+import * as commentService from "../service/comment.service";
 import { Request, Response, Router } from "express";
 import {
   handleValidationResult,
@@ -267,6 +268,12 @@ threadRouter.delete(
   async (req: Request, res: Response) => {
     const threadId = req.body.threadId;
     const userId = req.body.userId;
+
+    const replies = (await threadServices.getThreadComments(threadId)).comments;
+
+    replies?.forEach(element => {
+      commentService.deleteComment(element.commentId, userId);
+    });
 
     const result = await threadServices.deleteThread(threadId, userId);
 
