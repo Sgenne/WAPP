@@ -59,14 +59,10 @@ export const updateUser = async (
     userId: userId,
   });
 
-  if (!updatedUser) {
-    return { statusCode: 404, message: "No user with the given id was found." };
-  }
-
   return {
     statusCode: 200,
     message: "User updated successfully",
-    user: updatedUser,
+    user: updatedUser || undefined,
   };
 };
 
