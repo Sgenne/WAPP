@@ -1,11 +1,8 @@
-import mongoose from "mongoose";
 import "dotenv/config";
 import { categoryModel } from "../../db/category.db";
-import { commentModel } from "../../db/comment.db";
 import { threadModel } from "../../db/thread.db";
-import { userModel } from "../../db/user.db";
 import { Category } from "../../model/category.interface";
-import { getComment, postReply } from "../comment.service";
+import { getComment } from "../comment.service";
 import {
   likeThread,
   disLikeThread,
@@ -21,43 +18,34 @@ import {
   getSampleThreads,
   getCategoryThreads,
   getThreadComments,
-  getCommentComments,
   searchThreads,
 } from "../thread.service";
 import { register, getUser } from "../user.service";
-import { connectToDbTest } from "../../db/connectiontest";
+import { clearTestDB, closeTestDB, startTestDB } from "../../setupTests";
 
 const dummyUsername = "¯_(ツ)_/¯";
 const dummyTitle = "Will we succed tonight";
 const dummyContent = ":)";
 const dummyPassword = "password";
 const dummyEmail = "email@email.com";
-const dummyDateOfBirth = new Date(1972, 11, 10);
+const dummyDateOfBirth = new Date(197, 11, 10);
 
 beforeAll(async () => {
-  await connectToDbTest();
+  await startTestDB();
 });
 
 beforeEach(async () => {
-  jest.setTimeout(8000);
-  await threadModel.deleteMany({});
-  await commentModel.deleteMany({});
-  await userModel.deleteMany({});
-  await categoryModel.deleteMany({});
+  await clearTestDB();
 });
 
 afterAll(async () => {
-  await threadModel.deleteMany({});
-  await commentModel.deleteMany({});
-  await userModel.deleteMany({});
-  await categoryModel.deleteMany({});
-  await mongoose.connection.close();
+  await closeTestDB();
 });
 
-async function userSetup(): Promise<number> {
+async function userSetup(usernameSufix = ""): Promise<number> {
   const registerResult = await register(
     dummyEmail,
-    dummyUsername,
+    dummyUsername + usernameSufix,
     dummyPassword,
     dummyDateOfBirth
   );
@@ -251,7 +239,12 @@ test("Editing an existing thread with the correct variables succeeds.", async ()
   const category = await categorySetup();
   const threadId = await threadSetup(userId);
 
-  const result = await editThread(threadId, "凸༼ຈل͜ຈ༽凸", "Lenny faces uwu");
+  const result = await editThread(
+    userId,
+    threadId,
+    "凸༼ຈل͜ຈ༽凸",
+    "Lenny faces uwu"
+  );
   if (!result.thread) throw new Error("Thread is undefined.");
 
   expect(result.thread.author).toBe(userId);
@@ -263,12 +256,38 @@ test("Editing an existing thread with the correct variables succeeds.", async ()
 });
 
 test("Attempting to edit a thread that doesn't exist fails.", async () => {
-  await userSetup();
+  const userId = await userSetup();
   const category = await categorySetup();
 
-  const result = await editThread(100, "凸༼ຈل͜ຈ༽凸", "Lenny faces uwu");
+  const result = await editThread(userId, 100, "凸༼ຈل͜ຈ༽凸", "Lenny faces uwu");
   expect(result.thread).toBeUndefined;
   expect(result.statusCode).toBe(404);
+});
+
+test("Editing a thread created by another user fails.", async () => {
+  const dummyEditContent = "凸༼ຈل͜ຈ༽凸";
+  const dummyEditTitle = "Lenny faces uwu";
+
+  const ownerId = await userSetup();
+  const editorId = await userSetup("2");
+
+  await categorySetup();
+  const threadId = await threadSetup(ownerId);
+
+  const editResult = await editThread(
+    editorId,
+    threadId,
+    dummyEditContent,
+    dummyEditTitle
+  );
+
+  const thread = await threadModel.findOne({ threadId: threadId });
+  if (!thread) throw new Error("No thread was created.");
+
+  expect(editResult.thread).toBeUndefined();
+  expect(editResult.statusCode).toBe(403);
+  expect(thread.title).not.toBe(dummyEditTitle);
+  expect(thread.content).not.toBe(dummyEditContent);
 });
 
 /*
@@ -315,7 +334,7 @@ test("Liking thread fails if the thread doesnt exists and the user exists", asyn
 
 test("Liking an already disliked thread succeeds if the thread exists and the user exists, also make sure that the dislike is removed", async () => {
   const userId = await userSetup();
-  const category = await categorySetup();
+  await categorySetup();
   const threadId = await threadSetup(userId);
 
   await disLikeThread(threadId, userId);
@@ -363,7 +382,7 @@ test("Liking an already liked thread removes the previous like", async () => {
 
 test("Disliking a thread adds that thread to the users list of disliked threads.", async () => {
   const userId = await userSetup();
-  const category = await categorySetup();
+  await categorySetup();
   const threadId = await threadSetup(userId);
 
   await disLikeThread(threadId, userId);
@@ -380,7 +399,7 @@ test("Disliking a thread adds that thread to the users list of disliked threads.
 
 test("disLiking thread fails if the thread exists and the user doesnt exists", async () => {
   const userId = await userSetup();
-  const category = await categorySetup();
+  await categorySetup();
   const threadId = await threadSetup(userId);
 
   const likeResult = await disLikeThread(threadId, 0);
@@ -390,8 +409,8 @@ test("disLiking thread fails if the thread exists and the user doesnt exists", a
 
 test("disLiking thread fails if the thread doesnt exists and the user exists", async () => {
   const userId = await userSetup();
-  const category = await categorySetup();
-  const threadId = await threadSetup(userId);
+  await categorySetup();
+  await threadSetup(userId);
 
   const likeResult = await disLikeThread(0, userId);
 
@@ -400,7 +419,7 @@ test("disLiking thread fails if the thread doesnt exists and the user exists", a
 
 test("Disliking an already liked thread succeeds if the thread exists and the user exists, also make sure that the like is removed", async () => {
   const userId = await userSetup();
-  const category = await categorySetup();
+  await categorySetup();
   const threadId = await threadSetup(userId);
 
   await likeThread(threadId, userId);
@@ -422,7 +441,7 @@ test("Disliking an already liked thread succeeds if the thread exists and the us
 
 test("Disliking an already disliked thread removes the previous dislike", async () => {
   const userId = await userSetup();
-  const category = await categorySetup();
+  await categorySetup();
   const threadId = await threadSetup(userId);
 
   await disLikeThread(threadId, userId);
@@ -507,54 +526,6 @@ test("Getting comments from an non-exsisting thread", async () => {
   if (!commentResult.thread) throw new Error("Thread is undefined.");
 
   const result = await getThreadComments(0);
-
-  expect(result.statusCode).toBe(404);
-});
-
-test("getting comments from a comment", async () => {
-  const userId = await userSetup();
-  const category = await categorySetup();
-  const threadId = await threadSetup(userId);
-
-  const commentResult = await commentThread(
-    userId,
-    threadId,
-    "Markus was here hehe"
-  );
-  if (!commentResult.thread) throw new Error("Thread is undefined.");
-
-  const comment2Result = await postReply(
-    commentResult.thread.replies[0],
-    "Markus was here hehe",
-    userId
-  );
-
-  const result = await getCommentComments(commentResult.thread.replies[0]);
-  if (!result.comments) throw new Error("Unable to fetch comments");
-
-  expect(result.comments.length).toBe(1);
-  expect(result.statusCode).toBe(200);
-});
-
-test("Fails to get comments from a comment that doesnt exist", async () => {
-  const userId = await userSetup();
-  const category = await categorySetup();
-  const threadId = await threadSetup(userId);
-
-  const commentResult = await commentThread(
-    userId,
-    threadId,
-    "Markus was here hehe"
-  );
-  if (!commentResult.thread) throw new Error("Thread is undefined.");
-
-  const comment2Result = await postReply(
-    commentResult.thread.replies[0],
-    "Markus was here hehe",
-    userId
-  );
-
-  const result = await getCommentComments(0);
 
   expect(result.statusCode).toBe(404);
 });
@@ -654,25 +625,25 @@ test("Cannot get category details if category doesnt exists", async () => {
   search
   ================================
   */
-test("Searching for threads", async () => {
-  const userId = await userSetup();
-  const category = await categorySetup();
-  const threadId = await threadSetup(userId);
-  const result = await searchThreads("will");
-  if (!result.threads) throw new Error("Seatch Failed");
+// test("Searching for threads", async () => {
+//   const userId = await userSetup();
+//   const category = await categorySetup();
+//   const threadId = await threadSetup(userId);
+//   const result = await searchThreads("will");
+//   if (!result.threads) throw new Error("Seatch Failed");
 
-  expect(result.threads[0].threadId).toBe(threadId);
-  expect(result.statusCode).toBe(200);
+//   expect(result.threads[0].threadId).toBe(threadId);
+//   expect(result.statusCode).toBe(200);
 
-  const result2 = await searchThreads(":");
-  if (!result2.threads) throw new Error("Seatch Failed");
+//   const result2 = await searchThreads(":");
+//   if (!result2.threads) throw new Error("Seatch Failed");
 
-  expect(result2.threads[0].threadId).toBe(threadId);
-  expect(result2.statusCode).toBe(200);
+//   expect(result2.threads[0].threadId).toBe(threadId);
+//   expect(result2.statusCode).toBe(200);
 
-  const result3 = await searchThreads("nothinghere");
-  if (!result3.threads) throw new Error("Seatch Failed");
+//   const result3 = await searchThreads("nothinghere");
+//   if (!result3.threads) throw new Error("Seatch Failed");
 
-  expect(result3.threads.length).toBe(0);
-  expect(result3.statusCode).toBe(200);
-});
+//   expect(result3.threads.length).toBe(0);
+//   expect(result3.statusCode).toBe(200);
+// });

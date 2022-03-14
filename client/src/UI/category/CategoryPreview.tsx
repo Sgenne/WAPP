@@ -9,37 +9,34 @@ import { NavLink } from "react-router-dom";
 
 const CategoryPreview = (props: { category: Category }): JSX.Element => {
   const [threads, setThreads] = useState<Thread[]>([]);
-
-  async function getThreads(): Promise<void> {
-    try {
-      threadResult = await axios.get<{
-        message: string;
-        threads?: Thread[];
-      }>(
-        "http://localhost:8080/thread/sampleThreads/" + props.category.title,
-        {}
-      );
-    } catch (error) {
-      console.log(error);
-    }
-    setThreads(threadResult.data.threads);
-  }
-
-  let threadResult: AxiosResponse;
+  const [open, setOpen] = useState(false);
 
   useEffect((): void => {
+    const getThreads = async (): Promise<void> => {
+      let threadResult: AxiosResponse;
+      try {
+        threadResult = await axios.get<{
+          message: string;
+          threads?: Thread[];
+        }>(
+          "http://localhost:8080/thread/sample-threads/" + props.category.title,
+          {}
+        );
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+      setThreads(threadResult.data.threads);
+    };
     getThreads();
-  }, []);
-  let ThreadPreviewContent;
-  if (threads) {
-    ThreadPreviewContent = threads.map((thr: Thread) => (
-      <span key={thr.threadId}>
-        <ThreadPreview thread={thr} />
-      </span>
-    ));
-  }
+  }, [props.category.title]);
 
-  const [open, setOpen] = useState(false);
+  const threadPreviewContent = threads
+    ? threads.map((thread) => (
+        <ThreadPreview thread={thread} key={thread.threadId} />
+      ))
+    : [];
+
   const link = `/category/${props.category.title}`;
 
   return (
@@ -64,7 +61,7 @@ const CategoryPreview = (props: { category: Category }): JSX.Element => {
         <div className="row mt-2 collapse" id="collapseCat">
           <p className="col-12 col-lg-3">{props.category.description}</p>
           <ul className="category-box__threads col-12 col-lg-9">
-            {ThreadPreviewContent}
+            {threadPreviewContent}
           </ul>
         </div>
       </Collapse>

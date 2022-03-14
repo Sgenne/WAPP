@@ -80,7 +80,7 @@ const DUMMY_USER: User = {
 
 const server = setupServer(
   rest.get(
-    "http://localhost:8080/thread/categoryThreads/" + DUMMY_CATEGORY.title,
+    "http://localhost:8080/thread/category-threads/" + DUMMY_CATEGORY.title,
     (req, res, ctx) =>
       res(
         ctx.json({
@@ -93,7 +93,7 @@ const server = setupServer(
       )
   ),
   rest.get(
-    "http://localhost:8080/thread/categoryDetails/" + DUMMY_CATEGORY.title,
+    "http://localhost:8080/thread/category-details/" + DUMMY_CATEGORY.title,
     (req, res, ctx) =>
       res(
         ctx.json({

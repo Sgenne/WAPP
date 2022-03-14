@@ -2,6 +2,7 @@ import { User } from "../model/user.interface";
 import { storeImage, deleteImage, DEFAULT_IMAGE } from "./image.service";
 import bcrypt from "bcryptjs";
 import { userModel } from "../db/user.db";
+import { deleteThread, getThreadsByAuthor } from "./thread.service";
 
 /**
  * The result of a user service. Contains a status code and message describing the
@@ -59,14 +60,10 @@ export const updateUser = async (
     userId: userId,
   });
 
-  if (!updatedUser) {
-    return { statusCode: 404, message: "No user with the given id was found." };
-  }
-
   return {
     statusCode: 200,
     message: "User updated successfully",
-    user: updatedUser,
+    user: updatedUser || undefined,
   };
 };
 
@@ -182,6 +179,17 @@ export const register = async (
 export const deleteUser = async (
   userId: number
 ): Promise<UserServiceResult> => {
+  const threads = await getThreadsByAuthor(userId);
+  let temp = true;
+  threads.threads?.forEach(async element => {
+    const threadres = await deleteThread(element.threadId, userId);
+    if(!threadres) temp = false;
+  });
+
+  if(!temp){
+    return { statusCode: 404, message: "user couldn't be deleted." };
+  }
+
   const deletedUser = await userModel.deleteOne({ userId: userId });
 
   if (!deletedUser) {
@@ -229,42 +237,6 @@ export const getUserByUsername = async (
     statusCode: 200,
     message: "The user was found successfully.",
     user: existingUser,
-  };
-};
-
-/**
- * Updates the visible properties of the user with the given userId.
- *
- * @param userId - The id of the user to update.
- *
- * @param options  - An object describing which of the users properties should be visible.
- */
-export const setVisibleProperties = async (
-  userId: number,
-  options: {
-    email: boolean;
-    joinDate: boolean;
-    birthDate: boolean;
-    bio: boolean;
-    image: boolean;
-    likedThreads: boolean;
-    dislikedThreads: boolean;
-  }
-): Promise<UserServiceResult> => {
-  const updateResult = await userModel.updateOne(
-    { userId: userId },
-    {
-      visibleProperties: options,
-    }
-  );
-
-  if (updateResult.matchedCount === 0) {
-    return { statusCode: 404, message: "User not found." };
-  }
-
-  return {
-    statusCode: 200,
-    message: "Visible properties updated successfully.",
   };
 };
 

@@ -81,7 +81,7 @@ export const likeComment = async (
  *
  * @param userId - Id of the user trying to dislike
  */
-export const disLikeComment = async (
+export const dislikeComment = async (
   commentId: number,
   userId: number
 ): Promise<CommentServiceResult> => {
@@ -358,5 +358,35 @@ export const postReply = async (
     statusCode: 201,
     message: "Reply posted successfully",
     comment: newComment,
+  };
+};
+
+/**
+ * Returns all replies to a specific root comment.
+ *
+ * @param rootId - The id of the root comment.
+ */
+ export const getCommentComments = async (
+  rootId: number
+): Promise<CommentServiceResult> => {
+  const comment: Comment | null = await commentModel.findOne({
+    commentId: rootId,
+  });
+
+  if (!comment) {
+    return {
+      statusCode: 404,
+      message: "No comment with the given root comment id exists.",
+    };
+  }
+
+  const commentArr: Comment[] = await commentModel.find({
+    commentId: { $in: comment.replies },
+  });
+
+  return {
+    statusCode: 200,
+    message: "Comments has successfully been recived.",
+    comments: commentArr,
   };
 };

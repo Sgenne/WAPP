@@ -34,7 +34,11 @@ const SignIn = (): JSX.Element => {
     }
   };
 
+  const hasInput = username && password;
+
   const submitClickHandler = async (): Promise<void> => {
+    if (!hasInput) return;
+
     let signInResult: AxiosResponse;
     try {
       signInResult = await axios.post<{ message: string; user?: User }>(
@@ -60,8 +64,6 @@ const SignIn = (): JSX.Element => {
     authContext.setPassword(password);
     authContext.setShowSignIn(false);
   };
-
-  const validInput = username && password;
 
   return (
     <Modal onBackgroundClick={closeHandler}>
@@ -93,7 +95,7 @@ const SignIn = (): JSX.Element => {
           />
         </div>
         <div className="sign-in__buttons">
-          <button onClick={submitClickHandler} disabled={!validInput}>
+          <button onClick={submitClickHandler} disabled={!hasInput}>
             sign in
           </button>
           <button onClick={closeHandler}>Cancel</button>

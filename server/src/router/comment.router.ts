@@ -3,7 +3,6 @@ import { Request, Response, Router } from "express";
 import {
   handleValidationResult,
   hasContent,
-  hasUsername,
   hasValidCommentId,
   hasValidUserId,
 } from "../utils/validation.util";
@@ -15,9 +14,8 @@ export const commentRouter = Router();
  * Adds a like by a specified user to a specified comment.
  */
 commentRouter.put(
-  "/likeComment",
+  "/like-comment",
   hasValidCommentId,
-  hasUsername,
   handleValidationResult,
   isAuthenticated,
   async (req: Request, res: Response) => {
@@ -41,16 +39,15 @@ commentRouter.put(
  * Adds a dislike by a specified user to a specified comment.
  */
 commentRouter.put(
-  "/disLikeComment",
+  "/dislike-comment",
   hasValidCommentId,
-  hasUsername,
   handleValidationResult,
   isAuthenticated,
   async (req: Request, res: Response) => {
     const commentID = req.body.commentID;
     const userId = req.body.userId;
 
-    const result = await commentService.disLikeComment(commentID, userId);
+    const result = await commentService.dislikeComment(commentID, userId);
 
     if (result.statusCode !== 200) {
       return res.status(result.statusCode).send({ message: result.message });
@@ -67,7 +64,7 @@ commentRouter.put(
  * Allows the creator of a comment to edit that comment.
  */
 commentRouter.put(
-  "/editComment",
+  "/edit-comment",
   hasValidCommentId,
   hasContent,
   handleValidationResult,
@@ -93,8 +90,8 @@ commentRouter.put(
 /**
  * Allows the creator of a comment to delete that comment.
  */
-commentRouter.put(
-  "/deleteComment",
+commentRouter.delete(
+  "/delete-comment",
   hasValidCommentId,
   handleValidationResult,
   isAuthenticated,
@@ -150,7 +147,7 @@ commentRouter.post(
  * Returns all comments that have been liked by a specified user.
  */
 commentRouter.get(
-  "/likedComments/:userId",
+  "/liked-comments/:userId",
   async (req: Request, res: Response) => {
     const userId = req.params.userId;
 
@@ -189,3 +186,21 @@ commentRouter.get("/:commentId", async (req: Request, res: Response) => {
 
   res.status(200).send({ message: result.message, comment: result.comment });
 });
+
+/**
+ * Returns all replies to a specific comment.
+ */
+ commentRouter.get(
+  "/comment-comments/:commentId",
+  async (req: Request, res: Response) => {
+    const result = await commentService.getCommentComments(
+      +req.params.commentId
+    );
+
+    result.statusCode === 200
+      ? res
+          .status(200)
+          .send({ message: result.message, comments: result.comments })
+      : res.status(result.statusCode).send({ message: result.message });
+  }
+);

@@ -24,7 +24,7 @@ const ProfilePage = (): JSX.Element => {
   const params = useParams();
 
   if (!params.username) {
-    throw new Error("Invalid username");
+    throw new Error("No username was provided");
   }
 
   const ownerName = params.username;
@@ -109,7 +109,7 @@ const ProfilePage = (): JSX.Element => {
 
     try {
       response = await axios.get<{ comments: Comment[] }>(
-        `http://localhost:8080/comment/likedComments/${userId}`
+        `http://localhost:8080/comment/liked-comments/${userId}`
       );
     } catch (error) {
       setError(new Error("Liked comments could not be fetched."));
@@ -136,7 +136,6 @@ const ProfilePage = (): JSX.Element => {
     setListItems(threadListItems);
   }, [createdThreads]);
 
-  // Show created threads when page is loaded.
   useEffect((): void => {
     showCreatedThreads();
   }, [showCreatedThreads]);

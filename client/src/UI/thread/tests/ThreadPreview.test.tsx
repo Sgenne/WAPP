@@ -98,7 +98,7 @@ afterEach(() => {
 });
 afterAll(() => server.close());
 
-test("Clicking like changes the appearance of the like button.", () => {
+test("Clicking like changes the appearance of the like button.", async () => {
   const initialLikes = 0;
   const initialDislikes = 0;
 
@@ -109,7 +109,7 @@ test("Clicking like changes the appearance of the like button.", () => {
     dislikedThreads: [],
   });
 
-  const likeButton = screen.getAllByRole("button")[0];
+  const likeButton = (await screen.findAllByRole("button"))[0];
 
   expect(likeButton).not.toHaveClass("like-button--highlight");
   expect(likeButton).toHaveTextContent(initialLikes.toString());
@@ -120,7 +120,7 @@ test("Clicking like changes the appearance of the like button.", () => {
   expect(likeButton).toHaveTextContent((initialLikes + 1).toString());
 });
 
-test("Clicking dislike changes the appearanace of the dislike button.", () => {
+test("Clicking dislike changes the appearanace of the dislike button.", async () => {
   const initialLikes = 0;
   const initialDislikes = 0;
 
@@ -131,7 +131,7 @@ test("Clicking dislike changes the appearanace of the dislike button.", () => {
     dislikedThreads: [],
   });
 
-  const dislikeButton = screen.getAllByRole("button")[1];
+  const dislikeButton = (await screen.findAllByRole("button"))[1];
 
   expect(dislikeButton).not.toHaveClass("dislike-button--highlight");
   expect(dislikeButton).toHaveTextContent(initialLikes.toString());
@@ -142,7 +142,7 @@ test("Clicking dislike changes the appearanace of the dislike button.", () => {
   expect(dislikeButton).toHaveTextContent((initialDislikes + 1).toString());
 });
 
-test("Liking a previously disliked thread increments the likes and decrements the dislikes.", () => {
+test("Liking a previously disliked thread increments the likes and decrements the dislikes.", async () => {
   const initialLikes = 0;
   const initialDislikes = 1;
   const initialLikedThreads: number[] = [];
@@ -155,7 +155,7 @@ test("Liking a previously disliked thread increments the likes and decrements th
     dislikedThreads: initialDislikedThreads,
   });
 
-  const likeButton = screen.getAllByRole("button")[0];
+  const likeButton = (await screen.findAllByRole("button"))[0];
   const dislikeButton = screen.getAllByRole("button")[1];
 
   expect(likeButton).not.toHaveClass("like-button--highlight");
@@ -171,7 +171,7 @@ test("Liking a previously disliked thread increments the likes and decrements th
   expect(dislikeButton).toHaveTextContent((initialDislikes - 1).toString());
 });
 
-test("Disliking a previously liked thread increments the dislikes and decrements the likes.", () => {
+test("Disliking a previously liked thread increments the dislikes and decrements the likes.", async () => {
   const initialLikes = 1;
   const initialDislikes = 0;
   const initialLikedThreads = [0];
@@ -184,7 +184,7 @@ test("Disliking a previously liked thread increments the dislikes and decrements
     dislikedThreads: initialDislikedThreads,
   });
 
-  const likeButton = screen.getAllByRole("button")[0];
+  const likeButton = (await screen.findAllByRole("button"))[0];
   const dislikeButton = screen.getAllByRole("button")[1];
 
   expect(likeButton).toHaveClass("like-button--highlight");

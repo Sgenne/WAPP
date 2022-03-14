@@ -6,32 +6,26 @@ import { useEffect, useState } from "react";
 const Home = (): JSX.Element => {
   const [categories, setCategetories] = useState<Category[]>([]);
 
-  async function getCategory(): Promise<void> {
-    try {
-      categoryResult = await axios.get<{
-        message: string;
-        categories?: Category[];
-      }>("http://localhost:8080/thread/categories", {});
-    } catch (error) {
-      console.log(error);
-    }
-
-    setCategetories(categoryResult.data.categories);
-  }
-
-  let categoryResult: AxiosResponse;
-
   useEffect((): void => {
-    getCategory();
+    const getCategories = async (): Promise<void> => {
+      let categoryResult: AxiosResponse;
+      try {
+        categoryResult = await axios.get<{
+          message: string;
+          categories?: Category[];
+        }>("http://localhost:8080/thread/categories", {});
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+      setCategetories(categoryResult.data.categories);
+    };
+    getCategories();
   }, []);
 
-  const categoryPreviewComponents = categories.map((category) => {
-    return (
-      <span key={category.title}>
-        <CategoryPreview category={category} />
-      </span>
-    );
-  });
+  const categoryPreviewComponents = categories.map((category) => (
+    <CategoryPreview category={category} key={category.title} />
+  ));
 
   return (
     <div className="wholePage">

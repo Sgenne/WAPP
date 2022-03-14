@@ -61,8 +61,14 @@ const Header = (): JSX.Element => {
   const searchButtonClickHandler = () => {
     if (!searchInput) return;
 
-    navigate(`/search?query=${searchInput}`)
-  }
+    navigate(`/search?query=${searchInput}`);
+  };
+
+  const handleKeyDown = (event: { key: string }): void => {
+    if (event.key === "Enter") {
+      searchButtonClickHandler();
+    }
+  };
 
   const profileDropdownOptions = [
     {
@@ -91,10 +97,14 @@ const Header = (): JSX.Element => {
         <div className="header__search col-6">
           <input
             onChange={searchInputChangeHandler}
+            onKeyDown={handleKeyDown}
             type="text"
             placeholder="what are you looking for?"
           />
-          <button onClick={searchButtonClickHandler} className="header__search-button">
+          <button
+            onClick={searchButtonClickHandler}
+            className="header__search-button"
+          >
             <FaSearch />
           </button>
         </div>

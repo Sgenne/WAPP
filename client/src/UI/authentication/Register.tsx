@@ -41,10 +41,10 @@ const Register = (): JSX.Element => {
     setBirthDate(event.target.value);
   };
 
-  const validInput = username && password && email && birthDate;
+  const hasInput = username && password && email && birthDate;
 
   const submitClickHandler = async (): Promise<void> => {
-    if (!validInput) return;
+    if (!hasInput) return;
     let result: AxiosResponse;
     try {
       result = await axios.post("http://localhost:8080/user/register", {
@@ -55,7 +55,7 @@ const Register = (): JSX.Element => {
       });
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
-        setErrorMessage("Something went wrong while signing in.");
+        setErrorMessage("Something went wrong while registering.");
         return;
       }
 
@@ -63,10 +63,10 @@ const Register = (): JSX.Element => {
       return;
     }
 
-    const signedInUser = result.data.user;
+    const registeredUser = result.data.user;
 
     authContext.setIsSignedIn(true);
-    authContext.setSignedInUser(signedInUser);
+    authContext.setSignedInUser(registeredUser);
     authContext.setPassword(password);
     authContext.setShowRegister(false);
   };
@@ -111,7 +111,7 @@ const Register = (): JSX.Element => {
         <div className="register__input-container">
           <label htmlFor="date">Date of birth:</label>
           <input
-          placeholder="Enter your date of birth:"
+            placeholder="Enter your date of birth:"
             name="date of birth"
             type="date"
             id="date"
@@ -121,7 +121,7 @@ const Register = (): JSX.Element => {
         </div>
 
         <div className="register__buttons">
-          <button onClick={submitClickHandler} disabled={!validInput}>
+          <button onClick={submitClickHandler} disabled={!hasInput}>
             Register
           </button>
           <button onClick={closeHandler}>Cancel</button>

@@ -16,33 +16,28 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
   const [dislikes, setDislikes] = useState(props.thread.dislikes);
   const [isFetching, setIsFetching] = useState(false);
 
-  async function getUser(): Promise<void> {
-    try {
-      threadResult = await axios.get<{
-        message: string;
-        threads?: Thread[];
-      }>("http://localhost:8080/user/" + props.thread.author, {});
-    } catch (error) {
-      console.log(error);
-    }
-    setUser(threadResult.data.user);
-  }
-
-  let threadResult: AxiosResponse;
-  let userImage;
-
-  useEffect((): void => {
-    getUser();
-  }, []);
-
-  let author;
-  if (user) {
-    author = user?.username;
-
-    userImage = user.profilePicture.imageUrl;
-  }
   const authContext = useContext(AuthContext);
   const signedInUser = authContext.signedInUser;
+
+  useEffect((): void => {
+    const getUser = async (): Promise<void> => {
+      let userResult: AxiosResponse;
+
+      try {
+        userResult = await axios.get<{
+          message: string;
+          threads?: Thread[];
+        }>("http://localhost:8080/user/" + props.thread.author, {});
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+      setUser(userResult.data.user);
+    };
+    getUser();
+  }, [props.thread.author]);
+
+  if (!user) return <></>;
 
   const title: string = props.thread.title;
   const context: string = props.thread.content;
@@ -101,7 +96,7 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
     setIsFetching(true);
     try {
       likeResult = await axios.put<{ message: string; thread?: Thread }>(
-        "http://localhost:8080/thread/likeThread/",
+        "http://localhost:8080/thread/like-thread/",
         {
           userId: signedInUser.userId,
           password: authContext.password,
@@ -173,11 +168,10 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
       setLikes((prevLikes) => prevLikes - 1);
     }
 
-    let dislikeResult: AxiosResponse;
     setIsFetching(true);
     try {
-      dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
-        "http://localhost:8080/thread/dislikeThread/",
+      await axios.put<{ message: string; thread?: Thread }>(
+        "http://localhost:8080/thread/dislike-thread/",
         {
           userId: signedInUser.userId,
           password: authContext.password,
@@ -198,6 +192,9 @@ const ThreadPreview = (props: { thread: Thread }): JSX.Element => {
     }
     setIsFetching(false);
   };
+
+  const author = user.username;
+  const userImage = user.profilePicture.imageUrl;
 
   const likeButtonClassName =
     signedInUser && signedInUser.likedThreads.includes(props.thread.threadId)

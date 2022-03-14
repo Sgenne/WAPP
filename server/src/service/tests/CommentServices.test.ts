@@ -1,23 +1,19 @@
-import mongoose from "mongoose";
 import { categoryModel } from "../../db/category.db";
-import { commentModel } from "../../db/comment.db";
-import { connectToDbTest } from "../../db/connectiontest";
-import { threadModel } from "../../db/thread.db";
-import { userModel } from "../../db/user.db";
 import { Category } from "../../model/category.interface";
 import { Thread } from "../../model/thread.interface";
 import { User } from "../../model/user.interface";
+import { clearTestDB, closeTestDB, startTestDB } from "../../setupTests";
 import {
   likeComment,
-  disLikeComment,
+  dislikeComment,
   editComment,
   deleteComment,
   postReply,
   getComment,
   getCommentsByAuthor,
   getLikedComments,
+  getCommentComments,
 } from "../comment.service";
-//import { DEFAULT_IMAGE_ID, images } from "../image.service";
 import { commentThread, postThread } from "../thread.service";
 import { getUser, register } from "../user.service";
 
@@ -32,32 +28,19 @@ const dummyDateOfBirth = new Date(1972, 11, 10);
 let user: User;
 let thread: Thread;
 
-// Clear all arrays before each test.
 beforeAll(async () => {
-  await connectToDbTest();
+  await startTestDB();
 });
 
 beforeEach(async () => {
-  jest.setTimeout(8000);
-  await threadModel.deleteMany({});
-  await commentModel.deleteMany({});
-  await userModel.deleteMany({});
-  await categoryModel.deleteMany({});
+  await clearTestDB();
 });
 
 afterAll(async () => {
-  await threadModel.deleteMany({});
-  await commentModel.deleteMany({});
-  await userModel.deleteMany({});
-  await categoryModel.deleteMany({});
-  await mongoose.connection.close();
+  await closeTestDB();
 });
 
 beforeEach(async () => {
-  await threadModel.deleteMany({});
-  await commentModel.deleteMany({});
-  await userModel.deleteMany({});
-  await categoryModel.deleteMany({});
   user = await userSetup();
   await categorySetup();
   thread = await threadSetup(user.userId);
@@ -199,6 +182,46 @@ test("Get liked comments by author fails if the author doesnt exists", async () 
   expect(result.statusCode).toBe(404);
 });
 
+test("getting comments from a comment", async () => {
+  const commentResult = await commentThread(
+    user.userId,
+    thread.threadId,
+    "Markus was here hehe"
+  );
+  if (!commentResult.thread) throw new Error("Thread is undefined.");
+
+  const comment2Result = await postReply(
+    commentResult.thread.replies[0],
+    "Markus was here hehe",
+    user.userId
+  );
+
+  const result = await getCommentComments(commentResult.thread.replies[0]);
+  if (!result.comments) throw new Error("Unable to fetch comments");
+
+  expect(result.comments.length).toBe(1);
+  expect(result.statusCode).toBe(200);
+});
+
+test("Fails to get comments from a comment that doesnt exist", async () => {
+  const commentResult = await commentThread(
+    user.userId,
+    thread.threadId,
+    "Markus was here hehe"
+  );
+  if (!commentResult.thread) throw new Error("Thread is undefined.");
+
+  const comment2Result = await postReply(
+    commentResult.thread.replies[0],
+    "Markus was here hehe",
+    user.userId
+  );
+
+  const result = await getCommentComments(0);
+
+  expect(result.statusCode).toBe(404);
+});
+
 /*
   ================================
   editComment
@@ -302,7 +325,7 @@ test("Liking an already disliked thread succeeds if the thread exists and the us
   const rootComment = (await getComment(commentId)).comment;
   if (!rootComment) throw new Error("unable to fetch comment");
 
-  await disLikeComment(commentId, user.userId);
+  await dislikeComment(commentId, user.userId);
 
   user = (await getUser(user.userId)).user || user;
 
@@ -339,7 +362,7 @@ test("Liking an already liked comment removes the previous like as an valid user
 test("Disliking comment succeeds if the comment exists and the user exists, and the comment is not deleted", async () => {
   let commentId: number = await commentSetup(user.userId, thread.threadId);
 
-  const result = await disLikeComment(commentId, user.userId);
+  const result = await dislikeComment(commentId, user.userId);
   if (!result.comment) throw new Error("Comment is undefined.");
 
   user = (await getUser(user.userId)).user || user;
@@ -351,7 +374,7 @@ test("Disliking comment succeeds if the comment exists and the user exists, and 
 test("Disliking comment fails if the comment doesnt exists and the user exists, and the comment is not deleted", async () => {
   let commentId: number = await commentSetup(user.userId, thread.threadId);
 
-  const result = await disLikeComment(0, user.userId);
+  const result = await dislikeComment(0, user.userId);
 
   user = (await getUser(user.userId)).user || user;
 
@@ -362,7 +385,7 @@ test("Disliking comment fails if the comment doesnt exists and the user exists, 
 test("Disliking comment fails if the comment exists and the user doesnt exists, and the comment is not deleted", async () => {
   let commentId: number = await commentSetup(user.userId, thread.threadId);
 
-  const result = await disLikeComment(commentId, 0);
+  const result = await dislikeComment(commentId, 0);
 
   user = (await getUser(user.userId)).user || user;
 
@@ -374,7 +397,7 @@ test("Disliking comment fails if the comment exists and the user exists, and the
   let commentId: number = await commentSetup(user.userId, thread.threadId);
 
   await deleteComment(commentId, user.userId);
-  await disLikeComment(commentId, user.userId);
+  await dislikeComment(commentId, user.userId);
 
   user = (await getUser(user.userId)).user || user;
 
@@ -391,7 +414,7 @@ test("Disliking an already liked thread succeeds if the thread exists and the us
   expect(user.likedComments.includes(commentId)).toBe(true);
   expect(user.dislikedComments.includes(commentId)).toBe(false);
 
-  await disLikeComment(commentId, user.userId);
+  await dislikeComment(commentId, user.userId);
 
   user = (await getUser(user.userId)).user || user;
 
@@ -402,8 +425,8 @@ test("Disliking an already liked thread succeeds if the thread exists and the us
 test("Disliking an already liked comment removes the previous like as an valid user", async () => {
   let commentId: number = await commentSetup(user.userId, thread.threadId);
 
-  await disLikeComment(commentId, user.userId);
-  const result = await disLikeComment(commentId, user.userId);
+  await dislikeComment(commentId, user.userId);
+  const result = await dislikeComment(commentId, user.userId);
   if (!result.comment) throw new Error("Comment is undefined.");
 
   user = (await getUser(user.userId)).user || user;
@@ -421,7 +444,7 @@ test("Disliking an already liked comment removes the previous like as an valid u
 test("deleting a comment as a valid user", async () => {
   let commentId: number = await commentSetup(user.userId, thread.threadId);
 
-  await disLikeComment(commentId, user.userId);
+  await dislikeComment(commentId, user.userId);
   const result = await deleteComment(commentId, user.userId);
   if (!result.comment) throw new Error("Comment is undefined.");
 
@@ -434,7 +457,7 @@ test("deleting a comment as a valid user", async () => {
 test("deleting a comment that doesnt exist as a valid user", async () => {
   let commentId: number = await commentSetup(user.userId, thread.threadId);
 
-  await disLikeComment(commentId, user.userId);
+  await dislikeComment(commentId, user.userId);
   const result = await deleteComment(0, user.userId);
 
   expect(result.statusCode).toBe(404);
@@ -451,7 +474,7 @@ test("deleting a comment as a valid user but not a valid author", async () => {
   );
   if (!registerResult.user) throw new Error("unable to register user");
 
-  await disLikeComment(commentId, user.userId);
+  await dislikeComment(commentId, user.userId);
   const result = await deleteComment(commentId, registerResult.user.userId);
 
   expect(result.statusCode).toBe(403);
@@ -460,7 +483,7 @@ test("deleting a comment as a valid user but not a valid author", async () => {
 test("deleting a comment twice as a valid user", async () => {
   let commentId: number = await commentSetup(user.userId, thread.threadId);
 
-  await disLikeComment(commentId, user.userId);
+  await dislikeComment(commentId, user.userId);
   await deleteComment(commentId, user.userId);
   const result = await deleteComment(commentId, user.userId);
 
