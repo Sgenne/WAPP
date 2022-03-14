@@ -180,15 +180,9 @@ export const deleteUser = async (
   userId: number
 ): Promise<UserServiceResult> => {
   const threads = await getThreadsByAuthor(userId);
-  let temp = true;
-  threads.threads?.forEach(async element => {
+  threads.threads?.forEach(async (element) => {
     const threadres = await deleteThread(element.threadId, userId);
-    if(!threadres) temp = false;
   });
-
-  if(!temp){
-    return { statusCode: 404, message: "user couldn't be deleted." };
-  }
 
   const deletedUser = await userModel.deleteOne({ userId: userId });
 
