@@ -625,25 +625,25 @@ test("Cannot get category details if category doesnt exists", async () => {
   search
   ================================
   */
-// test("Searching for threads", async () => {
-//   const userId = await userSetup();
-//   const category = await categorySetup();
-//   const threadId = await threadSetup(userId);
-//   const result = await searchThreads("will");
-//   if (!result.threads) throw new Error("Seatch Failed");
+test("Searching for threads", async () => {
+  const userId = await userSetup();
+  const category = await categorySetup();
+  const threadId = await threadSetup(userId);
+  const result = await searchThreads("will");
+  if (!result.threads) throw new Error("Seatch Failed");
 
-//   expect(result.threads[0].threadId).toBe(threadId);
-//   expect(result.statusCode).toBe(200);
+  expect(result.threads[0].threadId).toBe(threadId);
+  expect(result.statusCode).toBe(200);
 
-//   const result2 = await searchThreads(":");
-//   if (!result2.threads) throw new Error("Seatch Failed");
+  const result2 = await searchThreads(":");
+  if (!result2.threads) throw new Error("Seatch Failed");
 
-//   expect(result2.threads[0].threadId).toBe(threadId);
-//   expect(result2.statusCode).toBe(200);
+  expect(result2.threads[0].threadId).toBe(threadId);
+  expect(result2.statusCode).toBe(200);
 
-//   const result3 = await searchThreads("nothinghere");
-//   if (!result3.threads) throw new Error("Seatch Failed");
+  const result3 = await searchThreads("nothinghere");
+  if (!result3.threads) throw new Error("Seatch Failed");
 
-//   expect(result3.threads.length).toBe(0);
-//   expect(result3.statusCode).toBe(200);
-// });
+  expect(result3.threads.length).toBe(0);
+  expect(result3.statusCode).toBe(200);
+});

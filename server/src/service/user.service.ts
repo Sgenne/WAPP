@@ -192,7 +192,7 @@ export const deleteUser = async (
 
   const deletedUser = await userModel.deleteOne({ userId: userId });
 
-  if (!deletedUser) {
+  if (deletedUser.deletedCount === 0) {
     return { statusCode: 404, message: "user not found." };
   }
 
