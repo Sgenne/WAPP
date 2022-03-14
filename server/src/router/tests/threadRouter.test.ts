@@ -8,7 +8,7 @@ import { clearTestDB, closeTestDB, startTestDB } from "../../setupTests";
 
 const dummyUsername = "¯_(ツ)_/¯";
 const dummyTitle = "Will we succed tonight";
-const dummyContent = ":)";
+const dummyContent = ":) I like turtles";
 const dummyPassword = "password";
 const dummyEmail = "email@email.com";
 const dummyDateOfBirth = new Date(1972, 11, 10);
@@ -424,4 +424,34 @@ test("Get the category details returns a status of 200.", async () => {
 
   expect(threadsResult.status).toBe(200);
   expect(threadsResult.body.comments.length).toBe(2);
+});
+
+/**
+ * Search
+ */
+test("Searching for a thread should give status 200", async () => {
+  const request = SuperTest(app);
+
+  const userId = await userSetup();
+  const categoryTitle = await categorySetup();
+  const threadId = await threadSetup(userId, categoryTitle);
+  const searchInput = "turtle";
+
+  const threadsResult = await request
+    .get(`/thread/search?q=${searchInput}`)
+    .send({});
+
+  expect(threadsResult.status).toBe(200);
+});
+
+test("Searching for a thread without a proper query should give status 400", async () => {
+  const request = SuperTest(app);
+
+  const userId = await userSetup();
+  const categoryTitle = await categorySetup();
+  const threadId = await threadSetup(userId, categoryTitle);
+
+  const threadsResult = await request.get(`/thread/search`).send({});
+
+  expect(threadsResult.status).toBe(400);
 });

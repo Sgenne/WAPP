@@ -78,8 +78,8 @@ button:disabled {
 
 header {
   height: 100px;
-  background-color: white;
-  border-bottom: 1px solid grey;
+  background-color: #f6d9ff;
+  border-bottom: 1px solid #a36fb3;
 }
 
 .header__logo {
@@ -151,7 +151,7 @@ header {
   margin: 6rem auto;
   padding: 14px;
   font-size: 1.1em;
-  background-color: #70b4c1;
+  background-color: #a36fb3;
 }
 
 .category-box {
