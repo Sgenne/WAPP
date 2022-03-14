@@ -6,63 +6,67 @@ import { Thread } from "../../../../server/src/model/thread.interface";
 import ThreadPreview from "../thread/ThreadPreview";
 
 const CategoryPage = (): JSX.Element => {
-  const param = useParams();
   const [threads, setThreads] = useState<Thread[]>([]);
   const [category, setCategory] = useState<Category>();
 
-  async function getCategoryThreads(): Promise<void> {
-    try {
-      threadResult = await axios.get<{
-        message: string;
-        threads?: Thread[];
-      }>("http://localhost:8080/thread/category-threads/" + param.category, {});
-    } catch (error) {
-      return;
-    }
-    setThreads(threadResult.data.threads);
-  }
-
-  async function getCategoryDetails(): Promise<void> {
-    try {
-      categoryResult = await axios.get<{
-        message: string;
-        category?: Category;
-      }>("http://localhost:8080/thread/category-details/" + param.category, {});
-    } catch (error) {
-      return;
-    }
-    setCategory(categoryResult.data.category);
-  }
-
-  let threadResult: AxiosResponse;
-  let categoryResult: AxiosResponse;
-
-  useEffect(() => {
-    getCategoryDetails();
-    getCategoryThreads();
-  }, []);
+  const param = useParams();
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCategoryDetails = async (): Promise<void> => {
+      let categoryResult: AxiosResponse;
+      try {
+        categoryResult = await axios.get<{
+          message: string;
+          category?: Category;
+        }>(
+          "http://localhost:8080/thread/category-details/" + param.category,
+          {}
+        );
+      } catch (error) {
+        return;
+      }
+      setCategory(categoryResult.data.category);
+    };
+
+    const fetchCategoryThreads = async (): Promise<void> => {
+      let threadResult: AxiosResponse;
+      try {
+        threadResult = await axios.get<{
+          message: string;
+          threads?: Thread[];
+        }>(
+          "http://localhost:8080/thread/category-threads/" + param.category,
+          {}
+        );
+      } catch (error) {
+        return;
+      }
+      setThreads(threadResult.data.threads);
+    };
+
+    fetchCategoryDetails();
+    fetchCategoryThreads();
+  }, [param.category]);
+
   const submitClickHandler = async () => {
     navigate(`/create-thread/${category?.title}`);
   };
-  
-  let ThreadPreviewContent;
-  if (threads) {
-    ThreadPreviewContent = threads.map((thr: Thread) => (
-      <span key={thr.threadId}>
-        <ThreadPreview thread={thr} />
-      </span>
-    ));
-  }
-  return (
 
+  const threadPreviewContent = threads
+    ? threads.map((thread) => (
+        <ThreadPreview thread={thread} key={thread.threadId} />
+      ))
+    : [];
+
+  return (
     <div className="wholePage">
       <ul>
         <li className="flex">
           <div className="category-title">
-          <h1 >{category?.title}</h1>
-          <p>{category?.description}</p>
+            <h1>{category?.title}</h1>
+            <p>{category?.description}</p>
           </div>
           <div>
             <button
@@ -83,7 +87,7 @@ const CategoryPage = (): JSX.Element => {
             </button>
           </div>
         </li>
-        {ThreadPreviewContent}
+        {threadPreviewContent}
       </ul>
     </div>
   );

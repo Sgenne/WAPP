@@ -550,8 +550,8 @@ header {
   margin-right: 2px;
 }
 
-.like-button--highlight{
-  background-color: #24922F;
+.like-button--highlight {
+  background-color: #24922f;
   color: white;
 }
 
@@ -560,7 +560,7 @@ header {
 }
 
 .dislike-button--highlight {
-  background-color: #EB2438;
+  background-color: #eb2438;
   color: white;
 }
 
@@ -578,12 +578,10 @@ header {
 }
 
 .search-page__search-help {
-  margin-top: 16px 
+  margin-top: 16px;
 }
 
 .search-page__search-help-list li::before {
   content: "•";
   padding-right: 8px;
 }
-
-

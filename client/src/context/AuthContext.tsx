@@ -14,11 +14,6 @@ export interface AuthContextState {
   setShowRegister: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-/**
- * The default state of AuthContext. Holds dummy values
- * that won't be used anywhere. Alternatively, we could
- * set createContext's argument to null.
- */
 const defaultState: AuthContextState = {
   isSignedIn: false,
   setIsSignedIn: () => {},

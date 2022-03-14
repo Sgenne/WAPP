@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,20 +9,20 @@ import QuillTools, { formats, modules } from "../../utils/quillTools";
 import ErrorMessage from "../common/ErrorMessage";
 import parse from "html-react-parser";
 
-
 const CreateComment = (): JSX.Element => {
-  const navigate = useNavigate();
-  const authContext = useContext(AuthContext);
-  const params = useParams();
-  const category = params.category;
   const [value, setValue] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [commentFor, setCommentFor] = useState<Thread>();
 
+  const navigate = useNavigate();
+  const authContext = useContext(AuthContext);
+  const params = useParams();
+  const category = params.category;
+
   useEffect((): void => {
     const getComment = async (): Promise<void> => {
       let result: AxiosResponse;
-      if(params.type === "thread"){
+      if (params.type === "thread") {
         try {
           result = await axios.get<{
             message: string;
@@ -32,17 +32,7 @@ const CreateComment = (): JSX.Element => {
           return;
         }
         setCommentFor(result.data.thread);
-       } //else{
-      //   try {
-      //     result = await axios.get<{
-      //       message: string;
-      //       comment?: Comment;
-      //     }>("http://localhost:8080/comment/" + params.id, {});
-      //   } catch (error) {
-      //     return;
-      //   }
-      // }
-
+      }
     };
     getComment();
   }, [params.id, params.type]);
@@ -91,7 +81,8 @@ const CreateComment = (): JSX.Element => {
           <div className="category-box container-fluid px-4">
             <div className="row1">
               <h3 className="thread-title">
-                You are about to create a comment for {params.type} {(params.type === "thread" && commentFor?.title) || params.id}
+                You are about to create a comment for {params.type}{" "}
+                {(params.type === "thread" && commentFor?.title) || params.id}
               </h3>
             </div>
             <div className="thread-desc">

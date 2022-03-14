@@ -20,55 +20,47 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
 
   const authContext = useContext(AuthContext);
   const signedInUser = authContext.signedInUser;
-
-  async function getComments(): Promise<void> {
-    let commentResult: AxiosResponse;
-
-    try {
-      commentResult = await axios.get<{
-        message: string;
-        comments?: Comment[];
-      }>(
-        "http://localhost:8080/comment/comment-comments/" + props.root.commentId,
-        {}
-      );
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-    setComments(commentResult.data.comments);
-  }
-
-  async function getUser(): Promise<void> {
-    try {
-      threadResult = await axios.get<{
-        message: string;
-        threads?: Thread[];
-      }>("http://localhost:8080/user/" + props.root.author, {});
-    } catch (error) {
-      console.log(error);
-    }
-    setThreads(threadResult.data.user);
-  }
-
-  let threadResult: AxiosResponse;
+  const navigate = useNavigate();
 
   useEffect((): void => {
+    const getUser = async (): Promise<void> => {
+      let threadResult: AxiosResponse;
+      try {
+        threadResult = await axios.get<{
+          message: string;
+          threads?: Thread[];
+        }>("http://localhost:8080/user/" + props.root.author, {});
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+      setThreads(threadResult.data.user);
+    };
+
+    async function getComments(): Promise<void> {
+      let commentResult: AxiosResponse;
+
+      try {
+        commentResult = await axios.get<{
+          message: string;
+          comments?: Comment[];
+        }>(
+          "http://localhost:8080/comment/comment-comments/" +
+            props.root.commentId,
+          {}
+        );
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+      setComments(commentResult.data.comments);
+    }
+
     getUser();
     getComments();
-  }, []);
+  }, [props.root.author, props.root.commentId]);
 
-  let author;
-  if (user) {
-    author = user?.username;
-  }
-
-  const list: JSX.Element[] = [];
-  if (comments) {
-    for (const comment of comments) {
-      list.push(<ThreadComment root={comment} />);
-    }
-  }
+  if (!user) return <></>;
 
   const likeClickHandler = async (): Promise<void> => {
     if (isFetching) {
@@ -117,10 +109,9 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
 
       setDislikes((prevDislikes) => prevDislikes - 1);
     }
-    let likeResult: AxiosResponse;
     setIsFetching(true);
     try {
-      likeResult = await axios.put<{ message: string; thread?: Thread }>(
+      await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/comment/like-comment/",
         {
           userId: signedInUser.userId,
@@ -195,10 +186,9 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
       setLikes((prevLikes) => prevLikes - 1);
     }
 
-    let dislikeResult: AxiosResponse;
     setIsFetching(true);
     try {
-      dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
+      await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/comment/dislike-comment/",
         {
           userId: signedInUser.userId,
@@ -221,14 +211,13 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
     setIsFetching(false);
   };
 
-  const navigate = useNavigate();
   const replyClickHandler = async (): Promise<void> => {
     navigate(`/create-comment/comment/${props.root.commentId}`);
   };
 
-  const context: string = props.root.content;
+  const content: string = props.root.content;
   const date = props.root.date;
-  const path = "/profile/" + user?.username;
+  const path = "/profile/" + user.username;
 
   const likeButtonClassName =
     signedInUser && signedInUser.likedComments.includes(props.root.commentId)
@@ -240,22 +229,26 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
       ? "generalButton dislike-button--highlight"
       : "generalButton";
 
+  const displayedChildComments: JSX.Element[] = comments
+    ? comments.map((comment) => (
+        <ThreadComment root={comment} key={comment.commentId} />
+      ))
+    : [];
+
   return (
     <li style={{ marginLeft: "30px" }}>
       <div className="category-box container-fluid px-4">
         <div className="row">
           <p className="category-box__row__thread-title col-3">
             <NavLink to={path} className="link">
-              {author}
+              {user.username}
             </NavLink>
           </p>
           <p className="category-box__row__thread-title col-5">
             {formatDate(new Date(date))}
           </p>
         </div>
-        <div className="category-box__thread-desc">
-          {parse(context)}
-        </div>
+        <div className="category-box__thread-desc">{parse(content)}</div>
         <div>
           <button className={likeButtonClassName} onClick={likeClickHandler}>
             <FaThumbsUp />
@@ -276,7 +269,7 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
           <ErrorMessage>{errorMessage}</ErrorMessage>
         </div>
       </div>
-      <ul>{list}</ul>
+      <ul>{displayedChildComments}</ul>
     </li>
   );
 };

@@ -13,17 +13,17 @@ import { formatDate } from "../../utils/formatUtils";
 import parse from "html-react-parser";
 
 const ThreadPage = (): JSX.Element => {
-  const navigate = useNavigate();
-  const param = useParams();
-  const id = param.threadId;
   const [user, setuser] = useState<User>();
   const [threadObject, setThreadObject] = useState<Thread>();
   const [comments, setComments] = useState<Comment[]>();
   const [errorMessage, setErrorMessage] = useState("");
   const [isFetching, setIsFetching] = useState(false);
 
+  const navigate = useNavigate();
+  const param = useParams();
   const authContext = useContext(AuthContext);
   const signedInUser = authContext.signedInUser;
+  const id = param.threadId;
 
   useEffect((): void => {
     const getThread = async (): Promise<void> => {
@@ -81,8 +81,7 @@ const ThreadPage = (): JSX.Element => {
     getComments();
   }, [threadObject]);
 
-  if (!threadObject) return <></>;
-  if (!user) return <div>An error has occured.</div>;
+  if (!(threadObject && user)) return <></>;
 
   const author = user.username;
   const path = "/profile/" + user.username;
@@ -103,7 +102,6 @@ const ThreadPage = (): JSX.Element => {
       setErrorMessage("You need to sign in to like");
       return;
     }
-
 
     if (signedInUser.likedThreads.includes(threadObject.threadId)) {
       authContext.setSignedInUser(
@@ -155,10 +153,9 @@ const ThreadPage = (): JSX.Element => {
       );
     }
 
-    let likeResult: AxiosResponse;
     setIsFetching(true);
     try {
-      likeResult = await axios.put<{ message: string; thread?: Thread }>(
+      await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/like-thread/",
         {
           userId: signedInUser.userId,
@@ -244,10 +241,9 @@ const ThreadPage = (): JSX.Element => {
       );
     }
 
-    let dislikeResult: AxiosResponse;
     setIsFetching(true);
     try {
-      dislikeResult = await axios.put<{ message: string; thread?: Thread }>(
+      await axios.put<{ message: string; thread?: Thread }>(
         "http://localhost:8080/thread/dislike-thread/",
         {
           userId: signedInUser.userId,
