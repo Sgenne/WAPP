@@ -97,12 +97,12 @@ const Header = (): JSX.Element => {
         <div className="header__search col-6">
           <input
             onChange={searchInputChangeHandler}
+            onKeyDown={handleKeyDown}
             type="text"
             placeholder="what are you looking for?"
           />
           <button
             onClick={searchButtonClickHandler}
-            onKeyDown={handleKeyDown}
             className="header__search-button"
           >
             <FaSearch />

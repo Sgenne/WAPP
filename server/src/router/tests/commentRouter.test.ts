@@ -43,7 +43,7 @@ async function categorySetup(): Promise<string> {
     title: dummyCategory,
     description: "this is a test",
   };
-  categoryModel.create(category);
+  await categoryModel.create(category);
 
   return category.title;
 }

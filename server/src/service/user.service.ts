@@ -2,6 +2,7 @@ import { User } from "../model/user.interface";
 import { storeImage, deleteImage, DEFAULT_IMAGE } from "./image.service";
 import bcrypt from "bcryptjs";
 import { userModel } from "../db/user.db";
+import { deleteThread, getThreadsByAuthor } from "./thread.service";
 
 /**
  * The result of a user service. Contains a status code and message describing the
@@ -178,6 +179,17 @@ export const register = async (
 export const deleteUser = async (
   userId: number
 ): Promise<UserServiceResult> => {
+  const threads = await getThreadsByAuthor(userId);
+  let temp = true;
+  threads.threads?.forEach(async element => {
+    const threadres = await deleteThread(element.threadId, userId);
+    if(!threadres) temp = false;
+  });
+
+  if(!temp){
+    return { statusCode: 404, message: "user couldn't be deleted." };
+  }
+
   const deletedUser = await userModel.deleteOne({ userId: userId });
 
   if (!deletedUser) {
