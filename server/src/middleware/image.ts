@@ -1,11 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import multer from "multer";
 
-/**
- * The path to the folder used to store images.
- */
-export const imageFolderPath = "images";
-
 export const handleUploadedImage = [
   multer().single("image"),
   (req: Request, res: Response, next: NextFunction) => {
@@ -19,7 +14,8 @@ export const handleUploadedImage = [
     if (
       !(
         uploadedFile.mimetype === "image/jpg" ||
-        uploadedFile.mimetype === "image/jpeg"
+        uploadedFile.mimetype === "image/jpeg" ||
+        uploadedFile.mimetype === "image/png"
       )
     ) {
       res.status(400).send({ message: "Invalid image format." });

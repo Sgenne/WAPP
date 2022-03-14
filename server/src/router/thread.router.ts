@@ -8,8 +8,8 @@ import {
   hasValidThreadId,
   hasValidThreadTitle,
   hasValidUserId,
-} from "../utils/validation.util";
-import { isAuthenticated } from "../utils/auth.util";
+} from "../middleware/validation";
+import { isAuthenticated } from "../middleware/auth";
 
 export const threadRouter = Router();
 

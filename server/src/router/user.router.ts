@@ -9,9 +9,9 @@ import {
   hasValidEmail,
   hasValidPassword,
   hasValidUsername,
-} from "../utils/validation.util";
-import { isAuthenticated } from "../utils/auth.util";
-import { handleUploadedImage } from "../utils/image.util";
+} from "../middleware/validation";
+import { isAuthenticated } from "../middleware/auth";
+import { handleUploadedImage } from "../middleware/image";
 
 export const userRouter = Router();
 
