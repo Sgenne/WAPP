@@ -97,11 +97,11 @@ const CreateComment = (): JSX.Element => {
         );
       }
 
-      // if (params.type === "thread") {
-      //   navigate("/thread/" + params.id);
-      // } else {
-      //   navigate("/thread/" + resultData.data.comment.rootThread);
-      // }
+      if (params.type === "thread") {
+        navigate("/thread/" + params.id);
+      } else {
+        navigate("/thread/" + resultData.data.comment.rootThread);
+      }
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
         setErrorMessage("Could not create comment");
