@@ -286,7 +286,7 @@ threadRouter.delete(
 );
 
 /**
- * Returns threads that match query
+ * Returns threads that match the provided search query.
  */
 threadRouter.get("/search", async (req: Request, res: Response) => {
   const searchTerm = req.query.q as string;

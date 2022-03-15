@@ -540,19 +540,28 @@ export const getThreadComments = async (
   };
 };
 
+/**
+ * Returns all threads whose title or content contains the provided query.
+ * Search is case insensitive.
+ * 
+ * @param query - The search query.
+ */
 export const searchThreads = async (
   query: string
 ): Promise<ThreadServiceResult> => {
-  const searchResult: Thread[] = await threadModel.find({
-    $or: [
-      {
-        content: { $regex: new RegExp(query, "i") },
-      },
-      {
-        title: { $regex: new RegExp(query, "i") },
-      },
-    ],
-  });
+  const searchRegex = new RegExp(query, "i");
+  const searchResult: Thread[] = await threadModel
+    .find({
+      $or: [
+        {
+          content: { $regex: searchRegex },
+        },
+        {
+          title: { $regex: searchRegex },
+        }
+      ],
+    })
+    .sort({ likes: -1 });
 
   return {
     statusCode: 200,
