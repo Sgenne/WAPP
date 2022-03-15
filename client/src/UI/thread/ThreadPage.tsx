@@ -324,7 +324,10 @@ const ThreadPage = (): JSX.Element => {
               <button className="generalButton" onClick={replyClickHandler}>
                 Reply
               </button>
-              <LoggedInButtonsThread userId={authContext.signedInUser?.userId} thread={threadObject}/>
+              <LoggedInButtonsThread
+                userId={authContext.signedInUser?.userId}
+                thread={threadObject}
+              />
             </div>
             <div>
               <ErrorMessage>{errorMessage}</ErrorMessage>

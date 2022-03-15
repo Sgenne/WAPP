@@ -69,7 +69,7 @@ const CreateComment = (): JSX.Element => {
       setErrorMessage("You need to sign in to comment");
       return;
     }
-    
+
     let resultData: AxiosResponse;
     try {
       if (!comment || params.type !== "editcomment") {
@@ -84,8 +84,8 @@ const CreateComment = (): JSX.Element => {
             content: value,
           }
         );
-      } else{
-        console.log(value)
+      } else {
+        console.log(value);
         resultData = await axios.put<{ message: string; comment?: Comment }>(
           "http://localhost:8080/comment/edit-comment/",
           {

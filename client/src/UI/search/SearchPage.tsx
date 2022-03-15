@@ -9,8 +9,6 @@ const SearchPage = () => {
   const [searchResult, setSearchResult] = useState<Thread[]>([]);
   const [noResult, setNoResult] = useState(false);
 
-  // If searching for a new term when this component is already mounted, then
-  // useLocation() triggers a rerender.
   useLocation();
 
   const query = new URLSearchParams(window.location.search).get("query");
