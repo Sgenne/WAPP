@@ -77,11 +77,11 @@ commentRouter.put(
     const result = await commentService.editComment(commentID, content, userId);
 
     if (result.statusCode !== 200) {
+      
       return res.status(result.statusCode).send({ message: result.message });
     }
-
     res.status(200).send({
-      message: "Like status changed successfully.",
+      message: "Comment has been edited",
       comment: result.comment,
     });
   }

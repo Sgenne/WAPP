@@ -269,12 +269,6 @@ threadRouter.delete(
     const threadId = req.body.threadId;
     const userId = req.body.userId;
 
-    const replies = (await threadServices.getThreadComments(threadId)).comments;
-
-    replies?.forEach(element => {
-      commentService.deleteComment(element.commentId, userId);
-    });
-
     const result = await threadServices.deleteThread(threadId, userId);
 
     result.statusCode === 200

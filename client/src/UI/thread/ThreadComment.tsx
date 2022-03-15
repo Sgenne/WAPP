@@ -9,10 +9,12 @@ import { AuthContext } from "../../context/AuthContext";
 import { formatDate } from "../../utils/formatUtils";
 import ErrorMessage from "../common/ErrorMessage";
 import parse from "html-react-parser";
+import LoggedInButtonsComment from "../common/LoggedInButtonsComment";
 
 const ThreadComment = (props: { root: Comment }): JSX.Element => {
-  const [user, setThreads] = useState<User>();
+  const [user, setUser] = useState<User>();
   const [comments, setComments] = useState<Comment[]>();
+  const [comment, setComment] = useState<Comment>();
   const [errorMessage, setErrorMessage] = useState("");
   const [isFetching, setIsFetching] = useState(false);
   const [likes, setLikes] = useState(props.root.likes);
@@ -23,18 +25,33 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
   const navigate = useNavigate();
 
   useEffect((): void => {
-    const getUser = async (): Promise<void> => {
-      let threadResult: AxiosResponse;
+    const getComment = async (): Promise<void> => {
+      let commentResult: AxiosResponse;
       try {
-        threadResult = await axios.get<{
+        commentResult = await axios.get<{
           message: string;
           threads?: Thread[];
+        }>("http://localhost:8080/comment/" + props.root.commentId, {});
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+
+      setComment(commentResult.data.comment);
+    };
+
+    const getUser = async (): Promise<void> => {
+      let userResult: AxiosResponse;
+      try {
+        userResult = await axios.get<{
+          message: string;
+          user?: User;
         }>("http://localhost:8080/user/" + props.root.author, {});
       } catch (error) {
         console.log(error);
         return;
       }
-      setThreads(threadResult.data.user);
+      setUser(userResult.data.user);
     };
 
     async function getComments(): Promise<void> {
@@ -55,12 +72,12 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
       }
       setComments(commentResult.data.comments);
     }
-
-    getUser();
+    if (props.root.author !== 0) {
+      getUser();
+      getComment();
+    }
     getComments();
   }, [props.root.author, props.root.commentId]);
-
-  if (!user) return <></>;
 
   const likeClickHandler = async (): Promise<void> => {
     if (isFetching) {
@@ -217,7 +234,7 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
 
   const content: string = props.root.content;
   const date = props.root.date;
-  const path = "/profile/" + user.username;
+  const path = user ? "/profile/" + user.username : "";
 
   const likeButtonClassName =
     signedInUser && signedInUser.likedComments.includes(props.root.commentId)
@@ -240,9 +257,13 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
       <div className="category-box container-fluid px-4">
         <div className="row">
           <p className="category-box__row__thread-title col-3">
-            <NavLink to={path} className="link">
-              {user.username}
-            </NavLink>
+            {user ? (
+              <NavLink to={path} className="link">
+                {user.username}
+              </NavLink>
+            ) : (
+              "Deleted"
+            )}
           </p>
           <p className="category-box__row__thread-title col-5">
             {formatDate(new Date(date))}
@@ -250,20 +271,31 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
         </div>
         <div className="category-box__thread-desc">{parse(content)}</div>
         <div>
-          <button className={likeButtonClassName} onClick={likeClickHandler}>
-            <FaThumbsUp />
-            <p className="threadLikes">{likes}</p>
-          </button>
-          <button
-            className={dislikeButtonClassName}
-            onClick={dislikeClickHandler}
-          >
-            <FaThumbsDown />
-            <p className="threadLikes">{dislikes}</p>
-          </button>
-          <button className="generalButton" onClick={replyClickHandler}>
-            Reply
-          </button>
+          {user && (
+            <>
+              <button
+                className={likeButtonClassName}
+                onClick={likeClickHandler}
+              >
+                <FaThumbsUp />
+                <p className="threadLikes">{likes}</p>
+              </button>
+              <button
+                className={dislikeButtonClassName}
+                onClick={dislikeClickHandler}
+              >
+                <FaThumbsDown />
+                <p className="threadLikes">{dislikes}</p>
+              </button>
+              <button className="generalButton" onClick={replyClickHandler}>
+                Reply
+              </button>
+              <LoggedInButtonsComment
+                userId={authContext.signedInUser?.userId}
+                comment={comment}
+              />
+            </>
+          )}
         </div>
         <div>
           <ErrorMessage>{errorMessage}</ErrorMessage>

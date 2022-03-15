@@ -1,28 +1,28 @@
 import axios from "axios";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { Thread } from "../../../../server/src/model/thread.interface";
+import { Comment } from "../../../../server/src/model/comment.interface";
 import { AuthContext } from "../../context/AuthContext";
 
-const LoggedInButtonsThread = (props: {
+const LoggedInButtonsComment = (props: {
   userId: number | undefined;
-  thread: Thread;
+  comment: Comment | undefined;
 }): JSX.Element => {
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
-  if (props.thread.author !== props.userId) {
+  if (!props.comment || props.comment?.author !== props.userId) {
     return <div className="hide"></div>;
   }
 
-  const deleteThread = async (): Promise<void> => {
+  const deleteComment = async (): Promise<void> => {
     if (!authContext.signedInUser) return;
     const data = {
       userId: authContext.signedInUser.userId,
       password: authContext.password,
-      threadId: props.thread.threadId,
+      commentID: props.comment?.commentId,
     };
     try {
-      await axios.delete("http://localhost:8080/thread/delete-thread", {
+      await axios.delete("http://localhost:8080/comment/delete-comment", {
         data,
       });
     } catch (error) {
@@ -32,21 +32,21 @@ const LoggedInButtonsThread = (props: {
     navigate("/");
   };
 
-  const editThread = async (): Promise<void> => {
+  const editComment = async (): Promise<void> => {
     if (!authContext.signedInUser) return;
-    navigate("/create-thread/" + props.thread.threadId);
+    navigate("/create-comment/editcomment/" + props.comment?.commentId);
   };
 
   return (
     <>
-      <button className="generalButton button" onClick={deleteThread}>
-        Delete thread
+      <button className="generalButton button" onClick={deleteComment}>
+        Delete comment
       </button>
-      <button className="generalButton button" onClick={editThread}>
-        Edit thread
+      <button className="generalButton button" onClick={editComment}>
+        Edit comment
       </button>
     </>
   );
 };
 
-export default LoggedInButtonsThread;
+export default LoggedInButtonsComment;

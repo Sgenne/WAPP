@@ -139,7 +139,6 @@ const EditProfilePopup = (props: {
               <button onClick={submitUserInfoChanges}>Submit bio</button>
               <button onClick={props.onClose}>Cancel</button>
               <button onClick={deleteUser}>Delete user</button>
-              
             </div>
           </div>
         </div>

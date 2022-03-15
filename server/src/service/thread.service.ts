@@ -3,6 +3,7 @@ import { Thread } from "../model/thread.interface";
 import { Category } from "../model/category.interface";
 import { threadModel } from "../db/thread.db";
 import { getUser, UserServiceResult } from "./user.service";
+import { deleteComment } from "./comment.service";
 import { userModel } from "../db/user.db";
 import { commentModel } from "../db/comment.db";
 import { categoryModel } from "../db/category.db";
@@ -241,11 +242,12 @@ export const editThread = async (
   }
 
   const today: Date = new Date();
+  const month:number = today.getMonth() +1;
   const date: string =
     "\nlast edited " +
     today.getFullYear() +
     "-" +
-    today.getMonth() +
+    month +
     "-" +
     today.getDate();
   content += date;
@@ -328,6 +330,12 @@ export const deleteThread = async (
 
   const user = userResult.user;
   const thread = threadResult.thread;
+
+  const replies = (await getThreadComments(threadId)).comments;
+
+  replies?.forEach(element => {
+    deleteComment(element.commentId, userId);
+  });
 
   if (!user) {
     return userResult;
