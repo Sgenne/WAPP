@@ -242,11 +242,12 @@ export const editThread = async (
   }
 
   const today: Date = new Date();
+  const month:number = today.getMonth() +1;
   const date: string =
     "\nlast edited " +
     today.getFullYear() +
     "-" +
-    today.getMonth() +
+    month +
     "-" +
     today.getDate();
   content += date;

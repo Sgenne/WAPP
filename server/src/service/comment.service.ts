@@ -247,17 +247,18 @@ export const editComment = async (
       message: "The comment is already deleted.",
     };
   }
-  
+
   const today: Date = new Date();
+  const month:number = today.getMonth() +1;
   const date: string =
     "\nlast edited " +
     today.getFullYear() +
     "-" +
-    today.getMonth() +
+    month +
     "-" +
     today.getDate();
-    content += date;
-    comment.content = content;
+  content += date;
+  comment.content = content;
 
   await commentModel.updateOne({ commentId: commentId }, comment);
 
@@ -385,7 +386,7 @@ export const postReply = async (
  *
  * @param rootId - The id of the root comment.
  */
- export const getCommentComments = async (
+export const getCommentComments = async (
   rootId: number
 ): Promise<CommentServiceResult> => {
   const comment: Comment | null = await commentModel.findOne({
