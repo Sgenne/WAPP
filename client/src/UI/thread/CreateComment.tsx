@@ -38,7 +38,7 @@ const CreateComment = (): JSX.Element => {
     };
 
     const getCommentDeta = async (): Promise<void> => {
-      if (params.type === "comment") {
+      if (params.type === "editcomment") {
         let result: AxiosResponse;
         try {
           result = await axios.get<{
@@ -72,7 +72,7 @@ const CreateComment = (): JSX.Element => {
     
     let resultData: AxiosResponse;
     try {
-      if (!comment) {
+      if (!comment || params.type !== "editcomment") {
         resultData = await axios.post<{ message: string; comment?: Comment }>(
           "http://localhost:8080/" + params.type + "/reply/",
           {

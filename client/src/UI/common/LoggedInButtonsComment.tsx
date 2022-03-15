@@ -32,7 +32,7 @@ const LoggedInButtonsComment = (props: { userId: number | undefined, comment: Co
 
     const editComment = async (): Promise<void> => {
       if (!authContext.signedInUser) return;
-      navigate("/create-comment/comment/" + props.comment?.commentId);
+      navigate("/create-comment/editcomment/" + props.comment?.commentId);
     };
 
     return (
