@@ -4,6 +4,7 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { Thread } from "../../../../server/src/model/thread.interface";
+import { Comment } from "../../../../server/src/model/comment.interface";
 import { AuthContext } from "../../context/AuthContext";
 import QuillTools, { formats, modules } from "../../utils/quillTools";
 import ErrorMessage from "../common/ErrorMessage";
@@ -11,6 +12,8 @@ import parse from "html-react-parser";
 
 const CreateComment = (): JSX.Element => {
   const [value, setValue] = useState("");
+  const [comment, setComment] = useState<Comment>();
+
   const [errorMessage, setErrorMessage] = useState("");
   const [commentFor, setCommentFor] = useState<Thread>();
 
@@ -18,11 +21,10 @@ const CreateComment = (): JSX.Element => {
   const authContext = useContext(AuthContext);
   const params = useParams();
   const category = params.category;
-
   useEffect((): void => {
     const getComment = async (): Promise<void> => {
-      let result: AxiosResponse;
       if (params.type === "thread") {
+        let result: AxiosResponse;
         try {
           result = await axios.get<{
             message: string;
@@ -34,7 +36,32 @@ const CreateComment = (): JSX.Element => {
         setCommentFor(result.data.thread);
       }
     };
+
+    const getCommentDeta = async (): Promise<void> => {
+      if (params.type === "comment") {
+        let result: AxiosResponse;
+        try {
+          result = await axios.get<{
+            message: string;
+            comment: Comment;
+          }>("http://localhost:8080/comment/" + params.id, {});
+        } catch (error) {
+          return;
+        }
+        setComment(result.data.comment);
+        result.data.comment.content.includes("last edited")
+          ? setValue(
+              result.data.comment.content.substring(
+                0,
+                result.data.comment.content.length - 22
+              )
+            )
+          : setValue(result.data.comment.content);
+      }
+    };
+
     getComment();
+    getCommentDeta();
   }, [params.id, params.type]);
 
   const submitClickHandler = async () => {
@@ -42,26 +69,39 @@ const CreateComment = (): JSX.Element => {
       setErrorMessage("You need to sign in to comment");
       return;
     }
-
-    let signInResult: AxiosResponse;
+    
+    let resultData: AxiosResponse;
     try {
-      signInResult = await axios.post<{ message: string; thread?: Thread }>(
-        "http://localhost:8080/" + params.type + "/reply/",
-        {
-          userId: authContext.signedInUser?.userId,
-          password: authContext.password,
-          title: category,
-          threadId: params.id,
-          commentID: params.id,
-          content: value,
-        }
-      );
-
-      if (params.type === "thread") {
-        navigate("/thread/" + params.id);
-      } else {
-        navigate("/thread/" + signInResult.data.comment.rootThread);
+      if (!comment) {
+        resultData = await axios.post<{ message: string; comment?: Comment }>(
+          "http://localhost:8080/" + params.type + "/reply/",
+          {
+            userId: authContext.signedInUser?.userId,
+            password: authContext.password,
+            title: category,
+            threadId: params.id,
+            commentID: params.id,
+            content: value,
+          }
+        );
+      } else{
+        console.log(value)
+        resultData = await axios.put<{ message: string; comment?: Comment }>(
+          "http://localhost:8080/comment/edit-comment/",
+          {
+            userId: authContext.signedInUser?.userId,
+            password: authContext.password,
+            commentID: params.id,
+            content: value,
+          }
+        );
       }
+
+      // if (params.type === "thread") {
+      //   navigate("/thread/" + params.id);
+      // } else {
+      //   navigate("/thread/" + resultData.data.comment.rootThread);
+      // }
     } catch (error) {
       if (!(axios.isAxiosError(error) && error.response)) {
         setErrorMessage("Could not create comment");
@@ -69,7 +109,6 @@ const CreateComment = (): JSX.Element => {
       }
 
       setErrorMessage(error.response.data.message);
-      console.log(error);
       return;
     }
   };
@@ -108,10 +147,6 @@ const CreateComment = (): JSX.Element => {
               >
                 Create comment
               </button>
-              {/* <LoggedInButtonsComment
-                userId={authContext.signedInUser?.userId}
-                commentId={params.id ? params.id : undefined}
-              /> */}
             </div>
             <div>
               <ErrorMessage>{errorMessage}</ErrorMessage>

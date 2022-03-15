@@ -167,7 +167,6 @@ userRouter.post(
  */
 userRouter.get("/:userId", async (req: Request, res: Response) => {
   const userId = req.params.userId;
-
   const result = await userServices.getUser(+userId);
 
   const user = result.user;

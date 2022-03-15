@@ -547,6 +547,21 @@ test("After deleting a thread, that thread is no longer stored.", async () => {
   expect(result.statusCode).toBe(200);
 });
 
+test("After deleting a thread, that thread and its comments are no longer stored.", async () => {
+  const userId = await userSetup();
+  const category = await categorySetup();
+  const threadId = await threadSetup(userId);
+  await commentThread(userId, threadId, "test");
+  await commentThread(userId, threadId, "test");
+  await commentThread(userId, threadId, "test");
+  const result = await deleteThread(threadId, userId);
+  const getResult = await getThread(threadId);
+
+  expect(getResult.thread).toBeUndefined();
+  expect(result.statusCode).toBe(200);
+});
+
+
 test("Deleting a thread that doesnt exists as a user that exist", async () => {
   const userId = await userSetup();
   const category = await categorySetup();

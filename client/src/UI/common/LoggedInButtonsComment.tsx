@@ -5,10 +5,10 @@ import { Comment } from "../../../../server/src/model/comment.interface";
 import { AuthContext } from "../../context/AuthContext";
 
 
-const LoggedInButtonsComment = (props: { userId: number | undefined, commentId: number|undefined }): JSX.Element => {
+const LoggedInButtonsComment = (props: { userId: number | undefined, comment: Comment | undefined }): JSX.Element => {
     const authContext = useContext(AuthContext);
     const navigate = useNavigate();
-    if(props.comment.rootThread !== props.userId || !props.commentId){
+    if(!props.comment || props.comment?.author !== props.userId){
         return <div className="hide"></div>;
     }  
     
@@ -17,22 +17,22 @@ const LoggedInButtonsComment = (props: { userId: number | undefined, commentId: 
       const data = {
         userId: authContext.signedInUser.userId,
         password: authContext.password,
-        commentId: props.commentId,
+        commentID: props.comment?.commentId,
       };
       try {
-        await axios.delete("http://localhost:8080/comment/comment-thread", {
+        await axios.delete("http://localhost:8080/comment/delete-comment", {
           data,
         });
       } catch (error) {
         console.log(error);
         return;
       }
-  
+      navigate("/");
     };
 
     const editComment = async (): Promise<void> => {
       if (!authContext.signedInUser) return;
-      navigate("http://localhost:8080/comment/comment-thread" + props.commentId);
+      navigate("/create-comment/comment/" + props.comment?.commentId);
     };
 
     return (

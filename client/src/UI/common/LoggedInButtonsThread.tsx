@@ -27,7 +27,7 @@ const LoggedInButtonsThread = (props: { userId: number | undefined, thread: Thre
         console.log(error);
         return;
       }
-  
+      navigate("/");
     };
 
     const editThread = async (): Promise<void> => {

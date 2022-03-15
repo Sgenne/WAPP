@@ -9,10 +9,12 @@ import { AuthContext } from "../../context/AuthContext";
 import { formatDate } from "../../utils/formatUtils";
 import ErrorMessage from "../common/ErrorMessage";
 import parse from "html-react-parser";
+import LoggedInButtonsComment from "../common/LoggedInButtonsComment";
 
 const ThreadComment = (props: { root: Comment }): JSX.Element => {
-  const [user, setThreads] = useState<User>();
+  const [user, setUser] = useState<User>();
   const [comments, setComments] = useState<Comment[]>();
+  const [comment, setComment] = useState<Comment>();
   const [errorMessage, setErrorMessage] = useState("");
   const [isFetching, setIsFetching] = useState(false);
   const [likes, setLikes] = useState(props.root.likes);
@@ -23,18 +25,33 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
   const navigate = useNavigate();
 
   useEffect((): void => {
-    const getUser = async (): Promise<void> => {
-      let threadResult: AxiosResponse;
+    const getComment = async (): Promise<void> => {
+      let commentResult: AxiosResponse;
       try {
-        threadResult = await axios.get<{
+        commentResult = await axios.get<{
           message: string;
           threads?: Thread[];
+        }>("http://localhost:8080/comment/" + props.root.commentId, {});
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+      
+      setComment(commentResult.data.comment);
+    };
+
+    const getUser = async (): Promise<void> => {
+      let userResult: AxiosResponse;
+      try {
+        userResult = await axios.get<{
+          message: string;
+          user?: User;
         }>("http://localhost:8080/user/" + props.root.author, {});
       } catch (error) {
         console.log(error);
         return;
       }
-      setThreads(threadResult.data.user);
+      setUser(userResult.data.user);
     };
 
     async function getComments(): Promise<void> {
@@ -58,6 +75,7 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
 
     getUser();
     getComments();
+    getComment();
   }, [props.root.author, props.root.commentId]);
 
   if (!user) return <></>;
@@ -264,6 +282,7 @@ const ThreadComment = (props: { root: Comment }): JSX.Element => {
           <button className="generalButton" onClick={replyClickHandler}>
             Reply
           </button>
+          <LoggedInButtonsComment userId={authContext.signedInUser?.userId} comment={comment} />
         </div>
         <div>
           <ErrorMessage>{errorMessage}</ErrorMessage>

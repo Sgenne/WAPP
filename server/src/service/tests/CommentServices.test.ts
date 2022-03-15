@@ -454,6 +454,17 @@ test("deleting a comment as a valid user", async () => {
   expect(result.statusCode).toBe(200);
 });
 
+test("deleting a comment as a valid user deletes both its comment and subcomments", async () => {
+  let commentId: number = await commentSetup(user.userId, thread.threadId);
+  await postReply(commentId, "test",user.userId);
+  await postReply(commentId, "test",user.userId);
+
+  const result = await deleteComment(commentId, user.userId);
+  if (!result.comment) throw new Error("Comment is undefined.");
+
+  expect(result.statusCode).toBe(200);
+});
+
 test("deleting a comment that doesnt exist as a valid user", async () => {
   let commentId: number = await commentSetup(user.userId, thread.threadId);
 

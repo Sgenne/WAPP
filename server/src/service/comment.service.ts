@@ -228,7 +228,10 @@ export const editComment = async (
   const comment = commentResult.comment;
 
   if (!comment) {
-    return commentResult;
+    return {
+      statusCode: 404,
+      message: "The comment doesen't exist.",
+    };
   }
 
   if (comment.author !== userId) {
@@ -238,9 +241,25 @@ export const editComment = async (
     };
   }
 
-  if (!comment.isDeleted) {
-    comment.content = content + "\nedited";
+  if (comment.isDeleted) {
+    return {
+      statusCode: 405,
+      message: "The comment is already deleted.",
+    };
   }
+  
+  const today: Date = new Date();
+  const date: string =
+    "\nlast edited " +
+    today.getFullYear() +
+    "-" +
+    today.getMonth() +
+    "-" +
+    today.getDate();
+    content += date;
+    comment.content = content;
+
+  await commentModel.updateOne({ commentId: commentId }, comment);
 
   return {
     statusCode: 200,
